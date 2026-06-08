@@ -5,12 +5,25 @@ import { useScrub } from "@/hooks/useScrub";
 
 /* 키워드 5종 ↔ 우측 스테이지 매핑 (pin 공통) */
 const FACETS = [
-  { kw: "Blum 한국 독점 에이전트", proof: "한국 독점 에이전트 — sole agent" },
-  { kw: "정품의 공식 통로", proof: "정품은 공식 통로 한 곳을 거칩니다" },
-  { kw: "전국 오프라인 쇼룸", proof: "김포 · 용인 · 부산 — 방문 예약제" },
-  { kw: "프리미엄 멀티브랜드 수입", proof: "Blum · AGOFORM · Peka 등" },
-  { kw: "자체 가구 생산 (김포 본점)", proof: "하드웨어부터 완제품까지" },
+  { kw: "Blum 한국 독점 에이전트", em: "독점", proof: "한국 독점 에이전트 — sole agent" },
+  { kw: "정품의 공식 통로", em: "정품", proof: "정품은 공식 통로 한 곳을 거칩니다" },
+  { kw: "전국 오프라인 쇼룸", em: "쇼룸", proof: "김포 · 용인 · 부산 — 방문 예약제" },
+  { kw: "프리미엄 멀티브랜드 수입", em: "멀티브랜드", proof: "Blum · AGOFORM · Peka 등" },
+  { kw: "자체 가구 생산 (김포 본점)", em: "자체", proof: "하드웨어부터 완제품까지" },
 ];
+
+// 헤드라인에서 강조 단어만 <mark>로 분리(스크롤 하이라이트 대상)
+function renderHead(kw: string, em: string) {
+  const i = kw.indexOf(em);
+  if (i < 0) return kw;
+  return (
+    <>
+      {kw.slice(0, i)}
+      <mark className="story-em">{em}</mark>
+      {kw.slice(i + em.length)}
+    </>
+  );
+}
 
 // story 씬별 배경 틴트(이미지 없을 때·가장자리에 은은히 비침) — 스크롤 진행 시 색 변화
 const SCENE_TINTS = ["#1d1812", "#15191a", "#1b1410", "#13171a", "#1c1813"];
@@ -222,25 +235,30 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
             <div className="story-bg__near" />
             <div className="story-bg__scrim" />
           </div>
-          <div className="story-curtain" key={active} aria-hidden="true">
-            <i />
-          </div>
-          <div className="inner story-center">
-            <span className="eyebrow reveal-up">
-              <span className="num">02</span> / 정체성
-            </span>
-            <p className="story-claim reveal-up d1">
-              우리는 <span className="hl">Blum 한국 독점 에이전트</span>입니다.
-            </p>
-            <div className="story-beat">
-              <p className="story-chapter">
-                {String(active + 1).padStart(2, "0")} / 05
+          <div className="story-center">
+            <div className="story-top">
+              <span className="eyebrow reveal-up">
+                <span className="num">02</span> / 정체성
+              </span>
+              <p className="story-claim reveal-up d1">
+                우리는 <span className="hl">Blum 한국 독점 에이전트</span>입니다.
               </p>
-              <h2 className="story-head">{FACETS[active].kw}</h2>
-              <p className="story-proof">{FACETS[active].proof}</p>
             </div>
-            <div className="story-progress">
-              <i />
+            <div className="story-mid">
+              <div className="story-beat">
+                <p className="story-chapter">
+                  {String(active + 1).padStart(2, "0")} / 05
+                </p>
+                <h2 className="story-head">
+                  {renderHead(FACETS[active].kw, FACETS[active].em)}
+                </h2>
+                <p className="story-proof">{FACETS[active].proof}</p>
+              </div>
+            </div>
+            <div className="story-bottom">
+              <div className="story-progress">
+                <i />
+              </div>
             </div>
           </div>
         </div>
