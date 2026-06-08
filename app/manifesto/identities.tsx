@@ -177,10 +177,12 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
   const [active, setActive] = useState(0);
 
   const onUpdate = useCallback((p: number) => {
-    // 연속 진행도(story 가로 팬·진행바용) — 매 프레임 섹션에 세팅
-    secRef.current?.style.setProperty("--story", p.toFixed(4));
+    // 페이즈 인덱스 + 페이즈 내부 진행도(--story-local 0→1, 진행바·패럴럭스용)
     const n = FACETS.length;
-    const next = Math.min(n - 1, Math.max(0, Math.floor(p * n)));
+    const scaled = p * n;
+    const next = Math.min(n - 1, Math.max(0, Math.floor(scaled)));
+    const local = Math.min(1, Math.max(0, scaled - next));
+    secRef.current?.style.setProperty("--story-local", local.toFixed(4));
     if (next === activeRef.current) return;
     activeRef.current = next;
     setActive(next);
@@ -202,11 +204,11 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
         <div className="identity__sticky">
           <div className="story-bg" aria-hidden="true">
             <div className="story-bg__far" />
-            <div className="story-bg__world">
+            <div className="story-bg__scenes">
               {FACETS.map((f, i) => (
                 <div
                   key={f.kw}
-                  className="story-bg__scene"
+                  className={`story-bg__scene${i === active ? " is-active" : ""}`}
                   style={{
                     backgroundColor: SCENE_TINTS[i],
                     backgroundImage: `url(/images/identity/identity-card-${i + 1}.png)`,
@@ -216,6 +218,9 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
             </div>
             <div className="story-bg__near" />
             <div className="story-bg__scrim" />
+          </div>
+          <div className="story-curtain" key={active} aria-hidden="true">
+            <i />
           </div>
           <div className="inner story-center">
             <span className="eyebrow reveal-up">

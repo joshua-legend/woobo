@@ -995,22 +995,25 @@
       rgba(120, 150, 255, 0.07),
       transparent 60%
     );
-  transform: translateX(calc(var(--story, 0) * -30%));
+  transform: translateX(calc(var(--story-local, 0) * -7%));
   transition: transform 0.12s linear;
 }
-.route-manifesto .story-bg__world {
+.route-manifesto .story-bg__scenes {
   position: absolute;
   inset: 0;
-  width: 500%;
-  display: flex;
-  transform: translateX(calc(var(--story, 0) * -80%));
+  transform: scale(calc(1 + var(--story-local, 0) * 0.05));
   transition: transform 0.12s linear;
 }
 .route-manifesto .story-bg__scene {
-  flex: 0 0 20%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center;
+  opacity: 0;
+  transition: opacity 0.55s var(--ease);
+}
+.route-manifesto .story-bg__scene.is-active {
+  opacity: 1;
 }
 .route-manifesto .story-bg__near {
   position: absolute;
@@ -1022,7 +1025,7 @@
     rgba(239, 233, 223, 0.05) 0 1px,
     transparent 1px 150px
   );
-  transform: translateX(calc(var(--story, 0) * -130%));
+  transform: translateX(calc(var(--story-local, 0) * -14%));
   transition: transform 0.12s linear;
 }
 .route-manifesto .story-bg__scrim {
@@ -1096,8 +1099,38 @@
 .route-manifesto .story-progress i {
   position: absolute;
   inset: 0 auto 0 0;
-  width: calc(var(--story, 0) * 100%);
+  width: calc(var(--story-local, 0) * 100%);
   background: var(--c-orange);
+}
+
+/* 커튼 와이프 — 페이즈 전환 시 오른쪽→왼쪽으로 쓸고 지나감(active 키 변경마다 1회) */
+.route-manifesto .story-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: var(--c-charcoal);
+  transform: translateX(110%);
+  animation: rm-curtain 0.7s var(--ease);
+  pointer-events: none;
+}
+.route-manifesto .story-curtain i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: var(--c-orange);
+}
+@keyframes rm-curtain {
+  0% {
+    transform: translateX(110%);
+  }
+  48% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-112%);
+  }
 }
 
 @media (max-width: 900px) {
@@ -1958,11 +1991,14 @@
     position: static;
     min-height: auto;
   }
-  .route-manifesto .story-bg__world,
+  .route-manifesto .story-bg__scenes,
   .route-manifesto .story-bg__far,
   .route-manifesto .story-bg__near {
     transform: none !important;
     transition: none;
+  }
+  .route-manifesto .story-curtain {
+    animation: none !important;
   }
   .route-manifesto .story-beat .story-chapter,
   .route-manifesto .story-head,
