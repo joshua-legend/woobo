@@ -1123,16 +1123,27 @@
 }
 
 @media (max-width: 900px) {
+  /* split 세로 스택 — 단, 핀(sticky+220vh)·스크럽 인터랙션은 유지(모바일 인터랙션) */
   .route-manifesto .identity__grid {
     grid-template-columns: 1fr;
-    gap: 36px;
+    gap: clamp(18px, 5vw, 30px);
   }
-  .route-manifesto .identity__sticky {
-    min-height: auto;
-    position: relative;
+  .route-manifesto .identity:not(.identity--story) .identity__sticky {
+    padding-top: clamp(72px, 11vh, 110px);
+    padding-bottom: clamp(44px, 7vh, 80px);
   }
-  .route-manifesto .identity {
-    height: auto;
+  .route-manifesto .identity__left h2 {
+    font-size: clamp(22px, 5.6vw, 38px);
+    margin: 14px 0 12px;
+  }
+  .route-manifesto .identity__left .identity__loop {
+    height: clamp(30px, 7vw, 42px);
+  }
+  .route-manifesto .identity__left .identity__kw {
+    font-size: clamp(18px, 4.6vw, 30px);
+  }
+  .route-manifesto .pin-stage {
+    min-height: clamp(190px, 46vw, 280px);
   }
 }
 
