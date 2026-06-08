@@ -144,43 +144,7 @@ function StageDiagram({ i }: { i: number }) {
   );
 }
 
-/* ---------- 우측 스테이지 변주: story (가로 필름스트립) ---------- */
-// 세로 스크롤(--story 0→1)에 맞춰 트랙이 우→좌 연속 팬. 패널=이미지+텍스트 혼합.
-function StageStory({ active }: { active: number }) {
-  return (
-    <div className="pin-story" aria-hidden="true">
-      <div className="pin-story__track">
-        {FACETS.map((f, i) => (
-          <div
-            key={f.kw}
-            className={`pin-story__panel ph${i === active ? " is-active" : ""}`}
-          >
-            <div
-              className="pin-story__img"
-              style={{
-                backgroundImage: `url(/images/identity/identity-card-${i + 1}.png)`,
-              }}
-            />
-            <div className="pin-story__overlay" />
-            <div className="pin-story__txt">
-              <span className="pin-story__no">
-                {String(i + 1).padStart(2, "0")} / 05
-              </span>
-              <b>{f.kw}</b>
-              <span className="pin-story__proof">{f.proof}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="pin-story__bar">
-        <i />
-      </div>
-    </div>
-  );
-}
-
 function PinStage({ variant, active }: { variant: string; active: number }) {
-  if (variant === "story") return <StageStory active={active} />;
   return (
     <div className={`pin-stage pin-stage--${variant}`} aria-hidden="true">
       {FACETS.map((f, i) => (
@@ -206,13 +170,12 @@ function PinStage({ variant, active }: { variant: string; active: number }) {
 /* =========================== pin (좌우 분할 · 우측 스테이지 동기) =========================== */
 export function IdentityPin({ stage = "card" }: { stage?: string }) {
   const secRef = useRef<HTMLDivElement>(null);
-  const rightRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef(0);
   const [active, setActive] = useState(0);
 
   const onUpdate = useCallback((p: number) => {
-    // 연속 진행도(story 가로 팬·진행바용) — 매 프레임 세팅
-    rightRef.current?.style.setProperty("--story", p.toFixed(4));
+    // 연속 진행도(story 가로 팬·진행바용) — 매 프레임 섹션에 세팅
+    secRef.current?.style.setProperty("--story", p.toFixed(4));
     const n = FACETS.length;
     const next = Math.min(n - 1, Math.max(0, Math.floor(p * n)));
     if (next === activeRef.current) return;
@@ -221,6 +184,57 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
   }, []);
 
   useScrub(secRef, onUpdate, { start: "top top", end: "bottom bottom" });
+
+  // story: 가운데 텍스트 + 뒷배경 횡스크롤 팬(사이드스크롤)
+  if (stage === "story") {
+    return (
+      <section
+        className="section--dark identity identity--story"
+        id="identity"
+        data-section="identity"
+        data-theme="dark"
+        data-screen-label="02 정체성"
+        ref={secRef}
+      >
+        <div className="identity__sticky">
+          <div className="story-bg" aria-hidden="true">
+            <div className="story-bg__world">
+              {FACETS.map((f, i) => (
+                <div
+                  key={f.kw}
+                  className="story-bg__scene"
+                  style={{
+                    backgroundImage: `url(/images/identity/identity-card-${i + 1}.png)`,
+                  }}
+                />
+              ))}
+            </div>
+            <div className="story-bg__scrim" />
+          </div>
+          <div className="inner story-center">
+            <span className="eyebrow reveal-up">
+              <span className="num">02</span> / 정체성
+            </span>
+            <p className="story-claim reveal-up d1">
+              우리는 <span className="hl">Blum 한국 독점 에이전트</span>입니다.
+            </p>
+            <p className="story-chapter">
+              {String(active + 1).padStart(2, "0")} / 05
+            </p>
+            <h2 className="story-head" key={active}>
+              {FACETS[active].kw}
+            </h2>
+            <p className="story-proof" key={`p${active}`}>
+              {FACETS[active].proof}
+            </p>
+            <div className="story-progress">
+              <i />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -255,7 +269,7 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
               ))}
             </ul>
           </div>
-          <div className="identity__right" ref={rightRef}>
+          <div className="identity__right">
             <PinStage variant={stage} active={active} />
           </div>
         </div>
