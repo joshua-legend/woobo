@@ -183,6 +183,9 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
     const next = Math.min(n - 1, Math.max(0, Math.floor(scaled)));
     const local = Math.min(1, Math.max(0, scaled - next));
     secRef.current?.style.setProperty("--story-local", local.toFixed(4));
+    // 글 페이드: 페이즈 시작/끝에서 부드럽게 들어오고 나감(가운데 고정)
+    const fade = Math.max(0, Math.min(local / 0.15, (1 - local) / 0.15, 1));
+    secRef.current?.style.setProperty("--story-text", fade.toFixed(3));
     if (next === activeRef.current) return;
     activeRef.current = next;
     setActive(next);
@@ -229,7 +232,7 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
             <p className="story-claim reveal-up d1">
               우리는 <span className="hl">Blum 한국 독점 에이전트</span>입니다.
             </p>
-            <div className="story-beat" key={active}>
+            <div className="story-beat">
               <p className="story-chapter">
                 {String(active + 1).padStart(2, "0")} / 05
               </p>
