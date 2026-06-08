@@ -92,8 +92,16 @@
 
 - 프롬프트: `WORKLOG`/채팅 발행분 참조(공통 스파인 + 4:5 + 하단 텍스트 여백 + 정품 단정 금지).
 
-### story 변주 (`?identity=pin&idStage=story`) — 가로 필름스트립
-- card 이미지(`identity-card-1~5`)를 **그대로 재사용**(패널 배경). 새 이미지 불필요.
+### story 변주 (`?identity=pin&idStage=story`) — 풀블리드 감성 배경 (아래→위 덮기)
+> 파일: `public/images/identity/identity-story-<n>.png`. **가로 16:9, 감성 무드.** 현재 색 틴트 폴백.
+
+| id | 비율 | intent | 상태 |
+|---|---|---|---|
+| `identity-story-1` | 16:9 | 독점 에이전트 — 어둠 속 스포트라이트 단독 | 프롬프트 발행 |
+| `identity-story-2` | 16:9 | 정품의 공식 통로 — 따뜻한 빛/봉인 무드 | 프롬프트 발행 |
+| `identity-story-3` | 16:9 | 전국 쇼룸 — 골든아워 정적 쇼룸 | 프롬프트 발행 |
+| `identity-story-4` | 16:9 | 멀티브랜드 수입 — 소재 큐레이션 정물 | 프롬프트 발행 |
+| `identity-story-5` | 16:9 | 자체 생산(김포) — 빛 속 작업장/손 | 프롬프트 발행 |
 
 ### demo 변주 (`?identity=pin&idStage=demo`) — 채택, 이미지 0
 - 셀렉티브 폴리시: ③지도=실제 한국 SVG+핀 · ④로고=워드마크(텍스트) · ①②⑤=추상+모션. AI 이미지 불필요.

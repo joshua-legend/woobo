@@ -222,7 +222,7 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
                   className="story-bg__scene"
                   style={{
                     backgroundColor: SCENE_TINTS[i],
-                    backgroundImage: `url(/images/identity/identity-card-${i + 1}.png)`,
+                    backgroundImage: `url(/images/identity/identity-story-${i + 1}.png)`,
                   }}
                 />
               ))}
