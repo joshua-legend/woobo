@@ -7,57 +7,14 @@ import { useScrub } from "@/hooks/useScrub";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { CTA_HREF } from "@/lib/branches";
+import type { Variants } from "@/lib/variants";
+import { VariantSwitcher } from "@/components/lab/VariantSwitcher";
+import { HeroByVariant } from "./heroes";
 import "./manifesto.css";
 
 const setP = (el: HTMLElement | null, v: number) => {
   if (el) el.style.setProperty("--p", v.toFixed(4));
 };
-
-/* =========================== [01] HERO · 선언 (다크) =========================== */
-function Hero() {
-  return (
-    <section
-      className="section section--dark hero"
-      data-section="hero"
-      data-theme="dark"
-      data-screen-label="01 선언"
-    >
-      <div className="inner">
-        <span className="eyebrow reveal-up">
-          <span className="num">01</span> / 선언
-        </span>
-        <h1>
-          <span className="reveal-mask">
-            <span>우리는</span>
-          </span>
-          <br />
-          <span className="reveal-mask d1">
-            <span>
-              <span className="hero__pop">움직임</span>을
-            </span>
-          </span>
-          <br />
-          <span className="reveal-mask d2">
-            <span>믿습니다.</span>
-          </span>
-        </h1>
-        <p className="lede reveal-up d3">
-          가구 하드웨어 전문가의 신념. 그래서 우리는 Blum을 한국에서{" "}
-          <span className="hl">독점으로</span> 다룹니다.
-        </p>
-        <div className="hero__foot reveal-up d4">
-          <a className="btn btn--secondary" href="#identity">
-            우리가 누구인지 ↓
-          </a>
-          <span className="hero__scroll">
-            Woobo · Blum 한국 독점 에이전트 + 전국 쇼룸{" "}
-            <span className="line" /> 8 sections
-          </span>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* =========================== [02] 정체성 핀 (sticky + scrub) =========================== */
 const IDENTITY_KEYWORDS = [
@@ -709,7 +666,7 @@ function Showroom() {
 }
 
 /* =========================== PAGE =========================== */
-export default function ManifestoClient() {
+export default function ManifestoClient({ variants }: { variants: Variants }) {
   const rootRef = useRef<HTMLDivElement>(null);
   useReveal(rootRef);
 
@@ -722,7 +679,7 @@ export default function ManifestoClient() {
         ctaHref="#showroom"
       />
       <main id="top">
-        <Hero />
+        <HeroByVariant variant={variants.hero} />
         <Identity />
         <DemoSoftClose />
         <DemoHinge />
@@ -731,6 +688,7 @@ export default function ManifestoClient() {
         <SocialProof />
         <Showroom />
       </main>
+      <VariantSwitcher current={variants} />
     </div>
   );
 }
