@@ -21,7 +21,7 @@ export const SECTION_VARIANTS = {
   },
   idStage: {
     label: "정체성 우측(pin)",
-    options: ["card", "demo", "image", "diagram"],
+    options: ["card", "demo", "image", "diagram", "story"],
     default: "card",
   },
 } as const satisfies Record<string, SectionConfig>;

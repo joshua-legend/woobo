@@ -964,6 +964,91 @@
   color: var(--c-muted-on-dark);
 }
 
+/* story (가로 필름스트립 · 연속 팬, --story 0→1) */
+.route-manifesto .pin-story {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--c-line-dark);
+  border-radius: var(--r-stage);
+  overflow: hidden;
+}
+.route-manifesto .pin-story__track {
+  display: flex;
+  width: 500%;
+  height: 100%;
+  transform: translateX(calc(var(--story, 0) * -80%));
+  transition: transform 0.12s linear;
+}
+.route-manifesto .pin-story__panel {
+  position: relative;
+  flex: 0 0 20%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.route-manifesto .pin-story__panel.ph {
+  border: none;
+}
+.route-manifesto .pin-story__panel.ph::after {
+  display: none;
+}
+.route-manifesto .pin-story__img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.route-manifesto .pin-story__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(22, 20, 15, 0.05) 35%,
+    rgba(22, 20, 15, 0.9)
+  );
+}
+.route-manifesto .pin-story__txt {
+  position: relative;
+  padding: 22px 22px 30px;
+}
+.route-manifesto .pin-story__no {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--c-orange);
+}
+.route-manifesto .pin-story__txt b {
+  display: block;
+  margin: 8px 0 6px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(19px, 2.1vw, 27px);
+  letter-spacing: -0.02em;
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .pin-story__proof {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--c-muted-on-dark);
+}
+.route-manifesto .pin-story__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--c-line-dark);
+}
+.route-manifesto .pin-story__bar i {
+  display: block;
+  height: 100%;
+  width: calc(var(--story, 0) * 100%);
+  background: var(--c-orange);
+}
+
 @media (max-width: 900px) {
   .route-manifesto .identity__grid {
     grid-template-columns: 1fr;
@@ -1816,5 +1901,22 @@
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
+  }
+  /* story: 가로 팬 해제 → 패널 세로 스택 정적 */
+  .route-manifesto .pin-story {
+    aspect-ratio: auto;
+  }
+  .route-manifesto .pin-story__track {
+    transform: none !important;
+    flex-direction: column;
+    width: 100%;
+    transition: none;
+  }
+  .route-manifesto .pin-story__panel {
+    flex: none;
+    aspect-ratio: 4 / 5;
+  }
+  .route-manifesto .pin-story__bar {
+    display: none;
   }
 }
