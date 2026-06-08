@@ -57,9 +57,9 @@
 
 | id | 비율 | intent | 상태 |
 |---|---|---|---|
-| `hero-bg-aperture-a` | 16:9 | 쇼룸 | 후보 |
-| `hero-bg-aperture-b` | 16:9 | 자체생산(김포) | 후보 |
-| `hero-bg-aperture-c` | 16:9 | 손·작업 | 후보 |
+| `hero-bg-aperture-a` | 16:9 | 쇼룸 | 연결됨(png) — `?hero=aperture-a` |
+| `hero-bg-aperture-b` | 16:9 | 자체생산(김포) | 연결됨(png) — `?hero=aperture-b` |
+| `hero-bg-aperture-c` | 16:9 | 손·작업 | 연결됨(png) — `?hero=aperture-c` |
 
 > 3안은 글자 녹아웃 뒤에 깔리고 **차콜 80% 오버레이** 전제 → 미드톤이 약간 밝아도 됨.
 

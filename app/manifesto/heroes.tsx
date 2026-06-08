@@ -137,7 +137,7 @@ export function HeroSlot() {
 }
 
 /* =========================== aperture (단어 = 조리개) =========================== */
-export function HeroAperture() {
+export function HeroAperture({ bg = "a" }: { bg?: string }) {
   const secRef = useRef<HTMLDivElement>(null);
 
   // 진행도(--ap)를 섹션에 세팅 → 배경/스크림/글자가 상속해 읽음.
@@ -156,8 +156,8 @@ export function HeroAperture() {
       data-screen-label="01 선언"
     >
       <div
-        className="hero--aperture__bg ph"
-        data-ph="hero-bg-aperture · 와이드 컷 (실물 교체)"
+        className="hero--aperture__bg"
+        style={{ backgroundImage: `url(/images/hero/hero-bg-aperture-${bg}.png)` }}
         aria-hidden="true"
       />
       <div className="hero--aperture__scrim" aria-hidden="true" />
@@ -183,6 +183,9 @@ export function HeroAperture() {
 /* =========================== 셀렉터 =========================== */
 export function HeroByVariant({ variant }: { variant: string }) {
   if (variant === "slot") return <HeroSlot />;
-  if (variant === "aperture") return <HeroAperture />;
+  if (variant.startsWith("aperture")) {
+    const bg = variant.split("-")[1] || "a"; // aperture-a|b|c
+    return <HeroAperture bg={bg} />;
+  }
   return <HeroKinetic />;
 }

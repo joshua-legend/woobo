@@ -11,7 +11,7 @@ export type SectionConfig = {
 export const SECTION_VARIANTS = {
   hero: {
     label: "히어로",
-    options: ["kinetic", "slot", "aperture"],
+    options: ["kinetic", "slot", "aperture-a", "aperture-b", "aperture-c"],
     default: "kinetic",
   },
 } as const satisfies Record<string, SectionConfig>;
