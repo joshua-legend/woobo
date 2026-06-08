@@ -525,7 +525,6 @@
 }
 .route-manifesto .identity h2 {
   font-size: clamp(30px, 5vw, 64px);
-  max-width: 18ch;
   margin: 24px 0 22px;
 }
 .route-manifesto .identity__kicker {
@@ -1081,16 +1080,6 @@
   margin: 12px 0 16px;
   font-size: clamp(34px, 6vw, 84px);
   color: var(--c-paper-on-dark);
-}
-/* 강조 단어: 스크롤(--story-local)에 맞춰 형광펜이 왼→오로 채워짐 */
-.route-manifesto .story-em {
-  color: inherit;
-  padding: 0 0.05em;
-  background-image: linear-gradient(var(--c-orange), var(--c-orange));
-  background-repeat: no-repeat;
-  background-position: 0 84%;
-  background-size: calc(var(--story-local, 0) * 100%) 0.16em;
-  transition: background-size 0.1s linear;
 }
 .route-manifesto .story-proof {
   font-size: clamp(16px, 1.6vw, 20px);
