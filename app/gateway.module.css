@@ -1,0 +1,178 @@
+.gate {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  padding: clamp(28px, 5vw, 56px) var(--pad) clamp(40px, 6vh, 72px);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.brand {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.04em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 9px;
+}
+.brand .dot {
+  color: var(--color-orange);
+}
+.brand small {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-caption);
+}
+.note {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-caption);
+}
+
+.head {
+  max-width: var(--maxw);
+  width: 100%;
+  margin: clamp(48px, 12vh, 130px) auto clamp(34px, 6vh, 60px);
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(11px, 0.9vw, 13px);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-caption);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+}
+.eyebrow::before {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: var(--color-orange);
+}
+.title {
+  font-size: clamp(34px, 5.4vw, 76px);
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  margin: 22px 0 20px;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+.title .hl {
+  color: var(--color-orange);
+}
+.sub {
+  font-size: clamp(16px, 1.4vw, 20px);
+  font-weight: 300;
+  color: var(--color-ink-2);
+  max-width: 56ch;
+}
+
+.cards {
+  max-width: var(--maxw);
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 280px;
+  padding: 30px 28px 26px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--color-ink) 1.5%, var(--color-paper));
+  transition:
+    transform 0.45s var(--ease-soft),
+    border-color 0.45s var(--ease-soft),
+    background 0.45s var(--ease-soft);
+}
+.card:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--color-orange) 55%, transparent);
+  background: var(--color-paper);
+}
+.num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--color-orange);
+}
+.kind {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-caption);
+}
+.name {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(24px, 2.3vw, 30px);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.desc {
+  font-size: 14.5px;
+  font-weight: 300;
+  color: var(--color-ink-2);
+  line-height: 1.55;
+  flex: 1;
+}
+.route {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--color-caption);
+}
+.go {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-ink);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-line);
+}
+.go .arr {
+  color: var(--color-orange);
+  transition: transform 0.4s var(--ease-tip);
+}
+.card:hover .go .arr {
+  transform: translateX(5px);
+}
+
+.foot {
+  max-width: var(--maxw);
+  width: 100%;
+  margin: clamp(36px, 6vh, 60px) auto 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-caption);
+}
+
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}

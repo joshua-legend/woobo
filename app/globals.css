@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/* =========================================================
+   DESIGN TOKENS (V2) — 단일 소스
+   @theme → Tailwind 유틸 + :root CSS 변수 동시 생성 (DRY)
+   ========================================================= */
+@theme {
+  /* color */
+  --color-orange: #ff671f;
+  --color-orange-hover: #e4561a;
+  --color-ink: #1c1a17;
+  --color-ink-2: #59544d;
+  --color-caption: #8a847b;
+  --color-paper: #f4f1ec;
+  --color-paper-warm: #efe9e0;
+  --color-charcoal: #16140f;
+  --color-charcoal-card: #221f18;
+  --color-paper-on-dark: #efe9df;
+  --color-muted-on-dark: #b8b0a4;
+  --color-caption-on-dark: #9a9085;
+  --color-line: #e2ddd4;
+  --color-line-dark: rgba(239, 233, 223, 0.14);
+
+  /* easing — 소프트클로즈(디폴트) / TIP-ON 팝 / '쾅'(유일 1회) */
+  --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-tip: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-slam: cubic-bezier(0.72, 0, 1, 1);
+
+  /* fonts — next/font 변수에 바인딩 */
+  --font-head: var(--font-pretendard), var(--font-plex-kr), sans-serif;
+  --font-body: var(--font-plex-kr), var(--font-pretendard), sans-serif;
+  --font-mono: var(--font-plex-mono), monospace;
+
+  /* radius */
+  --radius-pill: 999px;
+  --radius-card: 3px;
+  --radius-stage: 3px;
+}
+
+/* 레이아웃·duration·motion 헬퍼 (유틸 불필요, :root 에 항상 emit) */
+:root {
+  --dur-reveal: 0.9s;
+  --dur-tip: 0.5s;
+  --dur-slam: 0.13s;
+  --dur-axis: 0.6s;
+  --maxw: 1200px;
+  --pad: clamp(20px, 5vw, 88px);
+  --space-section: clamp(96px, 13vh, 180px);
+  --gap-grid: clamp(36px, 5vw, 80px);
+  --motion: 0.7; /* reveal 이동량·플로팅 진폭 스케일 */
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  word-break: keep-all;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-head);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  text-wrap: balance;
+  margin: 0;
+}
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 오렌지 인라인 하이라이트 (전 디자인 공통) */
+.hl {
+  color: var(--color-orange);
+  font-weight: inherit;
+}
+
+/* =========================================================
+   REVEAL 프리미티브 (전 디자인 공유) — JS 가 .is-in 토글
+   .reveal-up  : 아래→위 fade+slide
+   .reveal-mask: 라인마스크(자식 span 을 112%→0 으로 밀어올림)
+   .d1~.d4     : stagger 딜레이
+   ========================================================= */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(calc(24px * var(--motion)));
+  transition:
+    opacity var(--dur-reveal) var(--ease-soft),
+    transform var(--dur-reveal) var(--ease-soft);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.reveal-up.is-in {
+  opacity: 1;
+  transform: none;
+}
+.reveal-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.reveal-mask > span {
+  display: inline-block;
+  transform: translateY(112%);
+  transition: transform 0.95s var(--ease-soft);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.reveal-mask.is-in > span {
+  transform: none;
+}
+.d1 {
+  --reveal-delay: 0.08s;
+}
+.d2 {
+  --reveal-delay: 0.16s;
+}
+.d3 {
+  --reveal-delay: 0.24s;
+}
+.d4 {
+  --reveal-delay: 0.32s;
+}
+
+/* =========================================================
+   REDUCED MOTION — 전역 폴백 (컴포넌트 JS 도 최종상태 세팅)
+   기본은 모션 ON
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal-up {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .reveal-mask > span {
+    transform: none;
+    transition: none;
+  }
+}

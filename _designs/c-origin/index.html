@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우보의 여정 — Woobo · Blum 한국 독점 에이전트 (개발 이관본)</title>
+
+<!-- 외부 의존: 폰트 CDN만 (Pretendard / IBM Plex Sans·Mono KR) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ============================================================
+   1) DESIGN TOKENS  ——  하드코딩 금지, 전부 var() 참조
+   ============================================================ */
+:root{
+  /* color · signature */
+  --c-orange:#ff671f;
+  --c-orange-hover:#e4561a;
+  --c-orange-soft:#ff8a55;       /* on-dark accent text */
+
+  /* color · ink (on light) */
+  --c-ink:#1c1a17;
+  --c-ink-2:#59544d;
+  --c-ink-cap:#8a847b;
+
+  /* color · surfaces */
+  --c-paper:#f4f1ec;
+  --c-paper-2:#ece7df;
+  --c-charcoal:#16140f;
+  --c-charcoal-card:#221f18;
+
+  /* color · on-dark text */
+  --c-d-fg:#f3efe7;
+  --c-d-fg-2:#b8b1a4;
+  --c-d-cap:#8c857a;
+
+  /* color · lines */
+  --c-line-l:#e2ddd4;
+  --c-line-d:rgba(239,233,223,.14);
+
+  /* easing (★ 변수화) */
+  --ease:cubic-bezier(0.16,1,0.3,1);          /* soft-close · default */
+  --ease-tip:cubic-bezier(0.34,1.56,0.64,1);  /* TIP-ON pop · overshoot */
+
+  /* timing */
+  --dur-rev:.9s;          /* reveal */
+  --dur-tip:.7s;          /* tip-on / pop */
+  --lerp:0.12;            /* rAF scrub smoothing factor (JS reads this) */
+
+  /* spacing scale */
+  --space-1:8px;  --space-2:16px; --space-3:24px;
+  --space-4:40px; --space-5:64px; --space-6:96px;
+  --gutter:clamp(20px,5vw,72px);
+  --sec-pad:clamp(96px,14vh,180px);
+  --maxw:1280px;
+
+  /* radius */
+  --r-sm:3px; --r:6px; --r-pill:100px;
+
+  /* typography families */
+  --font-head:'Pretendard',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans KR','Pretendard',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+
+  /* mono label tracking */
+  --track-mono:0.22em;
+}
+
+/* ============================================================
+   2) BASE / RESET
+   ============================================================ */
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font-body);
+  background:var(--c-paper);
+  color:var(--c-ink);
+  font-weight:400;line-height:1.65;
+  word-break:keep-all;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit}
+svg{display:block}
+
+/* ============================================================
+   3) TYPE PRIMITIVES
+   ============================================================ */
+.t-head  {font-family:var(--font-head);font-weight:800;letter-spacing:-0.04em;line-height:1.05;text-wrap:balance}
+.t-head-2{font-family:var(--font-head);font-weight:700;letter-spacing:-0.03em;line-height:1.12;text-wrap:balance}
+.t-mono   {font-family:var(--font-mono);text-transform:uppercase;letter-spacing:var(--track-mono);font-weight:500;font-size:.72rem}
+.t-mono-sm{font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.28em;font-weight:500;font-size:.64rem}
+.u-accent{color:var(--c-orange)}
+.u-emph{color:var(--c-ink);font-weight:700}
+
+/* ============================================================
+   4) LAYOUT UTILITIES
+   ============================================================ */
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--gutter);width:100%}
+section{position:relative}
+.sec-pad{padding-block:var(--sec-pad)}
+.sec-dark{background:var(--c-charcoal);color:var(--c-d-fg)}
+.sec-dark .t-head,.sec-dark .t-head-2{color:#fff}
+.sec-dark p{color:var(--c-d-fg-2)}
+.sec-light{background:var(--c-paper);color:var(--c-ink)}
+.sec-light-2{background:var(--c-paper-2)}
+
+.eyebrow{display:inline-flex;align-items:center;gap:.7em;color:var(--c-orange)}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--c-orange);display:inline-block}
+
+.lede{font-size:clamp(1.05rem,1.5vw,1.32rem);color:var(--c-ink-2);font-weight:300;max-width:38ch}
+.sec-dark .lede{color:var(--c-d-fg-2)}
+
+/* ============================================================
+   5) COMPONENTS
+   ============================================================ */
+
+/* 5a · progress bar  (MOTION: progress-bar) */
+.progress{position:fixed;top:0;left:0;height:2px;width:100%;background:var(--c-orange);
+  transform:scaleX(0);transform-origin:0 50%;z-index:120;will-change:transform}
+
+/* 5b · header */
+.header{position:fixed;top:0;left:0;right:0;z-index:110;display:flex;align-items:center;justify-content:space-between;
+  padding:22px var(--gutter);color:var(--c-d-fg);border-bottom:1px solid transparent;
+  transition:padding .5s var(--ease),background .5s var(--ease),backdrop-filter .5s var(--ease),border-color .5s var(--ease),color .5s var(--ease)}
+.header.is-shrunk{padding:12px var(--gutter);background:rgba(22,20,15,.72);backdrop-filter:blur(18px) saturate(1.2);border-bottom:1px solid var(--c-line-d)}
+.header.on-light{color:var(--c-ink)}
+.header.on-light.is-shrunk{background:rgba(244,241,236,.78);border-bottom:1px solid var(--c-line-l)}
+.brand{display:flex;align-items:baseline;gap:.6em;font-family:var(--font-head);font-weight:800;letter-spacing:-0.03em;font-size:1.18rem;text-decoration:none}
+.brand .dot{width:7px;height:7px;border-radius:50%;background:var(--c-orange);display:inline-block;transform:translateY(-1px)}
+.brand small{font-family:var(--font-mono);font-weight:500;font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;opacity:.7}
+.nav{display:flex;align-items:center;gap:clamp(14px,2vw,30px)}
+.nav a{text-decoration:none;font-size:.82rem;font-weight:500;opacity:.78;transition:opacity .25s}
+.nav a:hover{opacity:1}
+.nav .cta-mini{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;
+  border:1px solid currentColor;border-radius:var(--r-pill);padding:.6em 1.1em;opacity:.9;transition:background .3s,color .3s,border-color .3s,opacity .3s}
+.header:not(.on-light) .nav .cta-mini:hover{background:var(--c-orange);border-color:var(--c-orange);color:#fff;opacity:1}
+.header.on-light .nav .cta-mini:hover{background:var(--c-ink);border-color:var(--c-ink);color:var(--c-paper);opacity:1}
+
+/* 5c · placeholder (빗금 + 모노 캡션) — data-ph 로 교체 위치 명시 */
+.ph{position:relative;overflow:hidden;background:var(--c-paper-2);display:flex;align-items:center;justify-content:center;border:1px solid var(--c-line-l)}
+.ph::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,rgba(28,26,23,.06) 0 1px,transparent 1px 11px)}
+.ph.is-dark{background:#1d1b15;border-color:var(--c-line-d)}
+.ph.is-dark::before{background-image:repeating-linear-gradient(135deg,rgba(243,239,231,.05) 0 1px,transparent 1px 11px)}
+.ph-cap{position:relative;z-index:1;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.2em;font-size:.66rem;color:var(--c-ink-cap);text-align:center;line-height:1.7;padding:1em}
+.ph.is-dark .ph-cap{color:var(--c-d-cap)}
+.ph-cap b{color:var(--c-ink-2);font-weight:600;display:block;letter-spacing:.16em}
+.ph.is-dark .ph-cap b{color:var(--c-d-fg-2)}
+
+/* 5d · reveal primitives (MOTION: reveal-up / reveal-mask) */
+.up{opacity:0;transform:translateY(26px);transition:opacity var(--dur-rev) var(--ease),transform var(--dur-rev) var(--ease)}
+.up.is-in{opacity:1;transform:none}
+.mask{display:block;overflow:hidden}
+.mask>*{display:block;transform:translateY(110%);transition:transform 1s var(--ease)}
+.mask.is-in>*{transform:none}
+[data-delay="1"]{transition-delay:.08s}
+[data-delay="2"]{transition-delay:.16s}
+[data-delay="3"]{transition-delay:.24s}
+[data-delay="4"]{transition-delay:.32s}
+[data-delay="5"]{transition-delay:.40s}
+
+/* 5e · chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;
+  padding:.55em .9em;border-radius:var(--r-pill);border:1px solid var(--c-line-l);color:var(--c-ink-2);background:rgba(255,255,255,.5);white-space:nowrap}
+.chip--solid{background:var(--c-ink);color:var(--c-paper);border-color:var(--c-ink)}
+.chip--orange{background:rgba(255,103,31,.1);border-color:rgba(255,103,31,.4);color:var(--c-orange-hover)}
+.sec-dark .chip{border-color:var(--c-line-d);color:var(--c-d-fg-2);background:rgba(255,255,255,.03)}
+.sec-dark .chip--orange{background:rgba(255,103,31,.16);border-color:rgba(255,103,31,.5);color:var(--c-orange-soft)}
+
+/* 5f · buttons */
+.btn{display:inline-flex;align-items:center;gap:.6em;font-family:var(--font-body);font-weight:600;font-size:.95rem;
+  padding:1.05em 1.7em;border-radius:var(--r-pill);border:1px solid transparent;cursor:pointer;text-decoration:none;line-height:1;
+  transition:transform .4s var(--ease-tip),background .3s,color .3s,border-color .3s}
+.btn .arr{transition:transform .4s var(--ease)}
+.btn:hover .arr{transform:translateX(4px)}
+.btn--primary{background:var(--c-orange);color:#fff}
+.btn--primary:hover{background:var(--c-orange-hover)}
+.btn--primary.is-pop{transform:scale(.94)}        /* MOTION: cta-primary-pop */
+.btn--secondary{background:transparent;color:var(--c-d-fg);border-color:var(--c-line-d)}
+.btn--secondary:hover{border-color:var(--c-d-fg);background:rgba(255,255,255,.05)}
+.btn--ghost{background:transparent;color:var(--c-d-cap)}
+.btn--ghost:hover{color:var(--c-d-fg)}
+
+/* 5g · micro CTA link */
+.micro{display:inline-flex;align-items:center;gap:.5em;margin-top:auto;font-size:.92rem;font-weight:500;color:var(--c-orange-hover);text-decoration:none}
+.micro .arr{transition:transform .4s var(--ease)}
+.micro:hover .arr{transform:translateX(5px)}
+.sec-dark .micro{color:var(--c-orange-soft)}
+
+/* ============================================================
+   6) SECTION — HERO
+   ============================================================ */
+.hero{min-height:100vh;display:flex;align-items:center;background:var(--c-charcoal);color:var(--c-d-fg);overflow:hidden;padding-block:140px 120px}
+.hero__bg{position:absolute;inset:-12% 0 0 0;z-index:0;will-change:transform}     /* MOTION: hero-parallax */
+.hero__bg .ph{position:absolute;inset:0;border:none}
+.hero__vignette{position:absolute;inset:0;z-index:1;
+  background:radial-gradient(120% 90% at 50% 30%,rgba(22,20,15,.35),rgba(22,20,15,.78) 60%,var(--c-charcoal) 100%),linear-gradient(180deg,rgba(22,20,15,.6),transparent 30%)}
+.hero .wrap{position:relative;z-index:2}
+.hero .eyebrow{margin-bottom:34px}
+.hero__title{font-size:clamp(2.5rem,6.2vw,5.6rem);max-width:18ch;margin-bottom:34px;color:#fff}
+.hero__title .quote{color:var(--c-orange)}
+.hero__sub{font-size:clamp(1.02rem,1.5vw,1.32rem);font-weight:300;color:var(--c-d-fg-2);max-width:52ch}
+.hero__sub b{color:#fff;font-weight:600}
+.scroll-cue{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--c-d-cap)}
+.scroll-cue .t-mono-sm{color:var(--c-d-cap)}
+.scroll-cue__track{width:1px;height:54px;background:var(--c-line-d);position:relative;overflow:hidden}
+.scroll-cue__track::after{content:"";position:absolute;left:0;top:-50%;width:1px;height:50%;background:var(--c-orange);animation:cue 2.2s var(--ease) infinite}
+@keyframes cue{0%{top:-55%}60%,100%{top:105%}}
+
+/* ============================================================
+   7) SECTION — HERITAGE (pinned timeline)
+   ============================================================ */
+.heritage{background:var(--c-charcoal);color:var(--c-d-fg)}
+.pin-outer{height:380vh;position:relative}                                       /* MOTION: heritage-timeline (pin spacer) */
+.pin-stage{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden}
+.pin-stage .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(30px,5vw,80px);align-items:center;width:100%}
+.heritage__left{max-width:46ch}
+.heritage__left h2{font-size:clamp(1.9rem,3.3vw,3rem);margin:22px 0;color:#fff}
+.heritage__note{margin-top:30px;padding:16px 18px;border-left:2px solid var(--c-orange);background:rgba(255,103,31,.06);font-size:.92rem;color:var(--c-d-fg-2);line-height:1.6}
+.heritage__note b{color:#fff;font-weight:600}
+.stat-row{display:flex;gap:clamp(20px,3vw,42px);margin-top:34px;flex-wrap:wrap}
+.stat__num{font-family:var(--font-head);font-weight:800;letter-spacing:-0.03em;font-size:clamp(1.9rem,3.4vw,2.9rem);color:var(--c-orange);line-height:1}
+.stat__lab{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--c-d-cap);margin-top:8px;display:block}
+
+.timeline{position:relative;height:clamp(420px,62vh,560px)}
+.timeline svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tl-track{fill:none;stroke:var(--c-line-d);stroke-width:2}
+.tl-draw{fill:none;stroke:var(--c-orange);stroke-width:2.5;stroke-linecap:round}    /* MOTION: heritage-timeline (path) */
+.tl-node{position:absolute;transform:translate(-50%,-50%) scale(.6);opacity:0;transition:opacity .6s var(--ease),transform .6s var(--ease-tip)}
+.tl-node.is-on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.tl-node__ring{width:15px;height:15px;border-radius:50%;border:2px solid var(--c-orange);background:var(--c-charcoal);position:relative;margin:0 auto 10px}
+.tl-node__ring::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--c-orange)}
+.tl-node.is-todo .tl-node__ring{border-color:var(--c-d-cap)}
+.tl-node.is-todo .tl-node__ring::after{background:var(--c-d-cap)}
+.tl-node__yr{font-family:var(--font-mono);font-weight:600;font-size:.92rem;color:#fff;letter-spacing:.04em}
+.tl-node__desc{font-size:.78rem;color:var(--c-d-fg-2);max-width:16ch;margin-top:3px;line-height:1.45}
+.tl-node__tag{font-family:var(--font-mono);font-size:.54rem;letter-spacing:.16em;text-transform:uppercase;margin-top:5px;color:var(--c-orange)}
+.tl-node.is-todo .tl-node__tag{color:var(--c-d-cap)}
+.tl-node__card{text-align:center}
+.tl-dots{position:absolute;left:0;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px}
+.tl-dots i{width:7px;height:7px;border-radius:50%;background:var(--c-line-d);transition:background .4s,transform .4s}
+.tl-dots i.is-on{background:var(--c-orange);transform:scale(1.5)}
+
+/* ============================================================
+   8) SECTIONS — DEMOS (shared)
+   ============================================================ */
+.demo-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(34px,5vw,84px);align-items:center}
+.demo-grid--rev{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr)}
+.demo-copy{display:flex;flex-direction:column;align-items:flex-start;max-width:42ch}
+.demo-copy h3{font-size:clamp(1.9rem,3.4vw,3.1rem);margin:20px 0 18px}
+.demo-copy .lede{margin-bottom:24px}
+.demo-copy .chips{margin-bottom:30px}
+.demo-stage{position:relative;aspect-ratio:1/.82;border-radius:var(--r-sm);overflow:hidden}
+
+/* 8a · DEMO-SOFTCLOSE (side cross-section)  (MOTION: demo-softclose) */
+.demo-softclose{background:linear-gradient(180deg,#efeae1,#e4ded3);border:1px solid var(--c-line-l)}
+.demo-softclose .scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.cabinet{position:relative;width:62%;height:64%;background:#d8d1c4;border:2px solid #b9b0a0;border-radius:var(--r-sm);box-shadow:inset 0 0 0 8px #cfc7b8}
+.cabinet__opening{position:absolute;inset:14px;background:#bcb3a3;overflow:hidden;border-radius:2px}
+.drawer{position:absolute;top:0;bottom:0;width:118%;left:0;background:linear-gradient(180deg,#fff,#efe9df);border:2px solid #cabfaad;border-right:6px solid var(--c-orange);border-radius:2px;will-change:transform;display:flex;align-items:center;justify-content:flex-end;padding-right:14px;box-shadow:-12px 0 30px rgba(0,0,0,.12)}
+.drawer::before{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);width:6px;height:34%;background:var(--c-orange);border-radius:3px}
+.drawer__glyph{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.18em;color:var(--c-ink-cap);text-transform:uppercase;writing-mode:vertical-rl;margin-right:18px}
+.cabinet__rail{position:absolute;left:8%;right:8%;bottom:18%;height:3px;background:repeating-linear-gradient(90deg,#b9b0a0 0 8px,transparent 8px 14px)}
+.demo-softclose .hud{position:absolute;left:22px;bottom:20px;z-index:3;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.16em;font-size:.62rem;color:var(--c-ink-2);display:flex;flex-direction:column;gap:4px}
+.demo-softclose .hud__ms{color:var(--c-orange-hover);font-weight:600;font-size:.92rem;letter-spacing:.04em}
+.softzone{position:absolute;right:10%;top:18%;bottom:18%;width:18%;background:linear-gradient(90deg,transparent,rgba(255,103,31,.16));border-right:2px dashed rgba(255,103,31,.5);opacity:0;transition:opacity .4s}
+.demo-softclose.is-soft .softzone{opacity:1}
+
+/* 8b · DEMO-TOOLFREE (hinge click + 3-axis)  (MOTION: demo-toolfree) */
+.demo-toolfree{background:linear-gradient(180deg,#efeae1,#e4ded3);border:1px solid var(--c-line-l)}
+.demo-toolfree .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px}
+.hinge{position:relative;width:54%;height:42%}
+.hinge__plate{position:absolute;left:0;top:50%;transform:translateY(-50%);width:34%;height:78%;background:#cdc5b6;border:2px solid #b3aa99;border-radius:var(--r-sm)}
+.hinge__plate::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,#9a9180 2px,transparent 3px),radial-gradient(circle at 30% 70%,#9a9180 2px,transparent 3px)}
+.hinge__arm{position:absolute;right:0;top:50%;transform:translate(40px,-50%) rotate(-8deg);opacity:0;width:62%;height:90%;background:linear-gradient(180deg,#fff,#e9e3d8);border:2px solid #c3b9a8;border-left:6px solid var(--c-orange);border-radius:var(--r);transition:transform .55s var(--ease-tip),opacity .4s}
+.hinge__arm.is-clicked{transform:translate(0,-50%) rotate(0);opacity:1}
+.hinge__cup{position:absolute;left:14%;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:3px solid var(--c-orange);background:#fff}
+.hinge__burst{position:absolute;left:40%;top:50%;transform:translate(-50%,-50%) scale(0);font-family:var(--font-mono);font-weight:600;color:var(--c-orange);font-size:.8rem;letter-spacing:.1em;opacity:0}
+.hinge__burst.is-go{animation:burst .7s var(--ease-tip)}
+@keyframes burst{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}30%{opacity:1}60%{transform:translate(-50%,-50%) scale(1.1);opacity:1}100%{transform:translate(-50%,-130%) scale(1);opacity:0}}
+.axes{display:flex;gap:14px;width:74%}
+.axis{flex:1;background:rgba(255,255,255,.6);border:1px solid var(--c-line-l);border-radius:var(--r-sm);padding:12px 12px 14px;opacity:0;transform:translateY(14px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.axis.is-on{opacity:1;transform:none}
+.axis__lab{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c-ink-2);display:flex;justify-content:space-between;margin-bottom:8px}
+.axis__lab .v{color:var(--c-orange-hover);font-weight:600}
+.axis__track{height:4px;background:var(--c-line-l);border-radius:3px;position:relative}
+.axis__fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--c-orange);border-radius:3px;transition:width .7s var(--ease)}
+.axis.is-on .axis__fill{width:var(--w,60%)}
+
+/* 8c · DEMO-TIPON (dark, pop open)  (MOTION: demo-tipon) */
+.demo-tipon{background:#1d1b15;border:1px solid var(--c-line-d)}
+.demo-tipon .scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.unit{position:relative;width:60%;height:62%;background:#26241d;border:2px solid #34312a;border-radius:var(--r);box-shadow:0 30px 60px rgba(0,0,0,.4)}
+.unit__front{position:absolute;inset:0;background:linear-gradient(180deg,#34312a,#26241d);border:1px solid #413d34;border-radius:var(--r);will-change:transform;transition:transform var(--dur-tip) var(--ease-tip);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px}
+.unit__front .seam{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(243,239,231,.1)}
+.unit__front .nohandle{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--c-d-cap)}
+.unit__box{position:absolute;inset:8%;background:repeating-linear-gradient(135deg,rgba(243,239,231,.04) 0 1px,transparent 1px 10px);border:1px solid var(--c-line-d);border-radius:2px;display:flex;align-items:center;justify-content:center}
+.unit__box .legra{font-family:var(--font-mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--c-d-cap)}
+.demo-tipon.is-open .unit__front{transform:translateX(54%)}
+.load-badge{position:absolute;right:18px;top:18px;z-index:4;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--c-orange-soft);border:1px solid rgba(255,103,31,.5);background:rgba(255,103,31,.12);padding:.5em .8em;border-radius:var(--r-pill);opacity:0;transform:translateY(-6px);transition:opacity .5s,transform .5s}
+.demo-tipon.is-open .load-badge{opacity:1;transform:none}
+.tip-hint{position:absolute;left:18px;bottom:18px;z-index:4;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c-d-cap);display:flex;align-items:center;gap:.5em}
+.tip-hint i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--c-orange);animation:tap 1.8s var(--ease) infinite}
+@keyframes tap{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.5);opacity:1}}
+
+/* ============================================================
+   9) SECTION — WHY WOOBO (trust grid)
+   ============================================================ */
+.why__head{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(24px,4vw,64px);align-items:end;margin-bottom:56px}
+.why__head h2{font-size:clamp(2rem,3.6vw,3.3rem);margin-top:20px}
+.why__warn{border-left:2px solid var(--c-orange);padding:14px 18px;background:rgba(255,103,31,.06);font-size:.98rem;color:var(--c-ink-2)}
+.why__warn b{color:var(--c-ink);font-weight:700}
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--c-line-l);border:1px solid var(--c-line-l)}
+.trust{background:var(--c-paper);padding:32px 28px 38px;min-height:200px;display:flex;flex-direction:column;gap:14px;position:relative}
+.trust__ix{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.2em;color:var(--c-ink-cap)}
+.trust h4{font-family:var(--font-head);font-weight:700;letter-spacing:-0.02em;font-size:1.22rem;line-height:1.3}
+.trust p{font-size:.92rem;color:var(--c-ink-2);font-weight:300}
+.trust__mark{margin-top:auto;width:34px;height:34px}
+.trust__mark svg{width:100%;height:100%;overflow:visible}
+.trust__mark :is(path,circle,line,rect){stroke:var(--c-orange);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.trust--feature{background:var(--c-ink);color:var(--c-paper)}
+.trust--feature .trust__ix{color:var(--c-orange)}
+.trust--feature h4{color:#fff}
+.trust--feature p{color:var(--c-d-fg-2)}
+.multibrand{margin-top:30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-family:var(--font-mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-cap)}
+.multibrand .bdg{padding:.5em .85em;border:1px solid var(--c-line-l);border-radius:var(--r-pill);color:var(--c-ink-2)}
+.multibrand .bdg--lead{border-color:var(--c-orange);color:var(--c-orange-hover)}
+
+/* ============================================================
+   10) SECTION — PARTNERS (logo wall + roadmap)
+   ============================================================ */
+.logo-wall{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--c-line-l);border:1px solid var(--c-line-l);margin-top:48px}
+.logo-cell{background:var(--c-paper);aspect-ratio:16/7;display:flex;align-items:center;justify-content:center;position:relative}
+.logo-cell .ph-cap{font-size:.58rem;color:var(--c-ink-cap)}
+.logo-cell::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,rgba(28,26,23,.04) 0 1px,transparent 1px 10px)}
+.roadmap{margin-top:56px;display:flex;align-items:center;position:relative}                /* MOTION: roadmap-draw */
+.roadmap svg{position:absolute;left:0;top:50%;width:100%;height:2px;overflow:visible}
+.rm-line{stroke:var(--c-line-l);stroke-width:2;fill:none}
+.rm-draw{stroke:var(--c-orange);stroke-width:2;fill:none;stroke-linecap:round}
+.rm-step{flex:1;position:relative;text-align:center;z-index:1}
+.rm-step__dot{width:13px;height:13px;border-radius:50%;background:var(--c-paper);border:2px solid var(--c-line-l);margin:0 auto 14px;transition:border-color .4s,background .4s}
+.rm-step.is-on .rm-step__dot{border-color:var(--c-orange);background:var(--c-orange)}
+.rm-step__yr{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--c-ink-cap)}
+.rm-step h5{font-family:var(--font-head);font-weight:700;font-size:1rem;margin-top:5px;letter-spacing:-0.02em}
+.rm-step p{font-size:.82rem;color:var(--c-ink-2);margin-top:4px;font-weight:300}
+
+/* ============================================================
+   11) SECTION — SHOWROOM CTA
+   ============================================================ */
+.showroom{background:var(--c-charcoal);color:var(--c-d-fg);overflow:hidden}
+.showroom__head{text-align:center;max-width:24ch;margin:0 auto 14px}
+.showroom h2{font-size:clamp(2.2rem,4.4vw,3.8rem);color:#fff}
+.showroom__sub{text-align:center;color:var(--c-d-fg-2);font-weight:300;font-size:clamp(1rem,1.4vw,1.2rem)}
+.showroom__sub b{color:#fff;font-weight:600}
+.showroom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:54px}
+.showroom-card{background:var(--c-charcoal-card);border:1px solid var(--c-line-d);border-radius:var(--r);padding:26px 24px 24px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;transition:border-color .4s,transform .5s var(--ease)}
+.showroom-card:hover{border-color:rgba(255,103,31,.5);transform:translateY(-4px)}
+.showroom-card__top{display:flex;align-items:center;justify-content:space-between}
+.showroom-card__name{font-family:var(--font-head);font-weight:700;font-size:1.32rem;letter-spacing:-0.02em;color:#fff}
+.showroom-card__flag{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--c-orange);border:1px solid rgba(255,103,31,.4);border-radius:var(--r-pill);padding:.4em .7em}
+.showroom-card__tag{font-size:.9rem;color:var(--c-d-fg-2);font-weight:300;min-height:2.6em}
+.showroom-card__meta{display:flex;flex-direction:column;gap:6px;margin-top:4px;padding-top:16px;border-top:1px solid var(--c-line-d)}
+.showroom-card__row{display:flex;gap:10px;font-size:.84rem;color:var(--c-d-fg-2)}
+.showroom-card__row .k{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c-d-cap);width:46px;flex:none;padding-top:3px}
+.showroom-card__todo{color:var(--c-d-cap);border-bottom:1px dashed var(--c-d-cap)}
+.showroom-card__book{margin-top:auto;display:inline-flex;align-items:center;justify-content:space-between;gap:.6em;font-family:var(--font-body);font-weight:600;font-size:.92rem;color:#fff;text-decoration:none;border:1px solid var(--c-line-d);border-radius:var(--r-pill);padding:.85em 1.3em;transition:background .3s,border-color .3s}
+.showroom-card__book:hover{background:var(--c-orange);border-color:var(--c-orange)}
+.showroom-card__book .arr{transition:transform .4s var(--ease)}
+.showroom-card__book:hover .arr{transform:translateX(4px)}
+.showroom__map{margin-top:18px;height:clamp(160px,22vh,240px);border-radius:var(--r)}
+.showroom__actions{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:44px}
+.close-line{height:2px;background:var(--c-orange);transform:scaleX(0);transform-origin:50% 50%;margin:64px auto 0;max-width:var(--maxw);will-change:transform}  /* MOTION: cta-closeline */
+.showroom__foot{text-align:center;margin-top:30px;font-family:var(--font-mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--c-d-cap)}
+.showroom__foot b{color:var(--c-orange)}
+
+/* ============================================================
+   12) RESPONSIVE  ——  breakpoints: 860px(tablet) / 760px(nav) / 560px(grid)
+   ============================================================ */
+@media(max-width:860px){
+  .pin-stage .wrap{grid-template-columns:1fr;gap:36px}
+  .timeline{height:46vh}
+  .demo-grid,.demo-grid--rev{grid-template-columns:1fr;gap:40px}
+  .why__head{grid-template-columns:1fr}
+  .trust-grid{grid-template-columns:1fr 1fr}
+  .showroom-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .nav a.hide-sm{display:none}
+  .logo-wall{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  .trust-grid{grid-template-columns:1fr}
+  .roadmap{flex-wrap:wrap;gap:24px}
+  .rm-step{flex:1 1 40%}
+  .roadmap svg{display:none}
+}
+
+/* ============================================================
+   13) REDUCED MOTION  ——  애니메이션 off + 최종상태 고정 (기본은 ON)
+   ============================================================ */
+@media(prefers-reduced-motion:reduce){
+  .up{opacity:1;transform:none;transition:none}
+  .mask>*{transform:none;transition:none}
+  .tl-node{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  .scroll-cue__track::after,.tip-hint i{animation:none}
+  .pin-outer{height:auto}
+  .pin-stage{position:relative;height:auto;padding-block:90px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== GLOBAL: progress bar ===== -->
+<div class="progress" data-progress aria-hidden="true"></div>
+
+<!-- ===== GLOBAL: header ===== -->
+<header class="header" data-header>
+  <a class="brand" href="#hero" aria-label="Woobo"><span class="dot"></span>Woobo<small>Blum 독점 에이전트</small></a>
+  <nav class="nav">
+    <a class="hide-sm" href="#heritage">헤리티지</a>
+    <a class="hide-sm" href="#why">왜 우보냐</a>
+    <a class="hide-sm" href="#showroom">쇼룸</a>
+    <a class="cta-mini" href="#showroom">방문 예약 →</a>
+  </nav>
+</header>
+
+<!-- ===== SECTION: hero ===== -->
+<section class="hero sec-dark" id="hero" data-section="hero" data-screen-label="01 Hero">
+  <div class="hero__bg" data-parallax>
+    <div class="ph is-dark" data-ph="풀블리드 영상 · 가구 하드웨어 작업(서랍 슬라이드/CNC/쇼룸 핸즈온) · 16:9 muted loop">
+      <span class="ph-cap"><b>풀블리드 영상 / 이미지</b>가구 하드웨어 작업 — 서랍 슬라이드·CNC·쇼룸 핸즈온<br>16:9 · MUTED LOOP</span>
+    </div>
+  </div>
+  <div class="hero__vignette"></div>
+  <div class="wrap">
+    <span class="eyebrow t-mono">01 / 우보의 여정</span>
+    <h1 class="hero__title t-head">
+      <span class="mask"><span>하나의 믿음에서</span></span>
+      <span class="mask"><span>시작했습니다.</span></span>
+      <span class="mask"><span class="quote">'좋은 움직임이</span></span>
+      <span class="mask"><span class="quote">좋은 가구를 만든다.'</span></span>
+    </h1>
+    <p class="hero__sub up" data-delay="3">우보인터내셔날 주식회사 — 프리미엄 가구 하드웨어·소재 수입 전문. 그리고 이제, <b>Blum 한국 독점 에이전트 + 전국 쇼룸</b>으로.</p>
+  </div>
+  <div class="scroll-cue"><span class="t-mono-sm">Scroll</span><span class="scroll-cue__track"></span></div>
+</section>
+
+<!-- ===== SECTION: heritage (pinned timeline) ===== -->
+<section class="heritage sec-dark" id="heritage" data-section="heritage" data-screen-label="02 Heritage">
+  <div class="pin-outer" data-pin>
+    <div class="pin-stage">
+      <div class="wrap">
+        <div class="heritage__left">
+          <span class="eyebrow t-mono">02 / 헤리티지</span>
+          <h2 class="t-head-2">우리가 독점으로 취급하는 브랜드의 유산 — Blum, 70여 년 가족기업의 외길.</h2>
+          <div class="stat-row">
+            <div class="stat"><div class="stat__num" data-count="2100">0</div><span class="stat__lab">특허 (Blum 자체 기준)</span></div>
+            <div class="stat"><div class="stat__num" data-count="26000">0</div><span class="stat__lab">시험장비 종 +</span></div>
+            <div class="stat"><div class="stat__num" style="font-size:clamp(1.2rem,2vw,1.7rem);line-height:1.2;margin-top:.4em">Made in<br>Austria</div><span class="stat__lab">오스트리아 제조</span></div>
+          </div>
+          <div class="heritage__note">
+            <b>Woobo는 이 유산을 한국에서 독점으로 잇는 에이전트</b> — 정품의 공식 통로.
+            <br><span class="t-mono-sm" style="color:var(--c-d-cap);display:inline-block;margin-top:8px">[TODO: 확인] 우보 자체 연혁 세부</span>
+          </div>
+        </div>
+        <div class="timeline" data-timeline>
+          <div class="tl-dots"><i></i><i></i><i></i><i></i><i></i></div>
+          <svg viewBox="0 0 460 520" preserveAspectRatio="none" aria-hidden="true">
+            <path class="tl-track" d="M70,40 C 280,90 60,200 250,250 C 420,295 120,400 330,470"/>
+            <path class="tl-draw" data-draw d="M70,40 C 280,90 60,200 250,250 C 420,295 120,400 330,470"/>
+          </svg>
+          <div class="tl-node" data-at="0.04" style="left:15%;top:8%"><div class="tl-node__card"><span class="tl-node__ring"></span><div class="tl-node__yr">1952</div><div class="tl-node__desc">Blum 창립 — 오스트리아 가족기업의 시작</div><div class="tl-node__tag">Fact · Blum</div></div></div>
+          <div class="tl-node" data-at="0.32" style="left:54%;top:34%"><div class="tl-node__card"><span class="tl-node__ring"></span><div class="tl-node__yr">특허 2,100+</div><div class="tl-node__desc">움직임을 향한 70여 년의 연구</div><div class="tl-node__tag">Fact · Blum</div></div></div>
+          <div class="tl-node" data-at="0.56" style="left:18%;top:60%"><div class="tl-node__card"><span class="tl-node__ring"></span><div class="tl-node__yr">시험장비 26,000+</div><div class="tl-node__desc">반복 개폐·내구 시험 설비</div><div class="tl-node__tag">Fact · Blum</div></div></div>
+          <div class="tl-node is-todo" data-at="0.78" style="left:52%;top:74%"><div class="tl-node__card"><span class="tl-node__ring"></span><div class="tl-node__yr">우보 · 수입 전문</div><div class="tl-node__desc">프리미엄 하드웨어·소재 수입</div><div class="tl-node__tag">[TODO] placeholder</div></div></div>
+          <div class="tl-node is-todo" data-at="0.96" style="left:82%;top:92%"><div class="tl-node__card"><span class="tl-node__ring"></span><div class="tl-node__yr">Blum 한국 독점</div><div class="tl-node__desc">독점 에이전트 + 전국 쇼룸 + 자체 생산</div><div class="tl-node__tag">[TODO] placeholder</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: demo-softclose (결과 ① · 하자 제로) ===== -->
+<section class="sec-light sec-pad" id="demo-softclose" data-section="demo-softclose" data-screen-label="03 Demo A 소프트클로즈">
+  <div class="wrap">
+    <div class="demo-grid">
+      <div class="demo-copy">
+        <span class="eyebrow t-mono">03 / 결과 · 하자 제로</span>
+        <h3 class="t-head-2 up">닫힘의 마지막 0.5초까지.</h3>
+        <p class="lede up" data-delay="1">세게 닫아도 사뿐히. <span class="u-emph">현장에선 클레임·재방문이 사라집니다.</span></p>
+        <div class="chips up" data-delay="2">
+          <span class="chip chip--orange">BLUMOTION</span>
+          <span class="chip">클레임&nbsp;↓</span>
+          <span class="chip chip--solid">쇼룸에서 직접 체험</span>
+        </div>
+        <a class="micro up" data-delay="3" href="#showroom">이 감각, 전국 쇼룸에서 직접 만져보세요 <span class="arr">→</span></a>
+      </div>
+      <div class="demo-stage demo-softclose up" data-delay="1" data-demo="softclose">
+        <div class="scene">
+          <div class="cabinet">
+            <div class="cabinet__opening">
+              <div class="softzone"></div>
+              <div class="drawer" data-drawer><span class="drawer__glyph">Soft-close</span></div>
+            </div>
+            <div class="cabinet__rail"></div>
+          </div>
+        </div>
+        <div class="hud"><span>Closing damping</span><span class="hud__ms" data-ms>0.50s</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: demo-toolfree (결과 ② · 시공 효율) ===== -->
+<section class="sec-light sec-light-2 sec-pad" id="demo-toolfree" data-section="demo-toolfree" data-screen-label="04 Demo B 무공구">
+  <div class="wrap">
+    <div class="demo-grid demo-grid--rev">
+      <div class="demo-stage demo-toolfree up" data-demo="toolfree">
+        <div class="scene">
+          <div class="hinge">
+            <div class="hinge__plate"></div>
+            <div class="hinge__arm" data-arm><span class="hinge__cup"></span></div>
+            <div class="hinge__burst" data-burst>딸깍 · CLICK</div>
+          </div>
+          <div class="axes">
+            <div class="axis" style="--w:64%"><div class="axis__lab"><span>상하 H</span><span class="v">+2.0</span></div><div class="axis__track"><div class="axis__fill"></div></div></div>
+            <div class="axis" style="--w:48%"><div class="axis__lab"><span>좌우 S</span><span class="v">−1.5</span></div><div class="axis__track"><div class="axis__fill"></div></div></div>
+            <div class="axis" style="--w:72%"><div class="axis__lab"><span>깊이 D</span><span class="v">+3.0</span></div><div class="axis__track"><div class="axis__fill"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-copy">
+        <span class="eyebrow t-mono">04 / 결과 · 시공 효율</span>
+        <h3 class="t-head-2 up">공구 없이, 딸깍.</h3>
+        <p class="lede up" data-delay="1">끼우고 상하·좌우·깊이 3방향 조절. <span class="u-emph">시공 시간·재작업&nbsp;↓.</span></p>
+        <div class="chips up" data-delay="2">
+          <span class="chip chip--orange">CLIP top</span>
+          <span class="chip">무공구</span>
+          <span class="chip chip--solid">3방향</span>
+        </div>
+        <a class="micro up" data-delay="3" href="#showroom">쇼룸에서 직접 조절하고, 견적까지 상담하세요 <span class="arr">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: demo-tipon (결과 ③ · 디자인 자유) ===== -->
+<section class="sec-dark sec-pad" id="demo-tipon" data-section="demo-tipon" data-screen-label="05 Demo C TIP-ON">
+  <div class="wrap">
+    <div class="demo-grid">
+      <div class="demo-copy">
+        <span class="eyebrow t-mono">05 / 결과 · 디자인 자유</span>
+        <h3 class="t-head-2 up">손잡이가 사라지면, 디자인이 완성됩니다.</h3>
+        <p class="lede up" data-delay="1">핸들리스 TIP-ON, 슬림한 LEGRABOX. 더 넓은 제안 폭.</p>
+        <div class="chips up" data-delay="2">
+          <span class="chip chip--orange">TIP-ON</span>
+          <span class="chip">LEGRABOX</span>
+          <span class="chip">핸들리스</span>
+        </div>
+        <a class="micro up" data-delay="3" href="#showroom">전국 쇼룸에서 실물의 완성도를 확인하세요 <span class="arr">→</span></a>
+      </div>
+      <div class="demo-stage demo-tipon up" data-delay="1" data-demo="tipon" role="button" tabindex="0" aria-label="서랍 톡 열기">
+        <span class="load-badge">하중 최대 약 70kg급 · 자체 시험 기준</span>
+        <div class="scene">
+          <div class="unit">
+            <div class="unit__box"><span class="legra">LEGRABOX · 슬림 프로파일</span></div>
+            <div class="unit__front"><span class="seam"></span><span class="nohandle">No Handle · TIP-ON</span></div>
+          </div>
+        </div>
+        <span class="tip-hint"><i></i>탭하면 톡 열림</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: why (왜 우보냐 · 신뢰 그리드) ===== -->
+<section class="sec-light sec-pad" id="why" data-section="why" data-screen-label="06 왜 우보냐">
+  <div class="wrap">
+    <div class="why__head">
+      <div>
+        <span class="eyebrow t-mono">06 / 왜 우보냐</span>
+        <h2 class="t-head-2 up">그 Blum을, 한국에서 <span class="u-accent">독점 에이전트</span>가 책임집니다.</h2>
+      </div>
+      <div class="why__warn up" data-delay="1"><b>유사품에 주의</b> — 정품 Blum은 한국 독점 에이전트 우보에서.</div>
+    </div>
+    <!-- 반복 요소: trust × 6 (React에서 map 렌더 대상) -->
+    <div class="trust-grid">
+      <div class="trust trust--feature up"><span class="trust__ix">A1</span><h4>Blum 한국 독점 에이전트</h4><p>정품의 공식 통로. 본사·코리아가 아닌, 한국 독점 에이전트(sole agent)입니다.</p><span class="trust__mark"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="13"/><path d="M11 17.5l4 4 8-9"/></svg></span></div>
+      <div class="trust up" data-delay="1"><span class="trust__ix">A2</span><h4>정품 보장 (유사품 차단)</h4><p>공식 통로를 통한 정품만. 출처가 분명한 제품으로 현장 리스크를 줄입니다.</p><span class="trust__mark"><svg viewBox="0 0 34 34"><path d="M17 4l11 4v8c0 7-5 12-11 14C11 28 6 23 6 16V8z"/><path d="M12 16l4 4 7-8"/></svg></span></div>
+      <div class="trust up" data-delay="2"><span class="trust__ix">A3</span><h4>프리미엄 멀티브랜드 수입</h4><p>가구 하드웨어·소재를 아우르는 프리미엄 유럽 브랜드 수입 전문기업.</p><span class="trust__mark"><svg viewBox="0 0 34 34"><rect x="5" y="9" width="11" height="11"/><rect x="18" y="14" width="11" height="11"/></svg></span></div>
+      <div class="trust up" data-delay="1"><span class="trust__ix">A4</span><h4>가구 하드웨어 전문성</h4><p>움직임·결합·소재를 이해하는 팀. 제품 선정부터 시공 상담까지.</p><span class="trust__mark"><svg viewBox="0 0 34 34"><path d="M20 6a6 6 0 00-8 8L6 20l4 4 6-6a6 6 0 008-8l-4 4-4-4z"/></svg></span></div>
+      <div class="trust up" data-delay="2"><span class="trust__ix">A5</span><h4>전국 쇼룸 직접 체험</h4><p>온라인으로 살짝, 그리고 전국 쇼룸에서 직접. 손끝의 완성도를 확인하세요.</p><span class="trust__mark"><svg viewBox="0 0 34 34"><path d="M5 14l12-8 12 8"/><path d="M8 13v14h18V13"/><line x1="15" y1="27" x2="15" y2="19"/><line x1="19" y1="27" x2="19" y2="19"/></svg></span></div>
+      <div class="trust up" data-delay="3"><span class="trust__ix">A6</span><h4>자체 가구 생산 (김포 본점)</h4><p>하드웨어를 다루는 손이 직접 가구를 만듭니다. <span style="color:var(--c-ink-cap)">[TODO] 세부</span></p><span class="trust__mark"><svg viewBox="0 0 34 34"><path d="M6 12h22v6H6z"/><path d="M9 18v9M25 18v9M6 22h22"/></svg></span></div>
+    </div>
+    <div class="multibrand up">
+      <span class="bdg bdg--lead">Blum · 간판</span>
+      <span class="bdg">AGOFORM · 독일</span>
+      <span class="bdg">Peka · 스위스</span>
+      <span>프리미엄 유럽 브랜드 수입 전문 — 페이지 포커스는 Blum 중심</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: partners (동행 · 로고월 + 로드맵) ===== -->
+<section class="sec-light sec-light-2 sec-pad" id="partners" data-section="partners" data-screen-label="07 동행">
+  <div class="wrap">
+    <span class="eyebrow t-mono">07 / 동행</span>
+    <h2 class="t-head-2 up" style="font-size:clamp(1.8rem,3.2vw,2.8rem);max-width:20ch;margin-top:18px">한국의 제작 현장·고객과 함께 — 전국 쇼룸으로 더 가까이.</h2>
+    <!-- 반복 요소: logo-cell × N (확정 레퍼런스만 채우고 나머지 [TODO]) -->
+    <div class="logo-wall up" data-delay="1">
+      <div class="logo-cell" data-ph="제작사 로고"><span class="ph-cap">제작사 로고</span></div>
+      <div class="logo-cell" data-ph="제작사 로고"><span class="ph-cap">제작사 로고</span></div>
+      <div class="logo-cell" data-ph="제작사 로고"><span class="ph-cap">제작사 로고</span></div>
+      <div class="logo-cell" data-ph="제작사 로고"><span class="ph-cap">제작사 로고</span></div>
+      <div class="logo-cell" data-ph="레퍼런스 로고"><span class="ph-cap">레퍼런스</span></div>
+      <div class="logo-cell" data-ph="레퍼런스 로고"><span class="ph-cap">레퍼런스</span></div>
+      <div class="logo-cell" data-ph="[TODO] 로고"><span class="ph-cap">[TODO]</span></div>
+      <div class="logo-cell" data-ph="[TODO] 로고"><span class="ph-cap">[TODO]</span></div>
+    </div>
+    <div class="roadmap" data-roadmap>
+      <svg preserveAspectRatio="none" aria-hidden="true"><path class="rm-line" d="M0,1 L1200,1"/><path class="rm-draw" data-draw d="M0,1 L1200,1"/></svg>
+      <div class="rm-step"><span class="rm-step__dot"></span><div class="rm-step__yr">Now</div><h5>독점 에이전트</h5><p>정품 공식 통로</p></div>
+      <div class="rm-step"><span class="rm-step__dot"></span><div class="rm-step__yr">Now</div><h5>전국 쇼룸</h5><p>김포·용인·부산</p></div>
+      <div class="rm-step"><span class="rm-step__dot"></span><div class="rm-step__yr">Next</div><h5>체험 확대</h5><p>핸즈온 데모 강화</p></div>
+      <div class="rm-step"><span class="rm-step__dot"></span><div class="rm-step__yr">Next</div><h5>자체 생산</h5><p>[TODO]</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: showroom (다음 움직임 · 방문 예약 CTA) ===== -->
+<section class="showroom sec-dark sec-pad" id="showroom" data-section="showroom" data-screen-label="08 다음 움직임">
+  <div class="wrap">
+    <span class="eyebrow t-mono" style="display:flex;justify-content:center">08 / 다음 움직임</span>
+    <h2 class="t-head showroom__head up" style="margin-top:18px">여정의 다음 장 — 전국 쇼룸에서 직접 만나요.</h2>
+    <p class="showroom__sub up" data-delay="1"><b>방문 예약제</b>로 운영합니다.</p>
+    <!-- 반복 요소: showroom-card × 3 (지점 데이터로 map 렌더) -->
+    <div class="showroom-grid">
+      <div class="showroom-card up" data-delay="1">
+        <div class="showroom-card__top"><span class="showroom-card__name">김포 본점</span><span class="showroom-card__flag">본점 · 생산</span></div>
+        <p class="showroom-card__tag">대규모 쇼룸 + 가구 직접 생산</p>
+        <div class="showroom-card__meta">
+          <div class="showroom-card__row"><span class="k">주소</span><span class="showroom-card__todo">[TODO: 확인]</span></div>
+          <div class="showroom-card__row"><span class="k">전화</span><span class="showroom-card__todo">[TODO: 확인]</span></div>
+        </div>
+        <a class="showroom-card__book" href="#">방문 예약 <span class="arr">→</span></a>
+      </div>
+      <div class="showroom-card up" data-delay="2">
+        <div class="showroom-card__top"><span class="showroom-card__name">용인점</span><span class="showroom-card__flag">쇼룸</span></div>
+        <p class="showroom-card__tag">하드웨어·소재 핸즈온 체험</p>
+        <div class="showroom-card__meta">
+          <div class="showroom-card__row"><span class="k">전화</span><span>031-274-4241</span></div>
+          <div class="showroom-card__row"><span class="k">주소</span><span class="showroom-card__todo">[TODO: 확인]</span></div>
+        </div>
+        <a class="showroom-card__book" href="#">방문 예약 <span class="arr">→</span></a>
+      </div>
+      <div class="showroom-card up" data-delay="3">
+        <div class="showroom-card__top"><span class="showroom-card__name">부산지사</span><span class="showroom-card__flag">쇼룸</span></div>
+        <p class="showroom-card__tag">영남권 직접 상담·체험</p>
+        <div class="showroom-card__meta">
+          <div class="showroom-card__row"><span class="k">주소</span><span>부산 동래구 안락동 459-29</span></div>
+          <div class="showroom-card__row"><span class="k">전화</span><span>051-323-2532</span></div>
+        </div>
+        <a class="showroom-card__book" href="#">방문 예약 <span class="arr">→</span></a>
+      </div>
+    </div>
+    <div class="showroom__map ph is-dark up" data-ph="전국 지점 인터랙티브 맵(김포·용인·부산)"><span class="ph-cap"><b>전국 지점 지도</b>김포 · 용인 · 부산 — 인터랙티브 맵 placeholder</span></div>
+    <div class="showroom__actions">
+      <a class="btn btn--primary" data-primary href="#">쇼룸 방문 예약 <span class="arr">→</span></a>
+      <a class="btn btn--secondary" href="#">견적·상담 요청</a>
+      <a class="btn btn--ghost" href="#">카탈로그 받기</a>
+    </div>
+    <div class="close-line" data-closeline></div>
+    <div class="showroom__foot up">Woobo · <b>Blum 한국 독점 에이전트</b> · moving ideas</div>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   WOOBO — interaction layer (vanilla, GSAP-portable)
+   · 전역 변수 남발 X — 단일 IIFE 모듈, 역할별 함수로 분리.
+   · 실제 동작은 rAF+lerp / IntersectionObserver 로 구현하되,
+     각 블록 위 MOTION 스펙 주석이 GSAP ScrollTrigger 재구현의 기준(SSOT).
+   · premium 플러그인(DrawSVG/SplitText/Inertia) 미사용:
+     SVG 드로잉 = stroke-dashoffset, 텍스트 마스크 = .mask 래퍼.
+   ============================================================ */
+(() => {
+  'use strict';
+  const RM    = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+  const lerp  = (a,b,t) => a + (b - a) * t;
+  const easeOutCubic = p => 1 - Math.pow(1 - p, 3);
+  const K = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lerp')) || 0.12;
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+  /* --------------------------------------------------------
+     MOTION: reveal-up  /  reveal-mask
+     trigger: each .up / .mask element, start ≈ "top 92% viewport"
+     type: trigger (one-shot) + CSS stagger via [data-delay]
+     target: .up (opacity 0→1, translateY 26px→0) · .mask>* (translateY 110%→0)
+     easing: --ease   pin: false   duration: --dur-rev (1s for mask)
+     reduced-motion: 즉시 최종상태(.is-in)  · GSAP: ScrollTrigger batch + once:true
+     -------------------------------------------------------- */
+  function initReveal(){
+    const els = $$('.up, .mask');
+    if (RM){ els.forEach(e => e.classList.add('is-in')); return; }
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach(e => { if (e.isIntersecting){ e.target.classList.add('is-in'); io.unobserve(e.target); } });
+    }, { threshold:0.18, rootMargin:'0px 0px -8% 0px' });
+    els.forEach(e => io.observe(e));
+    // 동기 폴백(탭 비활성 등 IO 미발화 대비): 화면 안 요소 즉시 표시
+    const sweep = () => {
+      const vh = innerHeight;
+      els.forEach(e => {
+        if (e.classList.contains('is-in')) return;
+        const r = e.getBoundingClientRect();
+        if (r.top < vh*0.92 && r.bottom > 0){ e.classList.add('is-in'); io.unobserve(e); }
+      });
+    };
+    addEventListener('scroll', sweep, { passive:true });
+    document.addEventListener('visibilitychange', sweep);
+    sweep();
+  }
+
+  /* --------------------------------------------------------
+     MOTION: header-shrink  +  header-theme
+     trigger: window scroll (shrink @ scrollY>40) · theme = section under y=70
+     type: trigger (class toggle)   target: [data-header]
+     property: padding/bg/blur (.is-shrunk) · text color (.on-light over .sec-light)
+     easing: --ease   reduced-motion: 동일(미세 전환만)
+     GSAP: ScrollTrigger onUpdate / per-section toggleClass
+     -------------------------------------------------------- */
+  function initHeader(){
+    const header = $('[data-header]');
+    const lights = $$('.sec-light');
+    const update = () => {
+      header.classList.toggle('is-shrunk', scrollY > 40);
+      const y = 70; let onLight = false;
+      for (const s of lights){ const r = s.getBoundingClientRect(); if (r.top <= y && r.bottom >= y){ onLight = true; break; } }
+      header.classList.toggle('on-light', onLight);
+    };
+    addEventListener('scroll', update, { passive:true });
+    update();
+  }
+
+  /* --------------------------------------------------------
+     SCRUB ENGINE — rAF + lerp(--lerp). 아래 4개 MOTION을 한 루프에서 구동.
+     (GSAP 이관 시 각 항목을 개별 ScrollTrigger{scrub:true}로 분리 권장)
+
+     MOTION: progress-bar
+       trigger: document, start "top top", end "bottom bottom"
+       type: scrub   target: [data-progress] scaleX 0→1   easing: linear   pin:false
+       reduced-motion: 유지(접근성 무해)
+
+     MOTION: hero-parallax
+       trigger: .hero, start "top top", end "bottom top"
+       type: scrub   target: .hero__bg translateY(0 → scrollY*0.18px)
+       easing: --ease(lerp)   pin:false   reduced-motion: off(translate 고정)
+
+     MOTION: heritage-timeline  (★ pin)
+       trigger: [data-pin], start "top top", end "bottom bottom" (pin 길이 380vh)
+       type: pin + scrub(progress 0~1)
+       targets:
+         · [data-draw](.tl-draw) stroke-dashoffset len→0           (SVG 드로잉)
+         · .tl-node[data-at] → progress≥at 시 .is-on (stagger 등장)
+         · .stat__num[data-count] → 0→target 카운트업(easeOutCubic)
+         · .tl-dots i → 진행 비율만큼 .is-on
+       easing: --ease   reduced-motion: pin 해제 + 전부 최종상태(CSS @media에서 처리)
+
+     MOTION: demo-softclose  (★ signature)
+       trigger: [data-demo="softclose"], start "top 85%", end "center 35%"
+       type: scrub(progress 0~1, easeOutCubic 댐핑)
+       target: [data-drawer] translateX 48%(open) → -2%(closed)
+       side: progress>0.72 → .is-soft(소프트존 표시) · [data-ms] 남은 시간 0.50s→0.00s
+       easing: --ease   pin:false   reduced-motion: 최종상태(닫힘)로 고정
+     -------------------------------------------------------- */
+  function initScrub(){
+    const bar      = $('[data-progress]');
+    const heroBg   = $('[data-parallax]');
+    const pin      = $('[data-pin]');
+    const tlDraw   = $('[data-timeline] [data-draw]');
+    const tlNodes  = $$('[data-timeline] .tl-node');
+    const tlDots   = $$('[data-timeline] .tl-dots i');
+    const counters = $$('.stat__num[data-count]');
+    const sc       = $('[data-demo="softclose"]');
+    const drawer   = sc ? $('[data-drawer]', sc) : null;
+    const msOut    = sc ? $('[data-ms]', sc) : null;
+    const rmWrap   = $('[data-roadmap]');
+    const rmDraw   = rmWrap ? $('[data-draw]', rmWrap) : null;
+    const rmSteps  = $$('[data-roadmap] .rm-step');
+
+    let tlLen = 0, rmLen = 0;
+    if (tlDraw){ tlLen = tlDraw.getTotalLength(); tlDraw.style.strokeDasharray = tlLen; tlDraw.style.strokeDashoffset = tlLen; }
+    if (rmDraw){ rmLen = rmDraw.getTotalLength(); rmDraw.style.strokeDasharray = rmLen; rmDraw.style.strokeDashoffset = rmLen; }
+
+    const cur = { bar:0, par:0, tl:0, draw:0, rm:0 };
+    const tgt = { bar:0, par:0, tl:0, draw:0, rm:0 };
+
+    function measure(){
+      const max = document.documentElement.scrollHeight - innerHeight;
+      tgt.bar = max > 0 ? scrollY / max : 0;
+      tgt.par = scrollY;
+      if (pin){ const r = pin.getBoundingClientRect(); const total = pin.offsetHeight - innerHeight; tgt.tl = clamp(-r.top / (total||1), 0, 1); }
+      if (sc){ const r = sc.getBoundingClientRect(); tgt.draw = clamp((innerHeight*0.85 - r.top) / (innerHeight*0.7), 0, 1); }
+      if (rmWrap){ const r = rmWrap.getBoundingClientRect(); tgt.rm = clamp((innerHeight - r.top) / (innerHeight + r.height), 0, 1); }
+    }
+
+    function frame(){
+      for (const k in cur) cur[k] = lerp(cur[k], tgt[k], RM ? 1 : K);
+      bar.style.transform = `scaleX(${cur.bar})`;
+      if (heroBg && !RM) heroBg.style.transform = `translate3d(0,${cur.par*0.18}px,0)`;
+
+      if (tlDraw){
+        const p = cur.tl;
+        tlDraw.style.strokeDashoffset = tlLen * (1 - p);
+        tlNodes.forEach(n => n.classList.toggle('is-on', p >= parseFloat(n.dataset.at) - 0.02));
+        const a = Math.round(p * (tlDots.length - 1));
+        tlDots.forEach((d,i) => d.classList.toggle('is-on', i <= a));
+        const ep = easeOutCubic(clamp((p - 0.1) / 0.7, 0, 1));
+        counters.forEach(c => { c.textContent = Math.round(+c.dataset.count * ep).toLocaleString(); });
+      }
+      if (drawer){
+        const raw = cur.draw, e = easeOutCubic(raw);
+        drawer.style.transform = `translateX(${lerp(48, -2, e)}%)`;
+        sc.classList.toggle('is-soft', raw > 0.72 && raw < 0.999);
+        if (msOut) msOut.textContent = (clamp(1 - raw, 0, 1) * 0.5).toFixed(2) + 's';
+      }
+      if (rmDraw){
+        const p = clamp((cur.rm - 0.15) / 0.6, 0, 1);
+        rmDraw.style.strokeDashoffset = rmLen * (1 - p);
+        const a = Math.round(p * (rmSteps.length - 1));
+        rmSteps.forEach((s,i) => s.classList.toggle('is-on', i <= a));
+      }
+      requestAnimationFrame(frame);
+    }
+
+    addEventListener('scroll', measure, { passive:true });
+    addEventListener('resize', () => {
+      if (tlDraw){ tlLen = tlDraw.getTotalLength(); tlDraw.style.strokeDasharray = tlLen; }
+      if (rmDraw){ rmLen = rmDraw.getTotalLength(); rmDraw.style.strokeDasharray = rmLen; }
+      measure();
+    });
+    measure();
+    if (RM){ // 최종상태 1회 고정
+      if (tlDraw){ tlDraw.style.strokeDashoffset = 0; tlNodes.forEach(n => n.classList.add('is-on')); tlDots.forEach(d => d.classList.add('is-on')); counters.forEach(c => c.textContent = (+c.dataset.count).toLocaleString()); }
+      if (rmDraw){ rmDraw.style.strokeDashoffset = 0; rmSteps.forEach(s => s.classList.add('is-on')); }
+      if (drawer) drawer.style.transform = 'translateX(-2%)';
+      if (bar) bar.style.transform = 'scaleX(0)';
+    } else {
+      requestAnimationFrame(frame);
+    }
+  }
+
+  /* --------------------------------------------------------
+     MOTION: demo-toolfree
+     trigger: [data-demo="toolfree"], start "top 50% (≈center in view)"
+     type: trigger 시퀀스 (재진입 시 리플레이)
+       0.25s → [data-arm] .is-clicked (translate+rotate 정렬, --ease-tip)
+       0.76s → [data-burst] .is-go (딸깍 팝 1회)
+       1.05s+ → .axis stagger(280ms) .is-on (3축 슬라이더 fill, --ease)
+     pin:false   reduced-motion: 즉시 최종상태(클릭됨+축 정렬)
+     GSAP: ScrollTrigger onEnter → gsap.timeline()
+     -------------------------------------------------------- */
+  function initToolfree(){
+    const root = $('[data-demo="toolfree"]'); if (!root) return;
+    const arm = $('[data-arm]', root), burst = $('[data-burst]', root), axes = $$('.axis', root);
+    if (RM){ arm.classList.add('is-clicked'); axes.forEach(a => a.classList.add('is-on')); return; }
+    let playing = false;
+    const play = () => {
+      if (playing) return; playing = true;
+      arm.classList.remove('is-clicked'); burst.classList.remove('is-go'); axes.forEach(a => a.classList.remove('is-on'));
+      setTimeout(() => arm.classList.add('is-clicked'), 250);
+      setTimeout(() => burst.classList.add('is-go'), 760);
+      axes.forEach((a,i) => setTimeout(() => a.classList.add('is-on'), 1050 + i*280));
+    };
+    new IntersectionObserver((ents) => ents.forEach(e => e.isIntersecting ? play() : (playing = false)), { threshold:0.5 }).observe(root);
+  }
+
+  /* --------------------------------------------------------
+     MOTION: demo-tipon
+     trigger: [data-demo="tipon"] · onEnter(ratio>0.55) 자동 + 클릭 토글
+     type: trigger   target: .unit__front translateX 0→54% (.is-open)
+     also: .load-badge fade-in, --ease-tip 오버슈트(톡 열림)
+     pin:false   duration: --dur-tip   reduced-motion: 열림 상태 고정
+     GSAP: ScrollTrigger toggleActions + click handler
+     -------------------------------------------------------- */
+  function initTipon(){
+    const root = $('[data-demo="tipon"]'); if (!root) return;
+    root.addEventListener('click', () => root.classList.toggle('is-open'));
+    if (RM){ root.classList.add('is-open'); return; }
+    new IntersectionObserver((ents) => ents.forEach(e => root.classList.toggle('is-open', e.isIntersecting && e.intersectionRatio > 0.55)),
+      { threshold:[0, 0.55, 0.8] }).observe(root);
+  }
+
+  /* --------------------------------------------------------
+     MOTION: cta-closeline  +  cta-primary-pop
+     closeline: trigger [data-closeline] onEnter(0.6) → scaleX 0→1 (1.1s, --ease) · 히어로 수미상관
+     primary-pop: [data-primary] click → .is-pop scale .94 (260ms, --ease-tip)
+     reduced-motion: closeline 즉시 표시 / pop 생략 가능
+     -------------------------------------------------------- */
+  function initCta(){
+    const line = $('[data-closeline]');
+    if (line){
+      if (RM){ line.style.transform = 'scaleX(1)'; }
+      else {
+        const io = new IntersectionObserver((ents) => ents.forEach(e => {
+          if (e.isIntersecting){ line.style.transition = 'transform 1.1s var(--ease)'; line.style.transform = 'scaleX(1)'; io.unobserve(e.target); }
+        }), { threshold:0.6 });
+        io.observe(line);
+      }
+    }
+    const primary = $('[data-primary]');
+    if (primary) primary.addEventListener('click', (ev) => {
+      ev.preventDefault(); primary.classList.add('is-pop');
+      setTimeout(() => primary.classList.remove('is-pop'), 260);
+    });
+  }
+
+  /* init all */
+  initReveal();
+  initHeader();
+  initScrub();
+  initToolfree();
+  initTipon();
+  initCta();
+})();
+</script>
+
+<!-- ============================================================
+     HANDOFF NOTES  ——  개발 이관용 정리 (Next.js + TS + Tailwind + GSAP)
+     ============================================================
+
+  [A] 섹션 → 컴포넌트 매핑
+  ┌─ data-section ──┬─ 컴포넌트(제안) ────┬─ 역할 ─────────────────────────┬─ 재사용 ─┐
+  │ (global)        │ <ProgressBar/>      │ 상단 2px 진행바                 │ 1회      │
+  │ (global)        │ <SiteHeader/>       │ 고정 헤더(축소/라이트 토글)     │ 1회      │
+  │ hero            │ <Hero/>             │ 풀블리드 + 마스크 타이틀 + 패럴랙스 │ 1회   │
+  │ heritage        │ <HeritageTimeline/> │ 핀 고정 타임라인(SVG draw+카운트업) │ 1회   │
+  │ demo-softclose  │ <DemoSoftclose/>    │ 서랍 닫힘 스크럽 데모            │ ← Demo 패턴 │
+  │ demo-toolfree   │ <DemoToolfree/>     │ 힌지 딸깍 + 3축 슬라이더         │ ← Demo 패턴 │
+  │ demo-tipon      │ <DemoTipon/>        │ TIP-ON 톡 열림(다크)            │ ← Demo 패턴 │
+  │ why             │ <WhyWoobo/>         │ 신뢰 그리드(TrustCard×6 map)    │ TrustCard 반복 │
+  │ partners        │ <Partners/>         │ 로고월(LogoCell×N) + 로드맵     │ LogoCell/RmStep 반복 │
+  │ showroom        │ <ShowroomCTA/>      │ 지점 카드×3 map + 지도 + CTA     │ ShowroomCard 반복 │
+  └─────────────────┴─────────────────────┴────────────────────────────────┴──────────┘
+  · 반복 데이터: TrustCard(ix,title,desc,icon), ShowroomCard(name,flag,tag,rows[],bookHref),
+    LogoCell(src|todo), RmStep(yr,title,desc,on). → props/JSON으로 map 렌더.
+  · 공통 Demo 쉘: <DemoSection layout="lr|rl" copy={...}><DemoStage/></DemoSection> 로 추상화 가능.
+
+  [B] 인터랙션 목록 (MOTION 스펙 — JS 내 주석이 SSOT)
+   1. reveal-up / reveal-mask … IO 1-shot + [data-delay] stagger → GSAP ScrollTrigger batch(once)
+   2. header-shrink / header-theme … scrollY>40 + 섹션 테마 토글
+   3. progress-bar … document scrub, scaleX 0→1
+   4. hero-parallax … .hero scrub, bg translateY (≈0.18·scrollY)
+   5. heritage-timeline … PIN 380vh, scrub: stroke-dashoffset draw + 노드 stagger + 카운트업 + dots
+   6. demo-softclose … scrub, drawer translateX 48→-2%(easeOutCubic 댐핑) + softzone + ms 카운트다운
+   7. demo-toolfree … onEnter 타임라인: arm click(--ease-tip) → burst → axis stagger(--ease)
+   8. demo-tipon … onEnter(ratio>.55) + click 토글, front translateX 0→54%(--ease-tip)
+   9. cta-closeline … onEnter scaleX 0→1 (히어로 수미상관) / cta-primary-pop … click scale .94
+   · 스크럽 부드러움: rAF+lerp(--lerp=0.12). GSAP 이관 시 ScrollTrigger{scrub:0.6~1}로 치환.
+   · premium 플러그인 불필요: DrawSVG→stroke-dashoffset, SplitText→.mask 래퍼(줄 단위 수동 분할).
+
+  [C] 에셋 목록 (data-ph 위치 = 교체 지점)
+   · hero            : 풀블리드 영상/이미지 16:9 (가구 하드웨어 작업, muted loop)
+   · partners        : 제작사/레퍼런스 로고 ×N (.logo-cell[data-ph])
+   · showroom        : 전국 지점 인터랙티브 맵 (.showroom__map[data-ph])
+   · 데모 A/B/C 비주얼은 CSS 다이어그램(에셋 불필요) — 원하면 실사/3D로 교체 가능.
+   · 아이콘: trust 마크는 인라인 SVG(외부 아이콘셋 불필요).
+
+  [D] 미확정 텍스트 [TODO: 확인]
+   · 김포 본점 주소·전화 · 용인점 주소 · 우보 자체 연혁 · 예약/견적/카탈로그 채널(href="#")
+   · partners 로고/레퍼런스 확정분 외 placeholder · 자체 생산 세부.
+   · 제공 확정값: 용인 031-274-4241 / 부산 동래구 안락동 459-29, 051-323-2532.
+
+  [E] 토큰 표 (전부 :root CSS 변수 — Tailwind theme.extend로 1:1 이식)
+   · color   : --c-orange #ff671f / hover #e4561a / soft #ff8a55
+               --c-ink #1c1a17 · ink-2 #59544d · ink-cap #8a847b
+               --c-paper #f4f1ec · paper-2 #ece7df · charcoal #16140f · charcoal-card #221f18
+               --c-d-fg #f3efe7 · d-fg-2 #b8b1a4 · d-cap #8c857a
+               --c-line-l #e2ddd4 · line-d rgba(239,233,223,.14)
+   · easing  : --ease cubic-bezier(.16,1,.3,1) [soft-close 기본]
+               --ease-tip cubic-bezier(.34,1.56,.64,1) [TIP-ON 팝]
+   · timing  : --dur-rev .9s · --dur-tip .7s · --lerp 0.12
+   · spacing : --space-1..6 (8/16/24/40/64/96) · --gutter clamp(20,5vw,72) · --sec-pad clamp(96,14vh,180)
+   · radius  : --r-sm 3 · --r 6 · --r-pill 100
+   · layout  : --maxw 1280
+
+  [F] 폰트 / 브레이크포인트
+   · --font-head : Pretendard (700/800, -0.03~-0.04em, text-wrap:balance)
+   · --font-body : IBM Plex Sans KR (300~700, word-break:keep-all)
+   · --font-mono : IBM Plex Mono (대문자, letter-spacing 0.14~0.28em) — 라벨/캡션
+   · breakpoints : 860px(태블릿: 데모/그리드 단일 컬럼·핀 1열) / 760px(nav 축약·로고 2열) / 560px(그리드 1열·로드맵 래핑)
+   · 모바일 단일 컬럼 동작 포함 · prefers-reduced-motion:reduce → 애니메이션 off + 최종상태.
+============================================================ -->
+
+</body>
+</html>

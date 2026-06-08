@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Woobo · Blum 한국 독점 에이전트 — 직접 보고 결정하세요 (개발 이관본)</title>
+
+<!-- ============================================================
+     STYLE BLOCK  (전부 :root 토큰 참조 / 매직넘버 최소화 / Tailwind 치환 용이)
+     ============================================================ -->
+<style>
+  /* ---- 폰트 (CDN, 유일한 외부 의존) ---- */
+  @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+  @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+  /* =========================================================
+     DESIGN TOKENS  (색·이징·간격·폰트·radius·duration 한 곳에)
+     ========================================================= */
+  :root {
+    /* color */
+    --c-orange: #ff671f;
+    --c-orange-hover: #e4561a;
+    --c-ink: #1c1a17;
+    --c-ink-2: #59544d;
+    --c-caption: #8a847b;
+    --c-paper: #f4f1ec;
+    --c-charcoal: #16140f;
+    --c-charcoal-card: #221f18;
+    --c-paper-on-dark: #efe9df;
+    --c-muted-on-dark: #b8b0a4;
+    --c-caption-on-dark: #9a9085;
+    --c-line: #e2ddd4;
+    --c-line-dark: rgba(239, 233, 223, 0.14);
+
+    /* easing */
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);          /* 소프트클로즈(디폴트) */
+    --ease-tip: cubic-bezier(0.34, 1.56, 0.64, 1);  /* TIP-ON 팝 */
+    --ease-slam: cubic-bezier(0.72, 0, 1, 1);       /* '쾅' (페이지 유일 1회) */
+
+    /* duration */
+    --dur-reveal: 0.9s;
+    --dur-tip: 0.5s;
+    --dur-slam: 0.13s;
+    --dur-axis: 0.6s;
+
+    /* typography */
+    --font-head: "Pretendard Variable", Pretendard, "IBM Plex Sans KR", sans-serif;
+    --font-body: "IBM Plex Sans KR", "Pretendard Variable", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+
+    /* radius */
+    --r-pill: 999px;
+    --r-card: 3px;
+    --r-stage: 3px;
+
+    /* spacing / layout */
+    --maxw: 1200px;
+    --pad: clamp(20px, 5vw, 88px);
+    --space-section: clamp(96px, 13vh, 180px);
+    --gap-grid: clamp(36px, 5vw, 80px);
+
+    /* motion intensity (0~1) — reveal 이동량·플로팅 진폭 스케일 */
+    --motion: 0.7;
+  }
+
+  /* =========================================================
+     BASE
+     ========================================================= */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--c-paper);
+    color: var(--c-ink);
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    word-break: keep-all;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.04;
+    text-wrap: balance;
+    margin: 0;
+  }
+  p { margin: 0; text-wrap: pretty; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ---- delay utility (stagger; 인라인 스타일 대체 / GSAP stagger 대응) ---- */
+  .d-04 { --d: 0.04s; } .d-05 { --d: 0.05s; } .d-06 { --d: 0.06s; }
+  .d-08 { --d: 0.08s; } .d-10 { --d: 0.10s; } .d-12 { --d: 0.12s; }
+  .d-16 { --d: 0.16s; } .d-18 { --d: 0.18s; } .d-20 { --d: 0.20s; }
+  .d-24 { --d: 0.24s; } .d-30 { --d: 0.30s; }
+
+  .hl { color: var(--c-orange); font-weight: inherit; }
+
+  /* ---- 모노 라벨 ---- */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: clamp(11px, 0.86vw, 13px);
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--c-caption);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8em;
+  }
+  .eyebrow .num { color: var(--c-orange); }
+  .eyebrow::before { content: ""; width: 26px; height: 1px; background: currentColor; opacity: 0.5; }
+
+  /* =========================================================
+     CHROME — 진행바 + 고정 헤더
+     ========================================================= */
+  .progress { position: fixed; inset: 0 0 auto 0; height: 2px; z-index: 200; }
+  .progress__bar { height: 100%; width: 0%; background: var(--c-orange); transform-origin: left; }
+
+  .site-header {
+    position: fixed; inset: 0 0 auto 0; z-index: 150;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 26px var(--pad);
+    border-bottom: 1px solid transparent;
+    transition: padding 0.45s var(--ease), background 0.45s var(--ease),
+      backdrop-filter 0.45s var(--ease), border-color 0.45s var(--ease);
+  }
+  .site-header.is-shrunk {
+    padding: 13px var(--pad);
+    background: color-mix(in srgb, var(--c-paper) 78%, transparent);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border-bottom-color: var(--c-line);
+  }
+  .brand { font-family: var(--font-head); font-weight: 800; font-size: 22px; letter-spacing: -0.04em; display: flex; align-items: center; gap: 10px; }
+  .brand .dot { color: var(--c-orange); }
+  .brand small {
+    font-family: var(--font-mono); font-weight: 500; font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--c-caption);
+    border-left: 1px solid var(--c-line); padding-left: 10px;
+  }
+  .header-cta {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+    padding: 11px 18px; border: 1px solid var(--c-ink); border-radius: var(--r-pill);
+    transition: background 0.3s var(--ease), color 0.3s var(--ease);
+  }
+  .header-cta:hover { background: var(--c-ink); color: var(--c-paper); }
+  /* 다크 섹션 위 헤더 테마 */
+  .site-header.on-dark { color: var(--c-paper-on-dark); }
+  .site-header.on-dark .brand small { color: var(--c-paper-on-dark); border-color: var(--c-line-dark); }
+  .site-header.on-dark.is-shrunk { background: color-mix(in srgb, var(--c-charcoal) 72%, transparent); border-bottom-color: var(--c-line-dark); }
+  .site-header.on-dark .header-cta { border-color: var(--c-paper-on-dark); }
+  .site-header.on-dark .header-cta:hover { background: var(--c-paper-on-dark); color: var(--c-charcoal); }
+
+  /* =========================================================
+     SECTION 골격
+     ========================================================= */
+  .section { position: relative; padding: var(--space-section) var(--pad); }
+  .section .inner { max-width: var(--maxw); margin: 0 auto; }
+  .section--dark { background: var(--c-charcoal); color: var(--c-paper-on-dark); }
+  .section--dark .eyebrow { color: var(--c-caption-on-dark); }
+  .section--dark .eyebrow .num { color: var(--c-orange); }
+
+  .lede { font-size: clamp(17px, 1.5vw, 21px); font-weight: 300; color: var(--c-ink-2); max-width: 60ch; }
+  .section--dark .lede { color: var(--c-muted-on-dark); }
+  .lede strong, .section--dark strong { font-weight: 600; color: inherit; }
+
+  /* =========================================================
+     REVEAL PRIMITIVES — .up / .mask  (JS가 .in 토글)
+     ========================================================= */
+  .up {
+    opacity: 0;
+    transform: translateY(calc(28px * var(--motion)));
+    transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease);
+    transition-delay: var(--d, 0s);
+  }
+  .up.in { opacity: 1; transform: none; }
+
+  .mask { display: inline-block; overflow: hidden; vertical-align: bottom; }
+  .mask > span { display: inline-block; transform: translateY(110%); transition: transform 0.95s var(--ease); transition-delay: var(--d, 0s); }
+  .mask.in > span { transform: none; }
+
+  /* =========================================================
+     PLACEHOLDER (빗금 + 모노 캡션) — data-ph로 교체 위치 명시
+     ========================================================= */
+  .ph {
+    position: relative;
+    background-color: color-mix(in srgb, var(--c-ink) 4%, transparent);
+    background-image: repeating-linear-gradient(-45deg, transparent 0 11px, color-mix(in srgb, var(--c-ink) 7%, transparent) 11px 12px);
+    border: 1px solid var(--c-line);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .ph::after {
+    content: attr(data-ph);
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--c-caption); background: var(--c-paper); padding: 6px 12px; border: 1px solid var(--c-line); border-radius: 4px;
+  }
+  .section--dark .ph {
+    background-color: rgba(239, 233, 223, 0.03);
+    background-image: repeating-linear-gradient(-45deg, transparent 0 11px, rgba(239, 233, 223, 0.06) 11px 12px);
+    border-color: var(--c-line-dark);
+  }
+  .section--dark .ph::after { background: var(--c-charcoal-card); color: var(--c-caption-on-dark); border-color: var(--c-line-dark); }
+
+  /* =========================================================
+     BUTTONS / CHIPS
+     ========================================================= */
+  .btn {
+    font-family: var(--font-body); font-weight: 600; font-size: 15px; letter-spacing: -0.01em;
+    display: inline-flex; align-items: center; gap: 10px; padding: 16px 26px;
+    border-radius: var(--r-pill); border: 1px solid transparent; cursor: pointer;
+    transition: transform 0.3s var(--ease-tip), background 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+  .btn .arrow { transition: transform 0.4s var(--ease-tip); }
+  .btn:hover .arrow { transform: translateX(5px); }
+  .btn--primary { background: var(--c-orange); color: #fff; }
+  .btn--primary:hover { background: var(--c-orange-hover); }
+  .btn--primary.pop { animation: tipPop var(--dur-tip) var(--ease-tip); }
+  @keyframes tipPop { 0% { transform: scale(1); } 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+  .btn--secondary { background: transparent; border-color: currentColor; }
+  .btn--secondary:hover { background: var(--c-ink); color: var(--c-paper); border-color: var(--c-ink); }
+  .section--dark .btn--secondary:hover { background: var(--c-paper-on-dark); color: var(--c-charcoal); border-color: var(--c-paper-on-dark); }
+  .btn--ghost { background: transparent; color: var(--c-caption); padding: 16px 20px; }
+  .btn--ghost:hover { color: var(--c-ink); }
+  .section--dark .btn--ghost:hover { color: var(--c-paper-on-dark); }
+
+  .chip {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    padding: 7px 13px; border-radius: var(--r-pill); border: 1px solid var(--c-line); color: var(--c-ink-2);
+  }
+  .chip--accent { border-color: var(--c-orange); color: var(--c-orange); }
+  .section--dark .chip { border-color: var(--c-line-dark); color: var(--c-muted-on-dark); }
+  .section--dark .chip--accent { border-color: var(--c-orange); color: var(--c-orange); }
+  .chiprow { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .microcta {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-orange); display: inline-flex; align-items: center; gap: 8px;
+  }
+  .microcta .arrow { transition: transform 0.4s var(--ease-tip); }
+  .microcta:hover .arrow { transform: translateX(5px); }
+
+  /* =========================================================
+     SECTION: hero
+     ========================================================= */
+  .hero { min-height: 100svh; display: flex; align-items: center; padding-top: 140px; padding-bottom: 80px; }
+  .hero .inner { width: 100%; }
+  .hero h1 { font-size: clamp(38px, 6.6vw, 92px); max-width: 17ch; margin: 28px 0 32px; }
+  .hero h1 .mask { line-height: 1.02; }
+  .hero .lede { font-size: clamp(17px, 1.7vw, 23px); max-width: 46ch; }
+  .hero__foot {
+    margin-top: clamp(40px, 7vh, 80px); display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px;
+    border-top: 1px solid var(--c-line); padding-top: 26px;
+  }
+  .hero__scroll { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--c-caption); display: inline-flex; align-items: center; gap: 10px; }
+  .hero__scroll .line { width: 46px; height: 1px; background: var(--c-caption); position: relative; overflow: hidden; }
+  .hero__scroll .line::after { content: ""; position: absolute; inset: 0; width: 50%; background: var(--c-orange); animation: scrollPulse 2.2s var(--ease) infinite; }
+  @keyframes scrollPulse { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(220%); } }
+
+  /* =========================================================
+     SECTION: problem (슬램 도어)
+     ========================================================= */
+  .problem .grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: var(--gap-grid); align-items: center; }
+  .problem h2 { font-size: clamp(30px, 4.2vw, 56px); margin-bottom: 26px; }
+  .slamstage { position: relative; aspect-ratio: 4 / 3.4; border: 1px solid var(--c-line-dark); background: rgba(0,0,0,0.18); overflow: hidden; border-radius: 2px; }
+  .slamstage .carcass { position: absolute; inset: 14% 10% 14% 12%; border: 2px solid rgba(239,233,223,0.22); border-right: none; }
+  .slamstage .jamb { position: absolute; top: 12%; bottom: 12%; right: 10%; width: 6px; background: rgba(239,233,223,0.28); }
+  .slamdoor {
+    position: absolute; top: 12%; bottom: 12%; right: calc(10% + 6px); width: 56%;
+    transform-origin: right center; transform: rotateY(calc(-72deg * (1 - var(--p, 0)))); transform-style: preserve-3d;
+    background: linear-gradient(110deg, var(--c-charcoal-card), #2c281f); border: 1px solid rgba(239,233,223,0.16);
+    box-shadow: -30px 0 60px rgba(0,0,0,0.5); display: flex; align-items: flex-end; padding: 18px;
+  }
+  .slamdoor .knob { width: 8px; height: 44px; border-radius: var(--r-pill); background: rgba(239,233,223,0.3); }
+  .slamstage.shake { animation: slamShake 0.18s var(--ease-slam); }
+  @keyframes slamShake { 0% { transform: translateX(0); } 35% { transform: translateX(7px); } 70% { transform: translateX(-4px); } 100% { transform: translateX(0); } }
+  .slamstage .impact { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 0 var(--c-orange); opacity: 0; }
+  .slamstage.flash .impact { animation: slamFlash 0.4s var(--ease); }
+  @keyframes slamFlash { 0% { opacity: 0.9; box-shadow: inset 0 0 0 3px var(--c-orange); } 100% { opacity: 0; box-shadow: inset 0 0 0 22px transparent; } }
+  .slam-caption { position: absolute; left: 18px; bottom: 16px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-caption-on-dark); }
+  .slam-caption b { color: var(--c-orange); }
+
+  /* =========================================================
+     SECTION: cause
+     ========================================================= */
+  .cause { background: linear-gradient(var(--c-charcoal), var(--c-paper)); }
+  .cause .inner { max-width: 980px; }
+  .cause .big { font-family: var(--font-head); font-weight: 700; font-size: clamp(26px, 3.4vw, 46px); letter-spacing: -0.03em; line-height: 1.18; text-wrap: balance; }
+  .cause .big .hl { font-weight: 800; }
+  .cause .pathrow { margin-top: clamp(40px, 6vh, 72px); display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
+  .cause .path { background: var(--c-paper); padding: 26px 24px; }
+  .cause .path .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-caption); }
+  .cause .path .v { margin-top: 10px; font-weight: 600; font-size: 17px; }
+  .cause .path.bad .v { color: var(--c-ink-2); }
+  .cause .path.good { background: var(--c-ink); color: var(--c-paper); }
+  .cause .path.good .k { color: var(--c-orange); }
+
+  /* =========================================================
+     SECTION: solve (워드마크)
+     ========================================================= */
+  .solve { text-align: center; overflow: hidden; }
+  .solve .tagline { font-family: var(--font-mono); font-size: clamp(11px, 1vw, 13px); letter-spacing: 0.22em; text-transform: uppercase; color: var(--c-caption); }
+  .wordmark { font-family: var(--font-head); font-weight: 800; letter-spacing: -0.05em; font-size: clamp(74px, 20vw, 300px); line-height: 0.9; margin: 18px 0 8px; }
+  .wordmark .float { display: inline-block; animation: floaty 6s var(--ease-tip) infinite; }
+  @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(calc(-14px * var(--motion))); } }
+  .solve h2 { font-size: clamp(26px, 3.6vw, 50px); max-width: 22ch; margin: 24px auto 22px; }
+  .solve .lede { margin: 0 auto; text-align: center; max-width: 56ch; }
+  .solve .minilabel { margin-top: 30px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-caption); }
+
+  /* =========================================================
+     DEMO 공용 (softclose / hinge / tipon)
+     ========================================================= */
+  .demo .grid { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: var(--gap-grid); align-items: center; }
+  .demo.flip .grid { grid-template-columns: 1.08fr 0.92fr; }
+  .demo.flip .demo__copy { order: 2; }
+  .demo h3 { font-size: clamp(28px, 3.8vw, 52px); margin: 22px 0 20px; }
+  .demo .chiprow { margin: 26px 0 28px; }
+  .demo .microcta { margin-top: 6px; }
+  .demo__stage {
+    position: relative; aspect-ratio: 1 / 1; border-radius: var(--r-stage); border: 1px solid var(--c-line);
+    background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--c-orange) 5%, transparent), transparent 60%), color-mix(in srgb, var(--c-ink) 2.5%, var(--c-paper));
+    overflow: hidden;
+  }
+  .section--dark .demo__stage {
+    border-color: var(--c-line-dark);
+    background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--c-orange) 9%, transparent), transparent 60%), var(--c-charcoal-card);
+  }
+  .stage-meter { position: absolute; left: 18px; bottom: 16px; right: 18px; display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-caption); }
+  .stage-meter .track { flex: 1; height: 2px; background: var(--c-line); position: relative; }
+  .section--dark .stage-meter .track { background: var(--c-line-dark); }
+  .stage-meter .track i { position: absolute; inset: 0 auto 0 0; width: calc(var(--p, 0) * 100%); background: var(--c-orange); }
+
+  /* ---- demo-softclose: 서랍 측단면 ---- */
+  .demo-softclose .cab { position: absolute; top: 16%; bottom: 22%; right: 8%; width: 46%; border: 2px solid var(--c-ink); border-right: none; background: color-mix(in srgb, var(--c-ink) 5%, var(--c-paper)); }
+  .demo-softclose .runner { position: absolute; top: 30%; right: 8%; width: 74%; height: 3px; background: repeating-linear-gradient(90deg, var(--c-caption) 0 6px, transparent 6px 12px); opacity: 0.5; }
+  .demo-softclose .drawer {
+    position: absolute; top: 24%; bottom: 30%; right: 8%; width: 40%;
+    background: linear-gradient(180deg, #fff, color-mix(in srgb, var(--c-ink) 8%, #fff));
+    border: 2px solid var(--c-ink); box-shadow: 8px 12px 30px rgba(0,0,0,0.12);
+    transform: translateX(calc((1 - var(--p, 0)) * 92%));
+  }
+  .demo-softclose .drawer .face { position: absolute; right: -2px; top: -2px; bottom: -2px; width: 13px; background: var(--c-orange); }
+  .demo-softclose .soft { position: absolute; top: 14%; left: 8%; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-orange); opacity: calc(var(--p, 0) * var(--p, 0)); }
+  .demo-softclose .grabhint { position: absolute; left: 8%; bottom: 26%; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-caption); }
+
+  /* ---- demo-hinge: 무공구 힌지 3축 ---- */
+  .demo-hinge .wall { position: absolute; top: 12%; bottom: 12%; left: 14%; width: 8px; background: var(--c-ink); }
+  .demo-hinge .door {
+    position: absolute; top: 14%; bottom: 14%; left: calc(14% + 8px); width: 52%;
+    background: linear-gradient(120deg, #fff, color-mix(in srgb, var(--c-ink) 7%, #fff)); border: 2px solid var(--c-ink);
+    transform-origin: left center; transform: rotateY(calc(-58deg * clamp(0, calc((0.34 - var(--p, 0)) / 0.34), 1))); transform-style: preserve-3d;
+    box-shadow: -10px 8px 30px rgba(0,0,0,0.12);
+  }
+  .demo-hinge .hinge { position: absolute; left: calc(14% + 2px); width: 30px; height: 18px; background: var(--c-orange); border-radius: 3px; }
+  .demo-hinge .hinge.h1 { top: 24%; }
+  .demo-hinge .hinge.h2 { bottom: 24%; }
+  .demo-hinge .click { position: absolute; left: 16%; top: 8%; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-orange); opacity: 0; transition: opacity 0.3s var(--ease); }
+  .demo-hinge.clicked .click { opacity: 1; }
+  .demo-hinge .axes { position: absolute; right: 7%; top: 18%; width: 30%; display: flex; flex-direction: column; gap: 16px; }
+  .demo-hinge .axis { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-caption); }
+  .demo-hinge .axis .bar { margin-top: 6px; height: 4px; background: var(--c-line); position: relative; border-radius: 2px; }
+  .section--dark .demo-hinge .axis .bar { background: var(--c-line-dark); }
+  .demo-hinge .axis .bar i { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; background: var(--c-orange); transform: translate(-50%, -50%); left: var(--ax, 16%); transition: left var(--dur-axis) var(--ease-tip); }
+
+  /* ---- demo-tipon: TIP-ON 핸들리스 (다크) ---- */
+  .demo-tipon .cab { position: absolute; inset: 16% 14%; border: 2px solid var(--c-paper-on-dark); background: rgba(0,0,0,0.22); }
+  .demo-tipon .drawerC {
+    position: absolute; left: 16%; right: 16%; top: 40%; height: 28%;
+    background: linear-gradient(180deg, #2c2820, var(--c-charcoal-card)); border: 2px solid var(--c-paper-on-dark);
+    transform: translateY(calc(var(--p, 0) * -2%)); box-shadow: 0 18px 36px rgba(0,0,0,0.4);
+    transition: transform 0.7s var(--ease-tip);
+  }
+  .demo-tipon.open .drawerC { transform: translateY(-14%) scale(1.012); box-shadow: 0 30px 60px rgba(0,0,0,0.55); }
+  .demo-tipon .drawerC::after { content: ""; position: absolute; left: 50%; bottom: -2px; transform: translateX(-50%); width: 40%; height: 3px; background: var(--c-orange); opacity: 0; transition: opacity 0.4s var(--ease); }
+  .demo-tipon.open .drawerC::after { opacity: 1; }
+  .demo-tipon .tap { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-orange); animation: tapBlink 1.6s var(--ease) infinite; }
+  .demo-tipon.open .tap { opacity: 0; animation: none; }
+  @keyframes tapBlink { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+  /* =========================================================
+     SECTION: trust (신뢰 그리드)
+     ========================================================= */
+  .trust h2 { font-size: clamp(30px, 4.2vw, 56px); margin-bottom: 18px; }
+  .trust .warn { color: var(--c-orange); font-weight: 600; }
+  .trust .cards { margin-top: clamp(40px, 6vh, 64px); display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--c-line); border: 1px solid var(--c-line); }
+  .trust .card { background: var(--c-paper); padding: 30px 26px 34px; min-height: 190px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+  .trust .card .idx { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; color: var(--c-caption); }
+  .trust .card .tt { font-size: clamp(18px, 1.7vw, 23px); font-weight: 700; letter-spacing: -0.02em; }
+  .trust .card .ds { font-size: 14px; color: var(--c-ink-2); margin-top: 8px; font-weight: 300; }
+  .trust .card.feat { background: var(--c-ink); color: var(--c-paper); }
+  .trust .card.feat .idx { color: var(--c-orange); }
+  .trust .card.feat .ds { color: var(--c-muted-on-dark); }
+  .trust .card .mark { position: absolute; top: 28px; right: 26px; width: 30px; height: 30px; }
+  .trust .card .mark path, .trust .card .mark circle { stroke: var(--c-orange); stroke-width: 2; fill: none; stroke-dasharray: 120; stroke-dashoffset: 120; transition: stroke-dashoffset 1s var(--ease); }
+  .trust .card.in .mark path, .trust .card.in .mark circle { stroke-dashoffset: 0; }
+  .trust .brands { margin-top: 22px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--c-caption); display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+  .trust .brands b { color: var(--c-ink); }
+  .trust .footnote { margin-top: 14px; font-size: 12px; color: var(--c-caption); font-weight: 300; }
+
+  /* =========================================================
+     SECTION: showroom (CTA)
+     ========================================================= */
+  .showroom { text-align: center; }
+  .showroom h2 { font-size: clamp(32px, 5vw, 68px); margin-bottom: 18px; }
+  .showroom .lede { margin: 0 auto; text-align: center; }
+  .showroom .branches { margin: clamp(44px, 6vh, 70px) 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; }
+  .showroom-card { border: 1px solid var(--c-line-dark); background: var(--c-charcoal-card); padding: 26px 24px 24px; border-radius: var(--r-card); display: flex; flex-direction: column; gap: 14px; transition: transform 0.4s var(--ease), border-color 0.4s var(--ease); }
+  .showroom-card:hover { transform: translateY(-4px); border-color: rgba(255,103,31,0.5); }
+  .showroom-card .bh { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .showroom-card .name { font-family: var(--font-head); font-weight: 800; font-size: 22px; letter-spacing: -0.03em; }
+  .showroom-card .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-orange); }
+  .showroom-card .meta { font-size: 14px; color: var(--c-muted-on-dark); font-weight: 300; line-height: 1.55; }
+  .showroom-card .meta .ph-line { color: var(--c-paper-on-dark); font-variant-numeric: tabular-nums; }
+  .showroom-card .todo { color: #6f675c; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .showroom-card .book { margin-top: auto; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-paper-on-dark); display: inline-flex; align-items: center; gap: 8px; padding-top: 14px; border-top: 1px solid var(--c-line-dark); }
+  .showroom-card .book .arrow { color: var(--c-orange); transition: transform 0.4s var(--ease-tip); }
+  .showroom-card:hover .book .arrow { transform: translateX(5px); }
+  .showroom .map { height: 220px; margin-bottom: clamp(40px, 6vh, 60px); }
+  .showroom .actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  .closeline { position: relative; height: 2px; margin: clamp(54px, 8vh, 90px) auto 26px; max-width: 560px; }
+  .closeline i { position: absolute; inset: 0; background: var(--c-orange); transform: scaleX(0); transform-origin: center; transition: transform 1.1s var(--ease); }
+  .closeline.in i { transform: scaleX(1); }
+  .showroom .signoff { font-family: var(--font-mono); font-size: clamp(12px, 1.1vw, 14px); letter-spacing: 0.18em; text-transform: uppercase; color: var(--c-caption); }
+  .showroom .signoff b { color: var(--c-paper-on-dark); }
+
+  /* =========================================================
+     RESPONSIVE  (브레이크포인트 900px → 모바일 단일 컬럼)
+     ========================================================= */
+  @media (max-width: 900px) {
+    .problem .grid, .demo .grid, .demo.flip .grid { grid-template-columns: 1fr; }
+    .demo.flip .demo__copy { order: 0; }
+    .cause .pathrow, .trust .cards, .showroom .branches { grid-template-columns: 1fr; }
+    .demo__stage { max-width: 520px; }
+    .header-cta { display: none; }
+  }
+
+  /* =========================================================
+     REDUCED MOTION  (애니메이션 off + 요소 최종상태)  ※ 기본은 모션 ON
+     ========================================================= */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .up, .mask > span { transition: none !important; opacity: 1 !important; transform: none !important; }
+    .hero__scroll .line::after,
+    .wordmark .float,
+    .demo-tipon .tap { animation: none !important; }
+    .slamstage.shake, .slamstage.flash .impact { animation: none !important; }
+    /* 데모 최종상태 고정 (JS도 --p 최종값을 세팅) */
+    .slamdoor { transform: rotateY(0deg) !important; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- 진행바 -->
+<div class="progress"><div class="progress__bar"></div></div>
+
+<!-- 고정 헤더 -->
+<header class="site-header">
+  <a class="brand" href="#top">우보<span class="dot">.</span><small>Blum 한국 독점 에이전트</small></a>
+  <a class="header-cta" href="#showroom">쇼룸 방문 예약 →</a>
+</header>
+
+<main id="top">
+
+<!-- ===== SECTION: hero ===== -->
+<section class="section hero" data-section="hero" data-screen-label="01 HERO">
+  <div class="inner">
+    <span class="eyebrow up"><span class="num">01</span> / 현장</span>
+    <h1>
+      <span class="mask"><span>당신은 1mm까지</span></span><br />
+      <span class="mask d-06"><span>맞췄습니다. 그런데 클레임은</span></span><br />
+      <span class="mask d-12"><span>늘 <span class="hl">하드웨어</span>에서 옵니다.</span></span>
+    </h1>
+    <p class="lede up d-20">병행수입·유사품 하자, 직접 못 보고 사는 불안, 정보부족 — 더는 떠안지 마세요.</p>
+    <div class="hero__foot up d-30">
+      <a class="btn btn--secondary" href="#cause">왜 이런 일이 생길까 ↓</a>
+      <span class="hero__scroll">Scroll <span class="line"></span> 9 sections</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: problem (슬램 도어 '쾅') ===== -->
+<section class="section section--dark problem" data-section="problem" data-screen-label="02 문제">
+  <div class="inner">
+    <div class="grid">
+      <div class="problem__copy">
+        <span class="eyebrow up"><span class="num">02</span> / 문제</span>
+        <h2 class="up d-05">출처가 불분명하고 직접 못 보면, 품질도 책임도 흔들립니다.</h2>
+        <p class="lede up d-12">병행수입·<strong>유사품</strong>·정보부족·실물 미확인은 위조·A/S 불가·부품 단종 리스크가 따라옵니다. <strong class="hl">유사품에 주의하십시오.</strong></p>
+      </div>
+      <div class="up d-10">
+        <div class="slamstage" data-demo="slam">
+          <div class="carcass"></div>
+          <div class="jamb"></div>
+          <div class="slamdoor"><div class="knob"></div></div>
+          <div class="impact"></div>
+          <div class="slam-caption">직접 못 본 채 닫힌 문 — <b>쾅.</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: cause ===== -->
+<section class="section cause" id="cause" data-section="cause" data-screen-label="03 원인">
+  <div class="inner">
+    <span class="eyebrow up"><span class="num">03</span> / 원인</span>
+    <p class="big up d-05">문제의 뿌리는 제품이 아니라 <span class="hl">‘어디서 샀고, 직접 확인했는가’</span>입니다. 병행수입·유사품 경로엔 정품 통로가 없습니다 — 정품 Blum은 <span class="hl">한국 독점 에이전트</span> 한 곳을 거칩니다.</p>
+    <div class="pathrow">
+      <div class="path bad up"><div class="k">경로 A</div><div class="v">병행수입 — 정품 통로 없음</div></div>
+      <div class="path bad up d-08"><div class="k">경로 B</div><div class="v">유사품 — 위조·A/S 불가</div></div>
+      <div class="path good up d-16"><div class="k">정품 통로</div><div class="v">한국 독점 에이전트 → Woobo</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: solve (워드마크) ===== -->
+<section class="section solve" data-section="solve" data-screen-label="04 해결">
+  <div class="inner">
+    <p class="tagline up">Woobo · Blum 한국 독점 에이전트 · 프리미엄 하드웨어 수입 전문</p>
+    <div class="wordmark"><span class="mask"><span class="float">Woobo</span></span></div>
+    <h2 class="up d-10">그래서, <span class="hl">정품의 공식 통로 — Blum 한국 독점 에이전트 Woobo</span>에서 직접 보고 사세요.</h2>
+    <p class="lede up d-18">정품 보장(유사품 차단)·A/S는 기본, <strong>전국 쇼룸에서 직접 확인하고 상담</strong>까지.</p>
+    <p class="minilabel up d-24">우보인터내셔날 주식회사 — 프리미엄 가구 하드웨어·소재 수입 전문</p>
+  </div>
+</section>
+
+<!-- ===== SECTION: demo-softclose (증거 ① 소프트클로즈) ===== -->
+<section class="section demo demo-softclose-wrap" data-section="demo-softclose" data-screen-label="05 데모A">
+  <div class="inner">
+    <div class="grid">
+      <div class="demo__copy">
+        <span class="eyebrow up"><span class="num">05</span> / 증거 · 하자 제로</span>
+        <h3 class="up d-05">닫힘의 끝까지 책임집니다.</h3>
+        <p class="lede up d-10">세게 닫아도 사뿐히. <strong>클레임·재방문을 없앱니다.</strong></p>
+        <div class="chiprow up d-16">
+          <span class="chip chip--accent">BLUMOTION</span>
+          <span class="chip">클레임 ↓</span>
+          <span class="chip">쇼룸에서 직접 체험</span>
+        </div>
+        <a class="microcta up d-20" href="#showroom">이 감각, 전국 쇼룸에서 직접 만져보세요 <span class="arrow">→</span></a>
+      </div>
+      <div class="up d-10">
+        <div class="demo__stage demo-softclose" data-demo="softclose">
+          <div class="cab"></div>
+          <div class="runner"></div>
+          <div class="soft">soft-close ·</div>
+          <div class="drawer"><div class="face"></div></div>
+          <div class="grabhint">스크롤 = 서랍 닫힘 스크럽</div>
+          <div class="stage-meter"><span>OPEN</span><span class="track"><i></i></span><span>SOFT&nbsp;CLOSE</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: demo-hinge (증거 ② 무공구 시공) ===== -->
+<section class="section demo flip demo-hinge-wrap" data-section="demo-hinge" data-screen-label="06 데모B">
+  <div class="inner">
+    <div class="grid">
+      <div class="demo__copy">
+        <span class="eyebrow up"><span class="num">06</span> / 증거 · 시공 효율</span>
+        <h3 class="up d-05">공구 없이, 딸깍.</h3>
+        <p class="lede up d-10">끼우고 상하·좌우·깊이 3방향 조절. <strong>시공 시간·재작업 ↓.</strong></p>
+        <div class="chiprow up d-16">
+          <span class="chip chip--accent">CLIP top</span>
+          <span class="chip">무공구</span>
+          <span class="chip">3방향</span>
+        </div>
+        <a class="microcta up d-20" href="#showroom">쇼룸에서 직접 조절하고, 견적까지 상담하세요 <span class="arrow">→</span></a>
+      </div>
+      <div class="up d-10">
+        <div class="demo__stage demo-hinge" data-demo="hinge">
+          <div class="wall"></div>
+          <div class="hinge h1"></div>
+          <div class="hinge h2"></div>
+          <div class="door"></div>
+          <div class="click">click · 무공구 장착</div>
+          <div class="axes">
+            <div class="axis">상하 ↕<div class="bar"><i></i></div></div>
+            <div class="axis">좌우 ↔<div class="bar"><i></i></div></div>
+            <div class="axis">깊이 ⇲<div class="bar"><i></i></div></div>
+          </div>
+          <div class="stage-meter"><span>CLIP</span><span class="track"><i></i></span><span>3-WAY&nbsp;ADJ</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: demo-tipon (증거 ③ TIP-ON 핸들리스) ===== -->
+<section class="section section--dark demo demo-tipon-wrap" data-section="demo-tipon" data-screen-label="07 데모C">
+  <div class="inner">
+    <div class="grid">
+      <div class="demo__copy">
+        <span class="eyebrow up"><span class="num">07</span> / 증거 · 디자인 자유</span>
+        <h3 class="up d-05">손잡이 없이, 톡.</h3>
+        <p class="lede up d-10">핸들리스 미니멀, 더 넓은 제안 폭.</p>
+        <div class="chiprow up d-16">
+          <span class="chip chip--accent">TIP-ON</span>
+          <span class="chip">핸들리스</span>
+        </div>
+        <a class="microcta up d-20" href="#showroom">전국 쇼룸에서 실물의 완성도를 확인하세요 <span class="arrow">→</span></a>
+      </div>
+      <div class="up d-10">
+        <div class="demo__stage demo-tipon" data-demo="tipon">
+          <div class="cab"></div>
+          <div class="drawerC"></div>
+          <div class="tap">tap · 톡</div>
+          <div class="stage-meter"><span>PUSH</span><span class="track"><i></i></span><span>TIP-ON&nbsp;OPEN</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION: trust (신뢰 그리드) ===== -->
+<section class="section trust" data-section="trust" data-screen-label="08 안심">
+  <div class="inner">
+    <span class="eyebrow up"><span class="num">08</span> / 안심</span>
+    <h2 class="up d-05">독점 에이전트라, 끝까지 안심.</h2>
+    <p class="lede up d-10"><span class="warn">유사품에 주의 — 정품 Blum은 한국 독점 에이전트 우보에서.</span></p>
+    <!-- 반복요소: 동일 .card 구조 (map 렌더 가능) -->
+    <div class="cards">
+      <div class="card feat">
+        <div class="idx">01</div>
+        <svg class="mark" viewBox="0 0 30 30"><path d="M4 15 L12 23 L26 6" /></svg>
+        <div><div class="tt">Blum 한국 독점 에이전트</div><div class="ds">정품의 공식 통로 (sole agent)</div></div>
+      </div>
+      <div class="card">
+        <div class="idx">02</div>
+        <svg class="mark" viewBox="0 0 30 30"><path d="M15 3 L26 8 V16 C26 23 21 26 15 28 C9 26 4 23 4 16 V8 Z" /></svg>
+        <div><div class="tt">정품 보장 (유사품 차단)</div><div class="ds">A/S·부품 통로 확보</div></div>
+      </div>
+      <div class="card">
+        <div class="idx">03</div>
+        <svg class="mark" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" /></svg>
+        <div><div class="tt">프리미엄 멀티브랜드 수입</div><div class="ds">유럽 하드웨어·소재 전문</div></div>
+      </div>
+      <div class="card">
+        <div class="idx">04</div>
+        <svg class="mark" viewBox="0 0 30 30"><path d="M5 22 L15 5 L25 22 Z" /></svg>
+        <div><div class="tt">가구 하드웨어 전문성</div><div class="ds">제작 현장을 아는 상담</div></div>
+      </div>
+      <div class="card">
+        <div class="idx">05</div>
+        <svg class="mark" viewBox="0 0 30 30"><path d="M6 6 H24 V24 H6 Z M6 13 H24" /></svg>
+        <div><div class="tt">전국 쇼룸 직접 체험</div><div class="ds">실물 확인 · 방문 예약제</div></div>
+      </div>
+      <div class="card">
+        <div class="idx">06</div>
+        <svg class="mark" viewBox="0 0 30 30"><path d="M4 26 V12 L15 5 L26 12 V26" /></svg>
+        <div><div class="tt">자체 가구 생산 (김포 본점)</div><div class="ds">하드웨어부터 완제품까지</div></div>
+      </div>
+    </div>
+    <div class="brands up">멀티브랜드 수입 전문 — <b>Blum</b> (간판) · AGOFORM (독일) · Peka (스위스) 등</div>
+    <div class="footnote">※ 재고·납기 및 정확한 법적 등급 표현은 클라이언트 확인 후 확정 [TODO: 확인].</div>
+  </div>
+</section>
+
+<!-- ===== SECTION: showroom (CTA) ===== -->
+<section class="section section--dark showroom" id="showroom" data-section="showroom" data-screen-label="09 CTA">
+  <div class="inner">
+    <span class="eyebrow up"><span class="num">09</span> / 다음 움직임</span>
+    <h2 class="up d-05">직접 보고 결정하세요 — 전국 쇼룸에서.</h2>
+    <p class="lede up d-10"><strong>방문 예약제</strong>로 운영합니다.</p>
+
+    <!-- 반복요소: 동일 .showroom-card 구조 (map 렌더 가능) -->
+    <div class="branches">
+      <div class="showroom-card up d-04">
+        <div class="bh"><span class="name">김포 본점</span><span class="tag">FLAGSHIP</span></div>
+        <div class="meta">대규모 쇼룸 + 가구 직접 생산<br /><span class="todo">[TODO: 확인 — 김포 주소·전화]</span></div>
+        <a class="book" href="#showroom">방문 예약 <span class="arrow">→</span></a>
+      </div>
+      <div class="showroom-card up d-12">
+        <div class="bh"><span class="name">용인점</span><span class="tag">SHOWROOM</span></div>
+        <div class="meta"><span class="ph-line">T. 031-274-4241</span><br /><span class="todo">[TODO: 확인 — 용인 주소]</span></div>
+        <a class="book" href="#showroom">방문 예약 <span class="arrow">→</span></a>
+      </div>
+      <div class="showroom-card up d-20">
+        <div class="bh"><span class="name">부산지사</span><span class="tag">SHOWROOM</span></div>
+        <div class="meta">부산 동래구 안락동 459-29<br /><span class="ph-line">T. 051-323-2532</span></div>
+        <a class="book" href="#showroom">방문 예약 <span class="arrow">→</span></a>
+      </div>
+    </div>
+
+    <div class="ph map up" data-ph="전국 지점 지도 · 16:9 (지도 임베드/이미지 교체)"></div>
+
+    <div class="actions up">
+      <a class="btn btn--primary" data-cta="book" href="#showroom">쇼룸 방문 예약 <span class="arrow">→</span></a>
+      <a class="btn btn--secondary" href="#showroom">견적·상담 요청</a>
+      <a class="btn btn--ghost" href="#showroom">카탈로그 받기 ↓</a>
+    </div>
+
+    <div class="closeline"><i></i></div>
+    <p class="signoff"><b>Woobo</b> · Blum 한국 독점 에이전트 · moving ideas</p>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     SCRIPT BLOCK
+     · 전역 변수 남발 X (단일 IIFE / 명명된 함수)
+     · 각 인터랙션 위 MOTION 스펙 주석 → GSAP ScrollTrigger 재구현 기준
+     · premium 라이브러리 미사용 (stroke-dashoffset 드로잉 / 수동 글자분할은 마크업에서)
+     ============================================================ -->
+<script>
+(function () {
+  "use strict";
+
+  /* ---- 환경 ---- */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- util ---- */
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var lerp = function (a, b, t) { return a + (b - a) * t; };
+  var qs = function (s, r) { return (r || document).querySelector(s); };
+  var qsa = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  /* 요소 top이 startF~endF(뷰포트 높이 비율) 구간을 지날 때 0~1 진행도 */
+  var sectionProgress = function (el, startF, endF) {
+    var r = el.getBoundingClientRect(), vh = window.innerHeight;
+    return clamp((vh * startF - r.top) / (vh * startF - vh * endF), 0, 1);
+  };
+  var setP = function (el, v) { if (el) el.style.setProperty("--p", v.toFixed(4)); };
+
+  /* =======================================================
+     MOTION: progress-bar
+       trigger: document scroll
+       type: bind (scrollTop/maxScroll 0→1)
+       target: .progress__bar  property: width 0%→100%
+       easing: linear  pin: false  reduced-motion: 동일(데코)
+     ======================================================= */
+  var bar = qs(".progress__bar");
+  function updateProgress() {
+    var h = document.documentElement, max = h.scrollHeight - h.clientHeight;
+    if (bar) bar.style.width = ((max > 0 ? h.scrollTop / max : 0) * 100).toFixed(2) + "%";
+  }
+
+  /* =======================================================
+     MOTION: header-shrink + header-theme
+       trigger: scrollY > 40 → .is-shrunk (padding/blur/border)
+       trigger: 헤더 중앙선(56px)이 .section--dark 위 → .on-dark (색 반전)
+       type: trigger(state toggle)  pin: false  reduced-motion: 동일
+     ======================================================= */
+  var header = qs(".site-header");
+  var darkSections = qsa(".section--dark");
+  function updateHeader() {
+    if (!header) return;
+    header.classList.toggle("is-shrunk", window.scrollY > 40);
+    var probe = 56;
+    var onDark = darkSections.some(function (s) {
+      var r = s.getBoundingClientRect();
+      return r.top <= probe && r.bottom >= probe;
+    });
+    header.classList.toggle("on-dark", onDark);
+  }
+
+  /* =======================================================
+     MOTION: reveal-up / reveal-mask
+       trigger: 요소 top < 92% 뷰포트 → .in
+       type: trigger(once) + stagger(.d-* 딜레이 / GSAP stagger 대응)
+       target: .up(opacity 0→1, y 28*motion→0) · .mask>span(y 110%→0) · .trust .card(mark draw) · .closeline(scaleX 0→1)
+       easing: --ease  pin: false  reduced-motion: 최종상태 즉시표시
+     ======================================================= */
+  var revealEls = qsa(".up, .mask, .trust .card, .closeline");
+  function snap(el) {
+    el.style.transition = "none"; el.style.opacity = "1"; el.style.transform = "none";
+    var inner = el.querySelector(":scope > span");
+    if (inner) { inner.style.transition = "none"; inner.style.transform = "none"; }
+  }
+  function stuck(el) {
+    if (el.classList.contains("mask")) {
+      var inner = el.querySelector(":scope > span");
+      if (!inner) return false;
+      return Math.abs(new DOMMatrixReadOnly(getComputedStyle(inner).transform).m42) > 2;
+    }
+    return parseFloat(getComputedStyle(el).opacity) < 0.9;
+  }
+  function reveal(el) {
+    el.classList.add("in");
+    if (reduce) { snap(el); return; }
+    /* fallback: 트랜지션이 진행되지 않는(오프스크린/스로틀) 환경에서 블랭크 방지 — 실제 브라우저에선 no-op */
+    setTimeout(function () { if (stuck(el)) snap(el); }, 1500);
+  }
+  function checkReveal() {
+    if (!revealEls.length) return;
+    var trigger = window.innerHeight * 0.92;
+    for (var i = revealEls.length - 1; i >= 0; i--) {
+      if (revealEls[i].getBoundingClientRect().top < trigger) { reveal(revealEls[i]); revealEls.splice(i, 1); }
+    }
+  }
+
+  /* =======================================================
+     MOTION: demo-softclose-scrub  (시그니처)
+       trigger: .demo-softclose, 진입(top 86%vh)~정렬(top 32%vh)
+       type: scrub (스크롤 0~1 → --p, rAF+lerp 0.12)
+       target: .demo-softclose .drawer  property: translateX 92%→0 (p 0→1)
+       easing: --ease  pin: false  reduced-motion: 최종상태(닫힘, p=1) 고정
+     ======================================================= */
+  var dwSoft = qs(".demo-softclose");
+  var sSoft = { cur: 0 };
+
+  /* =======================================================
+     MOTION: demo-hinge-scrub + click + 3axis
+       trigger: .demo-hinge, 진입(top 86%vh)~정렬(top 30%vh)
+       type: scrub (--p) + trigger(p>0.36 → .clicked) + stagger(3축 knob)
+       target: .door rotateY -58°→0°(p 0→0.34) · .click opacity · .axis i left→[78%,30%,66%] 순차(180+i*220ms)
+       easing: door=--ease(scrub) / knob=--ease-tip  pin: false  reduced-motion: 최종상태(장착+정렬) 고정
+     ======================================================= */
+  var dwHinge = qs(".demo-hinge");
+  var sHinge = { cur: 0, clicked: false }, axisTimers = [];
+  var AXIS_TARGETS = ["78%", "30%", "66%"];
+  function hingeClick() {
+    sHinge.clicked = true; dwHinge.classList.add("clicked");
+    var knobs = qsa(".axis .bar i", dwHinge);
+    axisTimers.forEach(clearTimeout); axisTimers = [];
+    knobs.forEach(function (k, i) {
+      axisTimers.push(setTimeout(function () { k.style.setProperty("--ax", AXIS_TARGETS[i] || "60%"); }, reduce ? 0 : 180 + i * 220));
+    });
+  }
+  function hingeReset() {
+    sHinge.clicked = false; dwHinge.classList.remove("clicked");
+    qsa(".axis .bar i", dwHinge).forEach(function (k) { k.style.setProperty("--ax", "16%"); });
+  }
+
+  /* =======================================================
+     MOTION: demo-tipon
+       trigger(auto): .demo-tipon 진입 진행 p>0.55 → .open  /  trigger(click): 토글
+       type: trigger(state) — translateY 0→-14% + scale 1.012 오버슈트, 오렌지 라인 fade-in
+       target: .demo-tipon .drawerC  easing: --ease-tip  pin: false  reduced-motion: 정적(닫힘)
+     ======================================================= */
+  var dwTip = qs(".demo-tipon"), tipOpened = false;
+  function tipOpen() { tipOpened = true; if (dwTip) dwTip.classList.add("open"); }
+  if (dwTip && !reduce) {
+    dwTip.style.cursor = "pointer";
+    dwTip.addEventListener("click", function () { dwTip.classList.toggle("open"); tipOpened = dwTip.classList.contains("open"); });
+  }
+
+  /* =======================================================
+     MOTION: problem-slam ('쾅' — 페이지 유일 1회, 소프트클로즈 파괴)
+       trigger: .problem 진입률 ≥ 55%
+       type: trigger(once) — .slamdoor rotateY -72°→0° over --dur-slam(0.13s) --ease-slam + .shake + .flash
+       target: .slamstage  pin: false  reduced-motion: 닫힘 상태로 즉시 고정(애니메이션 없음)
+     ======================================================= */
+  var slamStage = qs(".slamstage"), slamDoor = qs(".slamdoor"), problem = qs(".problem"), slamFired = false;
+  function fireSlam() {
+    slamFired = true;
+    if (reduce) { setP(slamStage, 1); return; }
+    if (slamDoor) { slamDoor.style.transition = "transform var(--dur-slam) var(--ease-slam)"; setP(slamStage, 1); }
+    slamStage.classList.add("shake", "flash");
+    setTimeout(function () { slamStage.classList.remove("shake", "flash"); }, 460);
+  }
+
+  /* ---- rAF 제어 헤드: 모든 scrub/트리거 lerp 갱신 ---- */
+  function frame() {
+    checkReveal();
+    if (dwSoft) { sSoft.cur = lerp(sSoft.cur, sectionProgress(dwSoft, 0.86, 0.32), 0.12); setP(dwSoft, sSoft.cur); }
+    if (dwHinge) {
+      sHinge.cur = lerp(sHinge.cur, sectionProgress(dwHinge, 0.86, 0.30), 0.12); setP(dwHinge, sHinge.cur);
+      if (!sHinge.clicked && sHinge.cur > 0.36) hingeClick();
+      if (sHinge.clicked && sHinge.cur < 0.20) hingeReset();
+    }
+    if (dwTip) {
+      var pT = sectionProgress(dwTip, 0.80, 0.40); setP(dwTip, pT);
+      if (!tipOpened && pT > 0.55) tipOpen();
+      if (tipOpened && pT < 0.15) { tipOpened = false; dwTip.classList.remove("open"); }
+    }
+    if (!slamFired && problem) {
+      var r = problem.getBoundingClientRect(), vh = window.innerHeight;
+      if ((vh - r.top) / vh >= 0.55 && r.top < vh) fireSlam();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- 스크롤 핸들 (passive + rAF 코얼레싱) ---- */
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { updateProgress(); updateHeader(); checkReveal(); ticking = false; });
+  }
+
+  /* ---- 부드러운 앵커 스크롤 (개발 시 Lenis가 대체) ---- */
+  function bindAnchors() {
+    qsa('a[href^="#"]').forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        var id = a.getAttribute("href");
+        if (id.length <= 1) return;
+        var t = qs(id);
+        if (t) { e.preventDefault(); t.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }
+      });
+    });
+  }
+
+  /* ---- primary CTA pop (TIP-ON 팝) ---- */
+  function bindCta() {
+    var btn = qs('[data-cta="book"]');
+    if (!btn) return;
+    btn.addEventListener("click", function () { btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop"); });
+  }
+
+  /* ---- reduced-motion: 데모 최종상태 정적 고정 ---- */
+  function applyReducedStates() {
+    setP(slamStage, 1);
+    if (dwSoft) setP(dwSoft, 1);
+    if (dwHinge) { setP(dwHinge, 1); hingeClick(); }
+    if (dwTip) setP(dwTip, 0);
+  }
+
+  /* ---- init ---- */
+  function init() {
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", function () { updateProgress(); updateHeader(); }, { passive: true });
+    window.addEventListener("load", checkReveal);
+    bindAnchors(); bindCta();
+    updateProgress(); updateHeader(); checkReveal();
+    if (reduce) applyReducedStates();
+    requestAnimationFrame(frame);
+  }
+  init();
+})();
+</script>
+
+<!-- ============================================================
+     HANDOFF NOTES (개발 이관)  —  Next.js + TS + Tailwind + GSAP ScrollTrigger / Lenis
+     ============================================================
+
+  [A] 섹션 → 컴포넌트 매핑
+  ┌────────────────┬──────────────────────────────────┬───────────────┬───────────┐
+  │ data-section   │ 역할                             │ 컴포넌트(제안)│ 반복요소  │
+  ├────────────────┼──────────────────────────────────┼───────────────┼───────────┤
+  │ hero           │ 고통 공감 / 진입                 │ <Hero>        │ -         │
+  │ problem        │ 문제 + 슬램도어 '쾅'             │ <Problem>     │ -         │
+  │ cause          │ 원인 (다크→라이트)               │ <Cause>       │ Path ×3   │
+  │ solve          │ 해결 등장 (Woobo 워드마크)       │ <Solve>       │ -         │
+  │ demo-softclose │ 증거① 소프트클로즈 (scrub)       │ <DemoSoftClose>│ -        │
+  │ demo-hinge     │ 증거② 무공구 3축 (scrub+stagger) │ <DemoHinge>   │ Axis ×3   │
+  │ demo-tipon     │ 증거③ TIP-ON (trigger/click)     │ <DemoTipOn>   │ -         │
+  │ trust          │ 신뢰 그리드                      │ <Trust>       │ Card ×6   │
+  │ showroom       │ 쇼룸 예약 CTA                    │ <Showroom>    │ Branch ×3 │
+  └────────────────┴──────────────────────────────────┴───────────────┴───────────┘
+  · 공용: <SiteHeader>(진행바+헤더), 프리미티브 .up/.mask(reveal), .ph(placeholder), .btn/.chip/.microcta.
+  · 반복요소는 동일 클래스 구조이므로 데이터 배열 + map 으로 렌더 권장 (Path/Axis/Card/Branch).
+
+  [B] 인터랙션 목록 (스펙은 각 JS MOTION 주석 참조 / GSAP ScrollTrigger 1:1 재구현)
+  1. progress-bar       bind     scroll 0~1 → .progress__bar width
+  2. header-shrink      trigger  scrollY>40 → .is-shrunk
+  3. header-theme       trigger  헤더가 .section--dark 위 → .on-dark
+  4. reveal-up/mask     trigger+stagger  요소 top<92%vh → .in (.d-* 딜레이)
+  5. demo-softclose     scrub    .drawer translateX 92%→0   (--ease, lerp .12)
+  6. demo-hinge         scrub+stagger  .door rotateY -58→0(p<0.34) + 3축 knob 순차
+  7. demo-tipon         trigger/click  .open → drawerC y -14% + scale (--ease-tip)
+  8. problem-slam       trigger-once  .slamdoor rotateY→0 0.13s (--ease-slam) + shake/flash
+  9. trust mark draw    trigger  .card.in → stroke-dashoffset 120→0 (premium 라이브러리 없이)
+  10. closeline         trigger  .closeline.in → i scaleX 0→1
+  11. wordmark-float / hero-scroll / tipon-tap : 데코 루프 (reduced-motion에서 off)
+  · GSAP 매핑: scrub = ScrollTrigger {scrub:true, start/end}; trigger = ScrollTrigger {toggleActions/once};
+    stagger = gsap.to(targets,{stagger}); SVG draw = stroke-dashoffset 트윈; split text = 마크업에서 수동 분할(.mask>span).
+  · 스무딩: 현재 rAF+lerp 제어 헤드 → 개발 시 Lenis 로 교체(스크롤 가상화) 권장.
+
+  [C] 에셋 목록 (교체 위치 = data-ph / 데모는 CSS 렌더라 에셋 불필요)
+  · showroom .map  [data-ph]  → 전국 지점 지도(임베드 또는 16:9 이미지)
+  · (옵션) 데모 3종을 실제 제품 영상/이미지로 대체 가능 — 현재는 의도 전달용 CSS 목업.
+  · 미확정 텍스트 [TODO: 확인] : 김포 본점 주소·전화, 용인 주소, 방문예약/견적/카탈로그 채널(href).
+
+  [D] 토큰 표 (:root, 전부 변수 참조)
+  · color   : --c-orange #ff671f / --c-orange-hover #e4561a / --c-ink #1c1a17 / --c-ink-2 #59544d /
+              --c-caption #8a847b / --c-paper #f4f1ec / --c-charcoal #16140f / --c-charcoal-card #221f18 /
+              --c-paper-on-dark #efe9df / --c-line #e2ddd4 / --c-line-dark rgba(239,233,223,.14)
+  · easing  : --ease cubic-bezier(.16,1,.3,1) / --ease-tip cubic-bezier(.34,1.56,.64,1) / --ease-slam cubic-bezier(.72,0,1,1)
+  · duration: --dur-reveal .9s / --dur-tip .5s / --dur-slam .13s / --dur-axis .6s
+  · radius  : --r-pill 999px / --r-card 3px / --r-stage 3px
+  · layout  : --maxw 1200px / --pad clamp(20,5vw,88) / --space-section clamp(96,13vh,180) / --gap-grid clamp(36,5vw,80)
+  · motion  : --motion 0.7 (reveal 이동량·플로팅 진폭 스케일)
+  → Tailwind 이관: tailwind.config theme.extend.colors/transitionTimingFunction/borderRadius/spacing 에 위 토큰 매핑,
+    또는 CSS 변수 그대로 두고 Tailwind arbitrary value 로 var(--token) 참조.
+
+  [E] 브레이크포인트 / 폰트
+  · breakpoint: 900px (이하 단일 컬럼). Tailwind 기본 'lg(1024)'/'md(768)'와 근접 — 디자인 검수 후 정렬 권장.
+  · fonts: 헤드 Pretendard(700/800), 본문 IBM Plex Sans KR(300~700), 라벨/모노 IBM Plex Mono(대문자, letter-spacing).
+           → next/font 또는 self-host 권장(현재 jsDelivr/Google CDN @import).
+  · 접근성: word-break:keep-all, prefers-reduced-motion reduce 시 애니메이션 off + 최종상태.
+-->
+
+</body>
+</html>

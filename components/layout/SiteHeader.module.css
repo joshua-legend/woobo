@@ -1,0 +1,119 @@
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: var(--color-orange);
+  z-index: 200;
+  will-change: transform;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--gutter, var(--pad));
+  height: 84px;
+  border-bottom: 1px solid transparent;
+  color: var(--color-ink);
+  transition:
+    height 0.5s var(--ease-soft),
+    background 0.5s var(--ease-soft),
+    backdrop-filter 0.5s var(--ease-soft),
+    border-color 0.5s var(--ease-soft),
+    color 0.5s var(--ease-soft);
+}
+.shrunk {
+  height: 60px;
+  background: color-mix(in srgb, var(--color-paper) 78%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid var(--color-line);
+}
+.onDark {
+  color: var(--color-paper-on-dark);
+}
+.onDark.shrunk {
+  background: color-mix(in srgb, var(--color-charcoal) 72%, transparent);
+  border-bottom: 1px solid var(--color-line-dark);
+}
+
+.brand {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+  color: currentColor;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+.brand .dot {
+  color: var(--color-orange);
+}
+.brand .sub {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-caption);
+}
+.onDark .brand .sub {
+  color: rgba(239, 233, 223, 0.5);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 30px);
+}
+.navLink {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: currentColor;
+  opacity: 0.78;
+  transition: opacity 0.25s var(--ease-soft);
+}
+.navLink:hover {
+  opacity: 1;
+}
+
+.cta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: currentColor;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  padding: 9px 18px;
+  white-space: nowrap;
+  opacity: 0.85;
+  transition: all 0.3s var(--ease-soft);
+}
+.cta:hover {
+  background: var(--color-orange);
+  border-color: var(--color-orange);
+  color: #fff;
+  opacity: 1;
+}
+
+@media (max-width: 760px) {
+  .hideSm {
+    display: none;
+  }
+}
+@media (max-width: 900px) {
+  .cta {
+    display: none;
+  }
+}
