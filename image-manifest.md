@@ -77,18 +77,23 @@
 
 ---
 
-## SECTION 02 · 정체성 pin 우측 스테이지 — `image` 변주용 (`?identity=pin&idStage=image`)
-> image안 채택 시에만 필요. 키워드별 무드 컷. 파일: `public/images/hero/identity-<n>.png`(또는 별도 폴더). 현재 `.ph`.
+## SECTION 02 · 정체성 pin — 채택 진행: **card + demo**
+
+### card 변주 이미지 (`?identity=pin&idStage=card`) — 채택, 이미지 필요
+> 파일: `public/images/identity/identity-card-<n>.png`. 4:5 풀카드 + 하단 텍스트 오버레이. 현재 `.ph` 해치 폴백.
 
 | id | 비율 | intent | 상태 |
 |---|---|---|---|
-| `identity-1` | 1:1 | Blum 한국 독점 에이전트 — 독점 계약/씰 무드 | 후보 |
-| `identity-2` | 1:1 | 정품의 공식 통로 — 정품 vs 유사품 대비 무드 | 후보 |
-| `identity-3` | 1:1 | 전국 오프라인 쇼룸 — 쇼룸/지도 무드 | 후보 |
-| `identity-4` | 1:1 | 프리미엄 멀티브랜드 수입 — 브랜드/수입 무드 | 후보 |
-| `identity-5` | 1:1 | 자체 가구 생산(김포) — 생산현장 무드 | 후보 |
+| `identity-card-1` | 4:5 | 독점 에이전트 — 스포트라이트 단독 하드웨어 | 프롬프트 발행 |
+| `identity-card-2` | 4:5 | 정품의 공식 통로 — 정품 씰/개봉 무드 | 프롬프트 발행 |
+| `identity-card-3` | 4:5 | 전국 오프라인 쇼룸 — 미니멀 쇼룸 컷 | 프롬프트 발행 |
+| `identity-card-4` | 4:5 | 멀티브랜드 수입 — 큐레이션 플랫레이 | 프롬프트 발행 |
+| `identity-card-5` | 4:5 | 자체 생산(김포) — 작업대 디테일 | 프롬프트 발행 |
 
-- 프롬프트 초안(공통 스파인 동일): `Square cinematic macro/mood for "<intent>", deep charcoal #16140f, single orange #ff671f accent, premium matte, fine grain, dark negative space, --ar 1:1` + 공통 네거티브. (정품 단정 캡션 금지)
+- 프롬프트: `WORKLOG`/채팅 발행분 참조(공통 스파인 + 4:5 + 하단 텍스트 여백 + 정품 단정 금지).
+
+### demo 변주 (`?identity=pin&idStage=demo`) — 채택, 이미지 0
+- 셀렉티브 폴리시: ③지도=실제 한국 SVG+핀 · ④로고=워드마크(텍스트) · ①②⑤=추상+모션. AI 이미지 불필요.
 
 ## SECTION 03~08 · (추후 슬롯 추가)
 - 03~05 데모 / 06 약속 / 07 사회적 증거(로고월·후기) / 08 쇼룸(지점 지도) — 현재 전부 `.ph` placeholder. 디벨롭 진행하며 슬롯 등재.

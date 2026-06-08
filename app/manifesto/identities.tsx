@@ -12,22 +12,22 @@ const FACETS = [
   { kw: "자체 가구 생산 (김포 본점)", proof: "하드웨어부터 완제품까지" },
 ];
 
-/* ---------- 우측 스테이지 변주: card ---------- */
-const CARD_MARKS = [
-  <path key="m" d="M20 6 L34 12 V22 C34 31 28 35 20 38 C12 35 6 31 6 22 V12 Z M13 21 L18 26 L28 15" />,
-  <path key="m" d="M5 20 H30 M24 13 L31 20 L24 27" />,
-  <path key="m" d="M20 4 C27 4 32 9 32 16 C32 25 20 36 20 36 C20 36 8 25 8 16 C8 9 13 4 20 4 Z M20 16 m-4 0 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0" />,
-  <path key="m" d="M7 12 H33 M7 20 H33 M7 28 H33" />,
-  <path key="m" d="M5 34 V16 L20 7 L35 16 V34 M15 34 V24 H25 V34" />,
-];
-
-function StageCard({ active }: { active: number }) {
-  const f = FACETS[active];
+/* ---------- 우측 스테이지 변주: card (이미지 카드) ---------- */
+// 키워드별 풀카드 이미지 + 하단 텍스트 오버레이. 이미지 없으면 .ph 해치 폴백.
+function StageCard({ i }: { i: number }) {
+  const f = FACETS[i];
   return (
-    <div className="pin-card">
-      <svg className="pin-card__mark" viewBox="0 0 40 40" aria-hidden="true">
-        {CARD_MARKS[active]}
-      </svg>
+    <div
+      className="pin-card ph"
+      data-ph={`identity-card-${i + 1}`}
+    >
+      <div
+        className="pin-card__img"
+        style={{
+          backgroundImage: `url(/images/identity/identity-card-${i + 1}.png)`,
+        }}
+      />
+      <div className="pin-card__overlay" />
       <div className="pin-card__txt">
         <b>{f.kw}</b>
         <span>{f.proof}</span>
@@ -67,15 +67,24 @@ function StageDemo({ i }: { i: number }) {
     case 2:
       return (
         <div className="pd pd-map">
-          <span className="pd-pin" style={{ left: "44%", top: "26%" }}>
-            <i />김포
-          </span>
-          <span className="pd-pin" style={{ left: "55%", top: "40%" }}>
-            <i />용인
-          </span>
-          <span className="pd-pin" style={{ left: "64%", top: "74%" }}>
-            <i />부산
-          </span>
+          <svg viewBox="0 0 100 132" className="pd-map__svg" aria-hidden="true">
+            <path
+              className="pd-map__land"
+              d="M50 8 L63 12 L67 23 L79 29 L74 41 L85 53 L80 65 L89 80 L78 93 L83 105 L70 113 L60 109 L52 118 L44 111 L40 97 L30 91 L35 77 L26 67 L32 53 L24 43 L35 35 L30 22 L42 18 Z"
+            />
+            <g className="pd-map__pin">
+              <circle cx="44" cy="41" r="3.4" />
+              <text x="49" y="42.5">김포</text>
+            </g>
+            <g className="pd-map__pin">
+              <circle cx="50" cy="53" r="3.4" />
+              <text x="55" y="54.5">용인</text>
+            </g>
+            <g className="pd-map__pin">
+              <circle cx="78" cy="98" r="3.4" />
+              <text x="54" y="99.5">부산</text>
+            </g>
+          </svg>
         </div>
       );
     case 3:
@@ -143,7 +152,7 @@ function PinStage({ variant, active }: { variant: string; active: number }) {
           key={f.kw}
           className={`pin-stage__item${i === active ? " is-active" : ""}`}
         >
-          {variant === "card" && <StageCard active={i} />}
+          {variant === "card" && <StageCard i={i} />}
           {variant === "image" && (
             <div
               className="pin-stage__ph ph"
