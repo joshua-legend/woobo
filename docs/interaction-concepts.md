@@ -60,7 +60,13 @@ pin을 좌우 분할: 좌=키워드 루프, 우=키워드와 동기되는 스테
 | `image` | 키워드별 사진 패널 | swipe | 5장(`identity-1~5`, .ph) | 구현됨(이미지 대기) |
 | `diagram` | SVG 도식 draw | strokeDashoffset | 0 | 구현됨 |
 
-## 03 · 신념① 소프트클로즈 — 채택: scrub 비핀 · 상태: 구현됨
+## 03 · 신념① 소프트클로즈 — 채택: **[미정]** · `?soft=scrub|throw|compare`
+
+| id | 컨셉 | 모션 | 상태 |
+|---|---|---|---|
+| `scrub` | 스크롤로 닫힘+끝 감속(현행) | `useScrub` `--ease` | 구현됨 |
+| `throw` | 드래그로 세게 던져도 항상 사뿐히 정착 | `useScrub`+포인터, 릴리즈 `--ease` 스냅 | 구현됨 |
+| `compare` | 일반(빨리 닫고 미세 범프) vs BLUMOTION(감속) 대비 | `useScrub`, 절제(슬램 이징 미사용) | 구현됨 |
 ## 04 · 신념② 무공구 3축 — 채택: scrub + 클릭 스테이지 · 상태: 구현됨
 ## 05 · 신념③ TIP-ON — 채택: scrub + 클릭 토글 · 상태: 구현됨
 ## 06 · 약속(Trust) — 채택: `.up` 스태거 + SVG draw · 상태: 구현됨

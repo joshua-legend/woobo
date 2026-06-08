@@ -1434,6 +1434,91 @@
   color: var(--c-caption);
 }
 
+/* ---- demo-softthrow: 드래그 던지기 ---- */
+.route-manifesto .demo-softthrow .drawer {
+  cursor: grab;
+}
+.route-manifesto .demo-softthrow.is-grab .drawer {
+  cursor: grabbing;
+}
+.route-manifesto .demo-softthrow .grabhint {
+  color: var(--c-orange);
+}
+
+/* ---- sc-compare: 쾅 vs 사뿐 (절제 · 슬램 이징 미사용) ---- */
+.route-manifesto .sc-compare {
+  display: flex;
+  gap: clamp(12px, 4%, 30px);
+  align-items: center;
+  padding: clamp(18px, 5%, 40px);
+}
+.route-manifesto .sc-col {
+  position: relative;
+  flex: 1;
+  aspect-ratio: 3 / 4;
+}
+.route-manifesto .sc-cab {
+  position: absolute;
+  inset: 6% 6% 14% 6%;
+  border: 2px solid var(--c-ink);
+  border-right: none;
+  background: color-mix(in srgb, var(--c-ink) 4%, var(--c-paper));
+}
+.route-manifesto .sc-drawer {
+  position: absolute;
+  top: 18%;
+  bottom: 28%;
+  right: 6%;
+  width: 58%;
+  border: 2px solid var(--c-ink);
+  background: linear-gradient(180deg, #fff, color-mix(in srgb, var(--c-ink) 8%, #fff));
+  box-shadow: 6px 8px 20px rgba(0, 0, 0, 0.1);
+}
+.route-manifesto .sc-col--hard .sc-drawer {
+  transform: translateX(calc((1 - var(--ph, 0)) * 100%));
+}
+.route-manifesto .sc-col--soft .sc-drawer {
+  transform: translateX(calc((1 - var(--ps, 0)) * 100%));
+}
+.route-manifesto .sc-col--soft .sc-drawer::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  bottom: -2px;
+  width: 10px;
+  background: var(--c-orange);
+}
+.route-manifesto .sc-drawer.is-bump {
+  animation: rm-scBump 0.18s var(--ease);
+}
+@keyframes rm-scBump {
+  0% {
+    transform: translateX(0);
+  }
+  45% {
+    transform: translateX(3%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.route-manifesto .sc-cap {
+  position: absolute;
+  left: 6%;
+  bottom: 2%;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--c-caption);
+}
+.route-manifesto .sc-col--hard .sc-cap {
+  color: var(--c-ink-2);
+}
+.route-manifesto .sc-col--soft .sc-cap {
+  color: var(--c-orange);
+}
+
 /* ---- demo-hinge: 무공구 힌지 3축 ---- */
 .route-manifesto .demo-hinge .wall {
   position: absolute;
@@ -1999,5 +2084,8 @@
   }
   .route-manifesto .story-beat {
     opacity: 1 !important;
+  }
+  .route-manifesto .sc-drawer.is-bump {
+    animation: none !important;
   }
 }

@@ -38,6 +38,14 @@
 
 ---
 
+### [2026-06-08] 세션 — 섹션3(소프트클로즈) throw·compare 버저닝
+- **한 일:**
+  - 신념① 소프트클로즈를 `?soft=` 버저닝으로: `scrub`(현행)·`throw`(드래그로 세게 던져도 항상 사뿐히 릴리즈 스냅)·`compare`(일반 vs BLUMOTION 대비, **절제** — 슬램 이징 안 쓰고 미세 범프만).
+  - 인라인 DemoSoftClose → `app/manifesto/softclose.tsx`로 추출+3변주.
+- **산출물:** 신규 `softclose.tsx`, 수정 `lib/variants.ts`(soft 키)·`ManifestoClient.tsx`·`manifesto.css`(softthrow·sc-compare). 검증: tsc·build 통과, 3변주 렌더·스위처 노출.
+- **결정:** compare는 '쾅' 슬램 토큰 미사용(절제). throw 포인터+touchAction none(모바일 드래그).
+- **확인요청(사장님):** throw 던짐 감도/compare 대비 강도 OK? 신념①도 최종 1안 선택.
+
 ### [2026-06-08] 세션 — story 페이즈+커튼 와이프 전환
 - **한 일:**
   - story를 **연속 팬 → 페이즈(챕터) 방식**으로: 각 페이즈에서 스크롤하면 진행바(`--story-local`)가 차고, 다 차면 **커튼 와이프(오른쪽→왼쪽)**로 다음 페이지처럼 넘어감(active 키 변경마다 1회). 텍스트 정중앙.

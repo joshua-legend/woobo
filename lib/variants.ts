@@ -24,6 +24,11 @@ export const SECTION_VARIANTS = {
     options: ["card", "demo", "image", "diagram", "story"],
     default: "card",
   },
+  soft: {
+    label: "신념① 소프트",
+    options: ["scrub", "throw", "compare"],
+    default: "scrub",
+  },
 } as const satisfies Record<string, SectionConfig>;
 
 export type SectionKey = keyof typeof SECTION_VARIANTS;
