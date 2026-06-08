@@ -18,12 +18,14 @@
 
 ### 1안 `hero-slot` — 슬롯 단어 ↔ 배경 교체 (단어 수만큼 N장)
 
+> 파일: `public/images/hero/<id>.png` → slot 히어로 배경에 연결됨.
+
 | id | 비율 | intent | 상태 |
 |---|---|---|---|
-| `hero-bg-motion` | 16:9 / 4:5 | '움직임' | 후보 |
-| `hero-bg-precision` | 16:9 / 4:5 | '정밀' | 후보 |
-| `hero-bg-authentic` | 16:9 / 4:5 | '정품'(무드만) | 후보 |
-| `hero-bg-detail` | 16:9 / 4:5 | '디테일/손끝' | 후보 |
+| `hero-bg-motion` | 16:9 / 4:5 | '움직임' | 연결됨(png) |
+| `hero-bg-precision` | 16:9 / 4:5 | '정밀' | 연결됨(png) |
+| `hero-bg-authentic` | 16:9 / 4:5 | '정품'(무드만) | 연결됨(png) |
+| `hero-bg-detail` | 16:9 / 4:5 | '디테일/손끝' | 연결됨(png) |
 
 **`hero-bg-motion`**
 - prompt: `Extreme macro side-section of a soft-close cabinet drawer caught mid-motion, subtle motion blur trailing the drawer face, machined runner visible, deep charcoal void #16140f, a single thin warm orange #ff671f rim-light tracing the leading edge, cinematic editorial lighting, shallow depth of field, matte premium surfaces, fine film grain, generous dark negative space on the left for a Korean headline, 16:9 --ar 16:9` + 공통 네거티브

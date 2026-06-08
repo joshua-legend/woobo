@@ -102,8 +102,8 @@ export function HeroSlot() {
         {SLOT_WORDS.map((s, i) => (
           <div
             key={s.bg}
-            className={`hero--slot__bg ph${i === idx ? " is-active" : ""}`}
-            data-ph={s.cap}
+            className={`hero--slot__bg${i === idx ? " is-active" : ""}`}
+            style={{ backgroundImage: `url(/images/hero/${s.bg}.png)` }}
           />
         ))}
         <div className="hero--slot__scrim" />
