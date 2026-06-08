@@ -177,15 +177,23 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
   const [active, setActive] = useState(0);
 
   const onUpdate = useCallback((p: number) => {
+    const el = secRef.current;
     // 페이즈 인덱스 + 페이즈 내부 진행도(--story-local 0→1, 진행바·패럴럭스용)
     const n = FACETS.length;
     const scaled = p * n;
     const next = Math.min(n - 1, Math.max(0, Math.floor(scaled)));
     const local = Math.min(1, Math.max(0, scaled - next));
-    secRef.current?.style.setProperty("--story-local", local.toFixed(4));
-    // 글 페이드: 페이즈 시작/끝에서 부드럽게 들어오고 나감(가운데 고정)
-    const fade = Math.max(0, Math.min(local / 0.15, (1 - local) / 0.15, 1));
-    secRef.current?.style.setProperty("--story-text", fade.toFixed(3));
+    if (el) {
+      el.style.setProperty("--story-local", local.toFixed(4));
+      // 글 페이드: 페이즈 시작/끝에서 부드럽게 들어오고 나감(가운데 고정)
+      const fade = Math.max(0, Math.min(local / 0.15, (1 - local) / 0.15, 1));
+      el.style.setProperty("--story-text", fade.toFixed(3));
+      // 씬 커버: 페이즈 진입 시 그 씬이 아래→위로 덮어 올라옴(clip 0→full)
+      for (let i = 1; i < n; i++) {
+        const cov = Math.min(1, Math.max(0, (scaled - i) / 0.5));
+        el.style.setProperty(`--cov-${i}`, cov.toFixed(4));
+      }
+    }
     if (next === activeRef.current) return;
     activeRef.current = next;
     setActive(next);
@@ -211,7 +219,7 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
               {FACETS.map((f, i) => (
                 <div
                   key={f.kw}
-                  className={`story-bg__scene${i === active ? " is-active" : ""}`}
+                  className="story-bg__scene"
                   style={{
                     backgroundColor: SCENE_TINTS[i],
                     backgroundImage: `url(/images/identity/identity-card-${i + 1}.png)`,
