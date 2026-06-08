@@ -10,77 +10,12 @@ import { CTA_HREF } from "@/lib/branches";
 import type { Variants } from "@/lib/variants";
 import { VariantSwitcher } from "@/components/lab/VariantSwitcher";
 import { HeroByVariant } from "./heroes";
+import { IdentityByVariant } from "./identities";
 import "./manifesto.css";
 
 const setP = (el: HTMLElement | null, v: number) => {
   if (el) el.style.setProperty("--p", v.toFixed(4));
 };
-
-/* =========================== [02] 정체성 핀 (sticky + scrub) =========================== */
-const IDENTITY_KEYWORDS = [
-  "Blum 한국 독점 에이전트",
-  "정품의 공식 통로",
-  "전국 오프라인 쇼룸",
-  "프리미엄 멀티브랜드 수입",
-  "자체 가구 생산 (김포 본점)",
-];
-
-function Identity() {
-  const secRef = useRef<HTMLDivElement>(null);
-  const itemsRef = useRef<HTMLLIElement[]>([]);
-  const activeRef = useRef(0);
-
-  const onUpdate = useCallback((p: number) => {
-    const n = IDENTITY_KEYWORDS.length;
-    const next = Math.min(n - 1, Math.max(0, Math.floor(p * n)));
-    if (next === activeRef.current) return;
-    activeRef.current = next;
-    itemsRef.current.forEach((li, i) => {
-      if (li) li.classList.toggle("is-active", i === next);
-    });
-  }, []);
-
-  useScrub(secRef, onUpdate, { start: "top top", end: "bottom bottom" });
-
-  return (
-    <section
-      className="section--dark identity"
-      id="identity"
-      data-section="identity"
-      data-theme="dark"
-      data-screen-label="02 정체성"
-      ref={secRef}
-    >
-      <div className="identity__sticky">
-        <div className="inner">
-          <span className="eyebrow reveal-up">
-            <span className="num">02</span> / 정체성
-          </span>
-          <h2 className="reveal-up d1">
-            우리는 <span className="hl">Blum 한국 독점 에이전트</span>입니다.
-          </h2>
-          <p className="lede reveal-up d2">
-            우보인터내셔날 주식회사 — 프리미엄 가구 하드웨어·소재 수입 전문.
-          </p>
-          <p className="identity__kicker reveal-up d3">우리는 또한 —</p>
-          <ul className="identity__loop" aria-hidden="true">
-            {IDENTITY_KEYWORDS.map((kw, i) => (
-              <li
-                key={kw}
-                className={`identity__kw${i === 0 ? " is-active" : ""}`}
-                ref={(el) => {
-                  if (el) itemsRef.current[i] = el;
-                }}
-              >
-                {kw}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* =========================== [03] 신념① · soft-close =========================== */
 function DemoSoftClose() {
@@ -680,7 +615,7 @@ export default function ManifestoClient({ variants }: { variants: Variants }) {
       />
       <main id="top">
         <HeroByVariant variant={variants.hero} />
-        <Identity />
+        <IdentityByVariant variant={variants.identity} />
         <DemoSoftClose />
         <DemoHinge />
         <DemoTipOn />

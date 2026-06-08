@@ -14,6 +14,11 @@ export const SECTION_VARIANTS = {
     options: ["kinetic", "slot", "aperture-a", "aperture-b", "aperture-c"],
     default: "kinetic",
   },
+  identity: {
+    label: "정체성",
+    options: ["pin", "stamp", "marquee"],
+    default: "pin",
+  },
 } as const satisfies Record<string, SectionConfig>;
 
 export type SectionKey = keyof typeof SECTION_VARIANTS;

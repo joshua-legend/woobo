@@ -38,6 +38,22 @@
 
 ---
 
+### [2026-06-08] 세션 — 섹션2(정체성) 변주 2종 추가 + 히어로 이미지 연결
+- **한 일:**
+  - 히어로 slot 배경 4장·aperture 배경 3장(=a/b/c 비교용) 실제 PNG 연결(`public/images/hero/`).
+  - **섹션2(정체성)에 변주 2종 추가**: `stamp`(자격 도장·SVG draw+팝) / `marquee`(흐르는 키워드 띠) — 현행 `pin`과 함께 `?identity=`로 스위처 비교.
+- **산출물:**
+  - 신규 `app/manifesto/identities.tsx`(pin/stamp/marquee+셀렉터). 수정 `lib/variants.ts`(identity 키)·`ManifestoClient.tsx`·`manifesto.css`(stamp·marquee 스타일).
+  - 검증: tsc·build 통과, 3변주 SSR 렌더, 스위처 정체성 줄 노출·hero↔identity 파라미터 상호 보존.
+- **결정:**
+  - 정체성 변주는 이미지 0(stamp=SVG 씰, marquee=타이포). 공용 버저닝이 섹션 늘려도 그대로 확장됨을 실증(레지스트리 키만 추가).
+- **다음:**
+  - 사장님 히어로(5)·정체성(3) 비교 → 각 1안 채택 → 스위처 제거·정적 복귀. 필요 시 섹션3~ 변주.
+- **확인요청(사장님):**
+  - 히어로/정체성 각각 어느 안? marquee 영문 라벨(OFFICIAL CHANNEL 등) 표기 OK?
+
+---
+
 ### [2026-06-08] 세션 — 공용 섹션 버저닝 + 히어로 3안 (검수 비교용)
 - **한 일:**
   - 전 섹션 공용 **버저닝 메커니즘** 구축: URL 쿼리(`?hero=...`)로 변주 선택 + 우하단 검수용 스위처. 새 섹션은 레지스트리 키만 추가.

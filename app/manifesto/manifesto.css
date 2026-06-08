@@ -564,6 +564,165 @@
   transform: translateY(0);
 }
 
+/* ---- identity variant: stamp (자격 도장) ---- */
+.route-manifesto .identity-stamp h2 {
+  font-size: clamp(28px, 4.4vw, 56px);
+  margin: 22px 0 14px;
+}
+.route-manifesto .identity-stamp__list {
+  list-style: none;
+  margin: clamp(36px, 6vh, 60px) 0 0;
+  padding: 0;
+}
+.route-manifesto .identity-stamp__row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 0;
+  border-top: 1px solid var(--c-line-dark);
+}
+.route-manifesto .identity-stamp__row:last-of-type {
+  border-bottom: 1px solid var(--c-line-dark);
+}
+.route-manifesto .identity-stamp__seal {
+  width: 44px;
+  height: 44px;
+  flex: none;
+}
+.route-manifesto .identity-stamp__seal circle,
+.route-manifesto .identity-stamp__seal path {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.route-manifesto .identity-stamp__seal circle {
+  stroke-dasharray: 126;
+  stroke-dashoffset: 126;
+  transition: stroke-dashoffset 0.8s var(--ease);
+}
+.route-manifesto .identity-stamp__seal path {
+  stroke-dasharray: 34;
+  stroke-dashoffset: 34;
+  transition: stroke-dashoffset 0.5s var(--ease) 0.35s;
+}
+.route-manifesto .identity-stamp__row.is-in .identity-stamp__seal {
+  animation: rm-stampPop 0.5s var(--ease-tip);
+}
+.route-manifesto .identity-stamp__row.is-in .identity-stamp__seal circle,
+.route-manifesto .identity-stamp__row.is-in .identity-stamp__seal path {
+  stroke-dashoffset: 0;
+}
+@keyframes rm-stampPop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.route-manifesto .identity-stamp__txt b {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(18px, 1.9vw, 26px);
+  letter-spacing: -0.02em;
+}
+.route-manifesto .identity-stamp__txt span {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--c-muted-on-dark);
+}
+.route-manifesto .identity-stamp__no {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--c-caption-on-dark);
+}
+.route-manifesto .identity-stamp__foot {
+  margin-top: 30px;
+  color: var(--c-orange);
+  font-weight: 600;
+}
+
+/* ---- identity variant: marquee (흐르는 키워드 띠) ---- */
+.route-manifesto .identity-mq {
+  overflow: hidden;
+}
+.route-manifesto .identity-mq h2 {
+  font-size: clamp(28px, 4.4vw, 56px);
+  margin: 22px 0 14px;
+}
+.route-manifesto .identity-mq__rows {
+  margin-top: clamp(40px, 7vh, 80px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.4vw, 16px);
+}
+.route-manifesto .identity-mq__row {
+  white-space: nowrap;
+  transform: translateX(calc(var(--mq, 0) * -6%));
+}
+.route-manifesto .identity-mq__row--b {
+  transform: translateX(calc(var(--mq, 0) * 6%));
+}
+.route-manifesto .identity-mq__track {
+  display: inline-flex;
+  will-change: transform;
+  animation: rm-mqA 26s linear infinite;
+}
+.route-manifesto .identity-mq__row--b .identity-mq__track {
+  animation: rm-mqB 26s linear infinite;
+}
+@keyframes rm-mqA {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes rm-mqB {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.route-manifesto .identity-mq__item {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(30px, 6vw, 86px);
+  letter-spacing: -0.03em;
+  color: var(--c-paper-on-dark);
+  padding-right: 0.4em;
+}
+.route-manifesto .identity-mq__item i {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.36em;
+  letter-spacing: 0.1em;
+  color: var(--c-orange);
+  vertical-align: middle;
+}
+.route-manifesto .identity-mq__row--b .identity-mq__item {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--c-muted-on-dark);
+}
+.route-manifesto .identity-mq__row--b .identity-mq__item i {
+  -webkit-text-stroke: 0;
+  color: var(--c-orange);
+}
+
 /* =========================================================
    DEMO 공용 (softclose / hinge / tipon)
    ========================================================= */
@@ -1158,6 +1317,22 @@
   .route-manifesto .hero--aperture__bg,
   .route-manifesto .hero--aperture__word {
     transition: none !important;
+  }
+  /* 정체성 변주: stamp 씰 즉시 완성 · marquee 흐름 정지 */
+  .route-manifesto .identity-stamp__seal {
+    animation: none !important;
+  }
+  .route-manifesto .identity-stamp__seal circle,
+  .route-manifesto .identity-stamp__seal path {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+  }
+  .route-manifesto .identity-mq__track {
+    animation: none !important;
+  }
+  .route-manifesto .identity-mq__row,
+  .route-manifesto .identity-mq__row--b {
+    transform: none !important;
   }
   /* 정체성 핀: 핀 해제 + 키워드 전체를 정적 리스트로 노출 */
   .route-manifesto .identity {
