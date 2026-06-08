@@ -564,6 +564,391 @@
   transform: translateY(0);
 }
 
+/* ---- identity pin: 좌우 분할 + 우측 동기 스테이지 ---- */
+.route-manifesto .identity__grid {
+  display: grid;
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: var(--gap-grid);
+  align-items: center;
+}
+.route-manifesto .identity__left h2 {
+  font-size: clamp(26px, 3.4vw, 48px);
+  margin: 20px 0 18px;
+  max-width: 16ch;
+}
+.route-manifesto .identity__left .identity__loop {
+  height: clamp(38px, 4.4vw, 56px);
+}
+.route-manifesto .identity__left .identity__kw {
+  font-size: clamp(20px, 2.6vw, 38px);
+}
+.route-manifesto .identity__right {
+  position: relative;
+}
+
+/* 스테이지 공용 */
+.route-manifesto .pin-stage {
+  position: relative;
+  width: 100%;
+  min-height: clamp(280px, 38vw, 420px);
+  border: 1px solid var(--c-line-dark);
+  border-radius: var(--r-stage);
+  background:
+    radial-gradient(
+      120% 90% at 50% 0%,
+      color-mix(in srgb, var(--c-orange) 8%, transparent),
+      transparent 60%
+    ),
+    var(--c-charcoal-card);
+  overflow: hidden;
+}
+.route-manifesto .pin-stage__item {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 3vw, 40px);
+  opacity: 0;
+  transform: translateX(7%);
+  transition:
+    opacity 0.55s var(--ease),
+    transform 0.55s var(--ease);
+  pointer-events: none;
+}
+.route-manifesto .pin-stage__item.is-active {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.55s var(--ease-tip),
+    transform 0.55s var(--ease-tip);
+}
+@keyframes rm-dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* card */
+.route-manifesto .pin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.route-manifesto .pin-card__mark {
+  width: 48px;
+  height: 48px;
+}
+.route-manifesto .pin-card__mark path {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.route-manifesto .pin-card__txt b {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(20px, 2.4vw, 30px);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.route-manifesto .pin-card__txt span {
+  color: var(--c-muted-on-dark);
+  font-weight: 300;
+}
+
+/* image */
+.route-manifesto .pin-stage__ph {
+  position: absolute;
+  inset: 0;
+  border: none;
+}
+
+/* demo: seal */
+.route-manifesto .pd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+.route-manifesto .pd-seal svg {
+  width: 120px;
+  height: 120px;
+}
+.route-manifesto .pd-seal circle,
+.route-manifesto .pd-seal path {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+}
+.route-manifesto .pin-stage__item.is-active .pd-seal circle {
+  animation: rm-dash 0.8s var(--ease) forwards;
+}
+.route-manifesto .pin-stage__item.is-active .pd-seal path {
+  animation: rm-dash 0.5s var(--ease) 0.4s forwards;
+}
+.route-manifesto .pd-seal span {
+  font-family: var(--font-mono);
+  letter-spacing: 0.22em;
+  font-size: 12px;
+  color: var(--c-paper-on-dark);
+}
+
+/* demo: route */
+.route-manifesto .pd-route {
+  width: 100%;
+  max-width: 320px;
+  gap: 24px;
+}
+.route-manifesto .pd-route__row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+.route-manifesto .pd-route__row b {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+.route-manifesto .pd-route__row--ok b {
+  color: var(--c-orange);
+}
+.route-manifesto .pd-route__row--no b {
+  color: var(--c-caption-on-dark);
+}
+.route-manifesto .pd-route__track {
+  position: relative;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--c-line-dark);
+}
+.route-manifesto .pd-route__row--ok .pd-route__track {
+  background: rgba(255, 103, 31, 0.25);
+}
+.route-manifesto .pd-route__row--no .pd-route__track {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--c-line-dark) 0 6px,
+    transparent 6px 12px
+  );
+}
+.route-manifesto .pd-route__track i {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--c-orange);
+  transform: translate(-50%, -50%);
+}
+.route-manifesto .pin-stage__item.is-active .pd-route__row--ok .pd-route__track i {
+  animation: rm-travel 1.1s var(--ease) forwards;
+}
+@keyframes rm-travel {
+  from {
+    left: 0;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+/* demo: map */
+.route-manifesto .pd-map {
+  position: relative;
+  width: 100%;
+  min-height: 240px;
+}
+.route-manifesto .pd-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--c-muted-on-dark);
+  opacity: 0;
+}
+.route-manifesto .pd-pin i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--c-orange);
+  transform: rotate(-45deg);
+}
+.route-manifesto .pin-stage__item.is-active .pd-pin {
+  animation: rm-pinpop 0.5s var(--ease-tip) forwards;
+}
+.route-manifesto .pin-stage__item.is-active .pd-pin:nth-of-type(2) {
+  animation-delay: 0.22s;
+}
+.route-manifesto .pin-stage__item.is-active .pd-pin:nth-of-type(3) {
+  animation-delay: 0.44s;
+}
+@keyframes rm-pinpop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -70%) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1);
+  }
+}
+
+/* demo: logos */
+.route-manifesto .pd-logos {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.route-manifesto .pd-chip {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(18px, 2vw, 26px);
+  padding: 10px 18px;
+  border: 1px solid var(--c-line-dark);
+  border-radius: 6px;
+  color: var(--c-paper-on-dark);
+  opacity: 0;
+  transform: translateY(10px);
+}
+.route-manifesto .pd-chip--more {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-orange);
+  border-color: var(--c-orange);
+}
+.route-manifesto .pin-stage__item.is-active .pd-chip {
+  animation: rm-chipin 0.5s var(--ease-tip) forwards;
+}
+.route-manifesto .pin-stage__item.is-active .pd-chip:nth-of-type(2) {
+  animation-delay: 0.12s;
+}
+.route-manifesto .pin-stage__item.is-active .pd-chip:nth-of-type(3) {
+  animation-delay: 0.24s;
+}
+.route-manifesto .pin-stage__item.is-active .pd-chip:nth-of-type(4) {
+  animation-delay: 0.36s;
+}
+@keyframes rm-chipin {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* demo: line */
+.route-manifesto .pd-line {
+  width: 100%;
+  max-width: 320px;
+}
+.route-manifesto .pd-line__rail {
+  width: 100%;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--c-line-dark) 0 8px,
+    transparent 8px 16px
+  );
+}
+.route-manifesto .pd-line__part {
+  width: 54px;
+  height: 36px;
+  border: 2px solid var(--c-orange);
+  border-radius: 3px;
+  background: rgba(255, 103, 31, 0.12);
+}
+.route-manifesto .pin-stage__item.is-active .pd-line__part {
+  animation: rm-partin 1s var(--ease) forwards;
+}
+@keyframes rm-partin {
+  from {
+    transform: translateX(-120px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.route-manifesto .pd-line span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--c-orange);
+}
+
+/* diagram */
+.route-manifesto .pin-dia-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+.route-manifesto .pin-dia {
+  width: 100%;
+  max-width: 300px;
+}
+.route-manifesto .pin-dia line,
+.route-manifesto .pin-dia path,
+.route-manifesto .pin-dia circle,
+.route-manifesto .pin-dia rect {
+  fill: none;
+  stroke: var(--c-paper-on-dark);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+}
+.route-manifesto .pin-dia circle,
+.route-manifesto .pin-dia .ok {
+  stroke: var(--c-orange);
+}
+.route-manifesto .pin-dia .no {
+  stroke: var(--c-caption-on-dark);
+}
+.route-manifesto .pin-stage__item.is-active .pin-dia line,
+.route-manifesto .pin-stage__item.is-active .pin-dia path,
+.route-manifesto .pin-stage__item.is-active .pin-dia circle,
+.route-manifesto .pin-stage__item.is-active .pin-dia rect {
+  animation: rm-dash 1s var(--ease) forwards;
+}
+.route-manifesto .pin-dia__cap {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--c-muted-on-dark);
+}
+
+@media (max-width: 900px) {
+  .route-manifesto .identity__grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .route-manifesto .identity__sticky {
+    min-height: auto;
+    position: relative;
+  }
+  .route-manifesto .identity {
+    height: auto;
+  }
+}
+
 /* ---- identity variant: stamp (자격 도장) ---- */
 .route-manifesto .identity-stamp h2 {
   font-size: clamp(28px, 4.4vw, 56px);
@@ -1354,5 +1739,49 @@
     transform: none;
     white-space: normal;
     font-size: clamp(20px, 3vw, 34px);
+  }
+  /* 우측 스테이지: 항목 전부 정적 노출 + 애니메이션 정지(최종상태) */
+  .route-manifesto .identity__grid {
+    grid-template-columns: 1fr;
+  }
+  .route-manifesto .pin-stage {
+    min-height: 0;
+  }
+  .route-manifesto .pin-stage__item {
+    position: static;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .route-manifesto .pin-stage--image .pin-stage__item {
+    position: relative;
+    min-height: 180px;
+  }
+  .route-manifesto .pd-seal circle,
+  .route-manifesto .pd-seal path,
+  .route-manifesto .pin-dia line,
+  .route-manifesto .pin-dia path,
+  .route-manifesto .pin-dia circle,
+  .route-manifesto .pin-dia rect {
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
+  }
+  .route-manifesto .pd-route__track i {
+    left: 100% !important;
+    animation: none !important;
+  }
+  .route-manifesto .pd-line__part {
+    transform: none !important;
+    animation: none !important;
+  }
+  .route-manifesto .pd-pin {
+    opacity: 1 !important;
+    transform: translate(-50%, -100%) !important;
+    animation: none !important;
+  }
+  .route-manifesto .pd-chip {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
   }
 }

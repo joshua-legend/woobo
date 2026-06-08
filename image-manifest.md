@@ -77,5 +77,18 @@
 
 ---
 
-## SECTION 02~08 · (추후 슬롯 추가)
-- 02 정체성 핀 / 03~05 데모 / 06 약속 / 07 사회적 증거(로고월·후기) / 08 쇼룸(지점 지도) — 현재 전부 `.ph` placeholder. 디벨롭 진행하며 슬롯 등재.
+## SECTION 02 · 정체성 pin 우측 스테이지 — `image` 변주용 (`?identity=pin&idStage=image`)
+> image안 채택 시에만 필요. 키워드별 무드 컷. 파일: `public/images/hero/identity-<n>.png`(또는 별도 폴더). 현재 `.ph`.
+
+| id | 비율 | intent | 상태 |
+|---|---|---|---|
+| `identity-1` | 1:1 | Blum 한국 독점 에이전트 — 독점 계약/씰 무드 | 후보 |
+| `identity-2` | 1:1 | 정품의 공식 통로 — 정품 vs 유사품 대비 무드 | 후보 |
+| `identity-3` | 1:1 | 전국 오프라인 쇼룸 — 쇼룸/지도 무드 | 후보 |
+| `identity-4` | 1:1 | 프리미엄 멀티브랜드 수입 — 브랜드/수입 무드 | 후보 |
+| `identity-5` | 1:1 | 자체 가구 생산(김포) — 생산현장 무드 | 후보 |
+
+- 프롬프트 초안(공통 스파인 동일): `Square cinematic macro/mood for "<intent>", deep charcoal #16140f, single orange #ff671f accent, premium matte, fine grain, dark negative space, --ar 1:1` + 공통 네거티브. (정품 단정 캡션 금지)
+
+## SECTION 03~08 · (추후 슬롯 추가)
+- 03~05 데모 / 06 약속 / 07 사회적 증거(로고월·후기) / 08 쇼룸(지점 지도) — 현재 전부 `.ph` placeholder. 디벨롭 진행하며 슬롯 등재.

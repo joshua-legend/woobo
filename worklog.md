@@ -38,6 +38,22 @@
 
 ---
 
+### [2026-06-08] 세션 — 정체성 pin 우측 동기 스테이지 4안 버저닝
+- **한 일:**
+  - pin을 **좌우 분할 스크롤리텔링**으로: 좌=키워드, 우=키워드와 동기되는 스테이지(우→좌 슬라이드인).
+  - 우측 스테이지 **4안**을 버저닝 새 축(`?idStage=`)으로 추가: `card`(아이콘 카드)·`demo`(항목별 미니 인터랙션 5종)·`image`(사진 패널 .ph)·`diagram`(SVG draw).
+- **산출물:**
+  - 수정 `app/manifesto/identities.tsx`(IdentityPin 분할+state 동기 + PinStage/StageCard/StageDemo/StageDiagram)·`lib/variants.ts`(idStage 키)·`ManifestoClient.tsx`·`manifesto.css`(분할 그리드+스테이지 4종+reduced-motion)·`image-manifest.md`(identity-1~5 슬롯).
+  - 검증: tsc·build 통과, 4안 SSR 렌더·split·demo 5종·image 캡션·파라미터 조합 보존 확인.
+- **결정:**
+  - 우측 스테이지는 pin 전용(stamp/marquee 미적용). 활성 인덱스를 state로 승격해 좌/우 동기. 기본 `card`.
+- **다음:**
+  - 사장님 4안 비교 → 1안 채택. image안 채택 시 `identity-1~5` 이미지 생성.
+- **확인요청(사장님):**
+  - 우측 4안 중 방향 / demo 미니데모 수준 OK / image안 갈지(이미지 5장 필요).
+
+---
+
 ### [2026-06-08] 세션 — 섹션2(정체성) 변주 2종 추가 + 히어로 이미지 연결
 - **한 일:**
   - 히어로 slot 배경 4장·aperture 배경 3장(=a/b/c 비교용) 실제 PNG 연결(`public/images/hero/`).

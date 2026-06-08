@@ -615,7 +615,7 @@ export default function ManifestoClient({ variants }: { variants: Variants }) {
       />
       <main id="top">
         <HeroByVariant variant={variants.hero} />
-        <IdentityByVariant variant={variants.identity} />
+        <IdentityByVariant variant={variants.identity} stage={variants.idStage} />
         <DemoSoftClose />
         <DemoHinge />
         <DemoTipOn />

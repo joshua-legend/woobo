@@ -19,6 +19,11 @@ export const SECTION_VARIANTS = {
     options: ["pin", "stamp", "marquee"],
     default: "pin",
   },
+  idStage: {
+    label: "정체성 우측(pin)",
+    options: ["card", "demo", "image", "diagram"],
+    default: "card",
+  },
 } as const satisfies Record<string, SectionConfig>;
 
 export type SectionKey = keyof typeof SECTION_VARIANTS;
