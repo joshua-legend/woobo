@@ -12,6 +12,9 @@ const FACETS = [
   { kw: "자체 가구 생산 (김포 본점)", proof: "하드웨어부터 완제품까지" },
 ];
 
+// story 씬별 배경 틴트(이미지 없을 때·가장자리에 은은히 비침) — 스크롤 진행 시 색 변화
+const SCENE_TINTS = ["#1d1812", "#15191a", "#1b1410", "#13171a", "#1c1813"];
+
 /* ---------- 우측 스테이지 변주: card (이미지 카드) ---------- */
 // 키워드별 풀카드 이미지 + 하단 텍스트 오버레이. 이미지 없으면 .ph 해치 폴백.
 function StageCard({ i }: { i: number }) {
@@ -198,17 +201,20 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
       >
         <div className="identity__sticky">
           <div className="story-bg" aria-hidden="true">
+            <div className="story-bg__far" />
             <div className="story-bg__world">
               {FACETS.map((f, i) => (
                 <div
                   key={f.kw}
                   className="story-bg__scene"
                   style={{
+                    backgroundColor: SCENE_TINTS[i],
                     backgroundImage: `url(/images/identity/identity-card-${i + 1}.png)`,
                   }}
                 />
               ))}
             </div>
+            <div className="story-bg__near" />
             <div className="story-bg__scrim" />
           </div>
           <div className="inner story-center">
@@ -218,15 +224,13 @@ export function IdentityPin({ stage = "card" }: { stage?: string }) {
             <p className="story-claim reveal-up d1">
               우리는 <span className="hl">Blum 한국 독점 에이전트</span>입니다.
             </p>
-            <p className="story-chapter">
-              {String(active + 1).padStart(2, "0")} / 05
-            </p>
-            <h2 className="story-head" key={active}>
-              {FACETS[active].kw}
-            </h2>
-            <p className="story-proof" key={`p${active}`}>
-              {FACETS[active].proof}
-            </p>
+            <div className="story-beat" key={active}>
+              <p className="story-chapter">
+                {String(active + 1).padStart(2, "0")} / 05
+              </p>
+              <h2 className="story-head">{FACETS[active].kw}</h2>
+              <p className="story-proof">{FACETS[active].proof}</p>
+            </div>
             <div className="story-progress">
               <i />
             </div>

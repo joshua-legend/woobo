@@ -977,6 +977,26 @@
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
+}
+/* 패럴럭스 — far(느림) < world(중간) < near(빠름) */
+.route-manifesto .story-bg__far {
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  background:
+    radial-gradient(
+      42% 60% at 24% 38%,
+      rgba(255, 103, 31, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      40% 58% at 72% 64%,
+      rgba(120, 150, 255, 0.07),
+      transparent 60%
+    );
+  transform: translateX(calc(var(--story, 0) * -30%));
+  transition: transform 0.12s linear;
 }
 .route-manifesto .story-bg__world {
   position: absolute;
@@ -991,16 +1011,30 @@
   height: 100%;
   background-size: cover;
   background-position: center;
-  background-color: var(--c-charcoal-card);
+}
+.route-manifesto .story-bg__near {
+  position: absolute;
+  inset: 0;
+  width: 320%;
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(239, 233, 223, 0.05) 0 1px,
+    transparent 1px 150px
+  );
+  transform: translateX(calc(var(--story, 0) * -130%));
+  transition: transform 0.12s linear;
 }
 .route-manifesto .story-bg__scrim {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    120% 100% at 50% 50%,
-    rgba(22, 20, 15, 0.5),
-    rgba(22, 20, 15, 0.86)
-  );
+  background:
+    radial-gradient(
+      130% 110% at 50% 48%,
+      rgba(28, 22, 16, 0.32),
+      rgba(20, 17, 12, 0.82) 78%
+    ),
+    linear-gradient(180deg, rgba(255, 103, 31, 0.05), transparent 30%);
 }
 .route-manifesto .story-center {
   position: relative;
@@ -1026,18 +1060,26 @@
   margin: 12px 0 16px;
   font-size: clamp(34px, 6vw, 84px);
   color: var(--c-paper-on-dark);
-  animation: rm-storyIn 0.6s var(--ease) both;
 }
 .route-manifesto .story-proof {
   font-size: clamp(16px, 1.6vw, 20px);
   font-weight: 300;
   color: var(--c-muted-on-dark);
-  animation: rm-storyIn 0.6s var(--ease) 0.05s both;
 }
-@keyframes rm-storyIn {
+/* 챕터 비트 스태거 등장(스토리텔링) — 진행 방향에서 슬라이드인 */
+.route-manifesto .story-beat .story-chapter {
+  animation: rm-beatIn 0.5s var(--ease) both;
+}
+.route-manifesto .story-beat .story-head {
+  animation: rm-beatIn 0.6s var(--ease) 0.08s both;
+}
+.route-manifesto .story-beat .story-proof {
+  animation: rm-beatIn 0.6s var(--ease) 0.16s both;
+}
+@keyframes rm-beatIn {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateX(38px);
   }
   to {
     opacity: 1;
@@ -1916,10 +1958,13 @@
     position: static;
     min-height: auto;
   }
-  .route-manifesto .story-bg__world {
+  .route-manifesto .story-bg__world,
+  .route-manifesto .story-bg__far,
+  .route-manifesto .story-bg__near {
     transform: none !important;
     transition: none;
   }
+  .route-manifesto .story-beat .story-chapter,
   .route-manifesto .story-head,
   .route-manifesto .story-proof {
     animation: none !important;
