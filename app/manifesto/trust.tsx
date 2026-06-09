@@ -1,18 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
-import { useScrub } from "@/hooks/useScrub";
-
-export type TrustFx = {
-  line: boolean;
-  nodes: boolean;
-  stagger: boolean;
-  hover: boolean;
-  draw: boolean;
-  glow: boolean;
-  pin: boolean;
-  neon: boolean;
-};
+import { useEffect, useRef } from "react";
 
 type Facet = {
   t: string;
@@ -205,55 +193,29 @@ function TrustFlow() {
   );
 }
 
-/* ---------- fusion (flow 골격 + grid 카드 + 직관 아이콘) ---------- */
-function TrustFusion({ neon }: { neon: boolean }) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const startRef = useRef<HTMLDivElement>(null);
-
-  // 트리거: 유럽제조 노드가 뷰포트 상단 35% 라인에 닿으면 네온 발동(위로 스크롤 시 리암)
-  useEffect(() => {
-    if (!neon) return;
-    const root = rootRef.current;
-    const start = startRef.current;
-    if (!root || !start) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      root.classList.add("neon-go");
-      return;
-    }
-    const io = new IntersectionObserver(
-      (ents) => {
-        for (const e of ents) {
-          if (e.isIntersecting) root.classList.add("neon-go");
-          else if (e.boundingClientRect.top > 0) root.classList.remove("neon-go");
-        }
-      },
-      { rootMargin: "-35% 0px -65% 0px", threshold: 0 },
-    );
-    io.observe(start);
-    return () => io.disconnect();
-  }, [neon]);
-
+/* ---------- fusion (flow 골격 + grid 카드 + stamp 도장) ---------- */
+function TrustFusion() {
   return (
-    <div className="trust-fusion" ref={rootRef}>
-      <div className="tf-node reveal-up" ref={startRef}>
-        <span className="tf-edge" aria-hidden="true">
-          <i className="e-t" />
-          <i className="e-l" />
-          <i className="e-r" />
-          <i className="e-b" />
-        </span>
+    <div className="trust-fusion">
+      <div className="tf-node reveal-up">
         <span className="tf-tag">유럽 제조</span>
         <b>Blum · AGOFORM · Peka</b>
       </div>
-      <div className="tf-link tf-link--1 reveal-up d1">
+      <div className="tf-link reveal-up d1">
         <i />
       </div>
       <div className="tf-hub reveal-up d1">
         <span className="tf-tag">한국 독점 에이전트 · sole agent</span>
         <b className="tf-hub__title">우보브랜드샵 — 정품의 공식 통로</b>
         <div className="tf-cards">
-          {FACETS.map((f) => (
-            <div key={f.t} className="tf-card reveal-up">
+          {FACETS.map((f, i) => (
+            <div
+              key={f.t}
+              className="tf-card reveal-up"
+              style={
+                { "--reveal-delay": `${0.06 + i * 0.07}s` } as React.CSSProperties
+              }
+            >
               <svg className="tf-icon" viewBox="0 0 32 32" aria-hidden="true">
                 {f.icon}
               </svg>
@@ -275,37 +237,10 @@ function TrustFusion({ neon }: { neon: boolean }) {
 }
 
 /* =========================== [05] 약속 (Trust · 버저닝) =========================== */
-export function TrustByVariant({
-  variant,
-  fx,
-}: {
-  variant: string;
-  fx: TrustFx;
-}) {
-  const secRef = useRef<HTMLElement>(null);
-  const onUpdate = useCallback((p: number) => {
-    secRef.current?.style.setProperty("--prog", p.toFixed(4));
-  }, []);
-  useScrub(secRef, onUpdate, { start: "top 75%", end: "bottom 45%" });
-
-  const cls = [
-    "section trust",
-    fx.line && "fx-line",
-    fx.nodes && "fx-nodes",
-    fx.stagger && "fx-stagger",
-    fx.hover && "fx-hover",
-    fx.draw && "fx-draw",
-    fx.glow && "fx-glow",
-    fx.pin && "is-pinned",
-    fx.neon && "fx-neon",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
+export function TrustByVariant({ variant }: { variant: string }) {
   return (
     <section
-      ref={secRef}
-      className={cls}
+      className="section trust"
       data-section="trust"
       data-theme="light"
       data-screen-label="05 약속"
@@ -327,7 +262,7 @@ export function TrustByVariant({
         ) : variant === "grid" ? (
           <TrustGrid />
         ) : (
-          <TrustFusion neon={fx.neon} />
+          <TrustFusion />
         )}
         <div className="brands reveal-up">
           멀티브랜드 수입 전문 — <b>Blum</b> (간판) · AGOFORM (독일) · Peka
