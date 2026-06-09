@@ -343,35 +343,68 @@ function SoftStageVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const durRef = useRef(0);
   const readyRef = useRef(false);
-  const pRef = useRef(0);
+  const targetRef = useRef(0); // 원하는 진행도 0..1
+  const dispRef = useRef(0); // 화면에 보이는(부드럽게 따라오는) 진행도
+  const runningRef = useRef(false);
+  const closeRef = useRef({ active: false, from: 0, t0: 0 });
   const modeRef = useRef<"scrub" | "drag" | "closing">("scrub");
   const dragRef = useRef({ startX: 0, startP: 0 });
   const rafRef = useRef(0);
   const [status, setStatus] = useState<"loading" | "ready" | "missing">(
     "loading",
   );
+  const [showGuide, setShowGuide] = useState(true);
 
-  // 코얼레싱 seek: seek 진행 중이면 건너뛰고, 끝나면(seeked) 최신 target 만 적용 → 끊김 방지
-  const applySeek = useCallback(() => {
+  // 단일 rAF 루프: disp 를 target 으로 lerp 보간(부드럽게) + seek 코얼레싱(seeking 중엔 스킵)
+  const tick = useCallback((now: number) => {
     const v = videoRef.current;
-    if (!v || !readyRef.current || !durRef.current || v.seeking) return;
-    const t = pRef.current * durRef.current;
-    if (Math.abs(v.currentTime - t) > 0.012) {
-      try {
-        v.currentTime = t;
-      } catch {
-        /* seek 무시 */
+    if (!v || !readyRef.current || !durRef.current) {
+      runningRef.current = false;
+      return;
+    }
+    if (closeRef.current.active) {
+      const k = clamp((now - closeRef.current.t0) / 760, 0, 1);
+      targetRef.current =
+        closeRef.current.from + (1 - closeRef.current.from) * easeOut(k);
+      if (k >= 1) {
+        closeRef.current.active = false;
+        modeRef.current = "scrub";
       }
     }
+    dispRef.current += (targetRef.current - dispRef.current) * 0.25;
+    if (Math.abs(targetRef.current - dispRef.current) < 0.0006)
+      dispRef.current = targetRef.current;
+    setP(stageRef.current, dispRef.current);
+    if (!v.seeking) {
+      const t = dispRef.current * durRef.current;
+      if (Math.abs(v.currentTime - t) > 0.012) {
+        try {
+          v.currentTime = t;
+        } catch {
+          /* seek 무시 */
+        }
+      }
+    }
+    const settled =
+      !closeRef.current.active &&
+      dispRef.current === targetRef.current &&
+      !v.seeking;
+    if (settled) runningRef.current = false;
+    else rafRef.current = requestAnimationFrame(tick);
   }, []);
+
+  const startLoop = useCallback(() => {
+    if (runningRef.current) return;
+    runningRef.current = true;
+    rafRef.current = requestAnimationFrame(tick);
+  }, [tick]);
 
   const setTarget = useCallback(
     (p: number) => {
-      pRef.current = clamp(p, 0, 1);
-      setP(stageRef.current, pRef.current);
-      applySeek();
+      targetRef.current = clamp(p, 0, 1);
+      startLoop();
     },
-    [applySeek],
+    [startLoop],
   );
 
   useEffect(() => {
@@ -384,10 +417,10 @@ function SoftStageVideo() {
         readyRef.current = true;
         setStatus("ready");
         v.pause();
-        applySeek();
+        startLoop();
       }
     };
-    const onSeeked = () => applySeek(); // 직전 seek 끝나면 그동안 밀린 최신 위치로
+    const onSeeked = () => startLoop(); // seek 끝나면 루프가 밀린 위치 이어서 적용
     const onErr = () => setStatus("missing");
     v.addEventListener("loadedmetadata", markReady);
     v.addEventListener("loadeddata", markReady);
@@ -404,11 +437,12 @@ function SoftStageVideo() {
       v.removeEventListener("error", onErr);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [applySeek]);
+  }, [startLoop]);
 
   const onUpdate = useCallback(
     (p: number) => {
       if (modeRef.current !== "scrub") return;
+      if (p > 0.02) setShowGuide(false);
       setTarget(p);
     },
     [setTarget],
@@ -418,8 +452,9 @@ function SoftStageVideo() {
   const onPointerDown = (e: React.PointerEvent) => {
     if (reduce || !readyRef.current) return;
     modeRef.current = "drag";
-    cancelAnimationFrame(rafRef.current);
-    dragRef.current = { startX: e.clientX, startP: pRef.current };
+    closeRef.current.active = false;
+    setShowGuide(false);
+    dragRef.current = { startX: e.clientX, startP: targetRef.current };
     stageRef.current?.classList.add("is-grab");
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
@@ -431,19 +466,14 @@ function SoftStageVideo() {
   };
   const onPointerUp = () => {
     if (modeRef.current !== "drag") return;
-    modeRef.current = "closing";
     stageRef.current?.classList.remove("is-grab");
-    const from = pRef.current;
-    const dur = 760;
-    let t0: number | null = null;
-    const step = (t: number) => {
-      if (t0 === null) t0 = t;
-      const k = clamp((t - t0) / dur, 0, 1);
-      setTarget(from + (1 - from) * easeOut(k));
-      if (k < 1) rafRef.current = requestAnimationFrame(step);
-      else modeRef.current = "scrub";
+    modeRef.current = "closing";
+    closeRef.current = {
+      active: true,
+      from: targetRef.current,
+      t0: performance.now(),
     };
-    rafRef.current = requestAnimationFrame(step);
+    startLoop();
   };
 
   return (
@@ -464,6 +494,8 @@ function SoftStageVideo() {
         muted
         playsInline
         preload="auto"
+        autoPlay={false}
+        onPlay={(e) => e.currentTarget.pause()}
       />
       {status !== "ready" && (
         <div
@@ -475,9 +507,15 @@ function SoftStageVideo() {
           }
         />
       )}
-      <div className="grabhint">
-        {reduce ? "" : "스크롤·드래그 = 서랍 / 손 떼면 사뿐히"}
-      </div>
+      {status === "ready" && (
+        <div
+          className={`softvideo__guide${showGuide ? "" : " is-hidden"}`}
+          aria-hidden="true"
+        >
+          <span className="softvideo__guide-arrows">↔</span>
+          좌우로 드래그 · 스크롤
+        </div>
+      )}
       <div className="stage-meter">
         <span>OPEN</span>
         <span className="track">

@@ -26,8 +26,8 @@ export const SECTION_VARIANTS = {
   },
   soft: {
     label: "신념① 소프트",
-    options: ["scrub", "throw", "compare", "sequence", "video"],
-    default: "scrub",
+    options: ["video", "scrub", "throw", "compare", "sequence"],
+    default: "video",
   },
 } as const satisfies Record<string, SectionConfig>;
 
