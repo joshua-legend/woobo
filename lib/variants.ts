@@ -39,6 +39,14 @@ export const SECTION_VARIANTS = {
     options: ["fusion", "flow", "stamp", "grid"],
     default: "fusion",
   },
+  // fusion 효과 on/off 토글 (퓨전일 때만 적용)
+  fxLine: { label: "fx·선draw", options: ["on", "off"], default: "on" },
+  fxNodes: { label: "fx·노드점등", options: ["off", "on"], default: "off" },
+  fxStagger: { label: "fx·스태거", options: ["on", "off"], default: "on" },
+  fxHover: { label: "fx·호버", options: ["on", "off"], default: "on" },
+  fxDraw: { label: "fx·아이콘draw", options: ["off", "on"], default: "off" },
+  fxGlow: { label: "fx·허브글로우", options: ["on", "off"], default: "on" },
+  fxPin: { label: "fx·핀", options: ["off", "on"], default: "off" },
 } as const satisfies Record<string, SectionConfig>;
 
 export type SectionKey = keyof typeof SECTION_VARIANTS;

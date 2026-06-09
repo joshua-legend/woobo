@@ -2112,11 +2112,15 @@
   position: absolute;
   inset: 0;
   background: var(--c-orange);
-  transform: scaleY(0);
+  transform: scaleY(1);
   transform-origin: top;
   transition: transform 0.6s var(--ease);
 }
-.route-manifesto .tf-link.is-in i {
+/* flow 변주는 항상 draw */
+.route-manifesto .trust-flow .tf-link i {
+  transform: scaleY(0);
+}
+.route-manifesto .trust-flow .tf-link.is-in i {
   transform: scaleY(1);
 }
 
@@ -2187,6 +2191,106 @@
   font-size: 13px;
   font-weight: 300;
   color: var(--c-ink-2);
+}
+
+/* =========================================================
+   trust fusion 효과 토글 (fx-*) — 퓨전(.trust-fusion)에만 적용
+   ========================================================= */
+/* A. fx-line: 연결선 draw */
+.route-manifesto .fx-line .trust-fusion .tf-link i {
+  transform: scaleY(0);
+}
+.route-manifesto .fx-line .trust-fusion .tf-link.is-in i {
+  transform: scaleY(1);
+}
+
+/* B. fx-nodes: --prog 따라 제조→우보→고객 순차 점등 */
+.route-manifesto .fx-nodes .tf-node,
+.route-manifesto .fx-nodes .tf-hub {
+  transition: opacity 0.3s var(--ease);
+}
+.route-manifesto .fx-nodes .trust-fusion .tf-node:first-child {
+  opacity: calc(0.35 + 0.65 * clamp(0, calc(var(--prog, 0) / 0.25), 1));
+}
+.route-manifesto .fx-nodes .trust-fusion .tf-hub {
+  opacity: calc(0.35 + 0.65 * clamp(0, calc((var(--prog, 0) - 0.3) / 0.25), 1));
+}
+.route-manifesto .fx-nodes .trust-fusion .tf-node:last-child {
+  opacity: calc(0.35 + 0.65 * clamp(0, calc((var(--prog, 0) - 0.7) / 0.25), 1));
+}
+
+/* C. fx-stagger: 카드 순차 등장(없으면 동시) */
+.route-manifesto .fx-stagger .tf-card:nth-of-type(1) {
+  --reveal-delay: 0.04s;
+}
+.route-manifesto .fx-stagger .tf-card:nth-of-type(2) {
+  --reveal-delay: 0.1s;
+}
+.route-manifesto .fx-stagger .tf-card:nth-of-type(3) {
+  --reveal-delay: 0.16s;
+}
+.route-manifesto .fx-stagger .tf-card:nth-of-type(4) {
+  --reveal-delay: 0.22s;
+}
+.route-manifesto .fx-stagger .tf-card:nth-of-type(5) {
+  --reveal-delay: 0.28s;
+}
+.route-manifesto .fx-stagger .tf-card:nth-of-type(6) {
+  --reveal-delay: 0.34s;
+}
+
+/* D. fx-hover: 카드 호버 강조 */
+.route-manifesto .fx-hover .tf-card {
+  transition:
+    background 0.3s var(--ease),
+    transform 0.3s var(--ease);
+}
+.route-manifesto .fx-hover .tf-card:hover {
+  background: color-mix(in srgb, var(--c-orange) 7%, var(--c-paper));
+  transform: translateY(-3px);
+  z-index: 1;
+}
+.route-manifesto .fx-hover .tf-card:hover .tf-icon circle,
+.route-manifesto .fx-hover .tf-card:hover .tf-icon path,
+.route-manifesto .fx-hover .tf-card:hover .tf-icon rect {
+  stroke-width: 2.6;
+}
+
+/* E. fx-draw: 아이콘이 선으로 그려지며 등장 */
+.route-manifesto .fx-draw .tf-icon circle,
+.route-manifesto .fx-draw .tf-icon path,
+.route-manifesto .fx-draw .tf-icon rect {
+  stroke-dasharray: 130;
+  stroke-dashoffset: 130;
+}
+.route-manifesto .fx-draw .tf-card.is-in .tf-icon circle,
+.route-manifesto .fx-draw .tf-card.is-in .tf-icon path,
+.route-manifesto .fx-draw .tf-card.is-in .tf-icon rect {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.7s var(--ease);
+}
+
+/* F. fx-glow: 허브 글로우 펄스 */
+.route-manifesto .fx-glow .tf-hub {
+  animation: rm-hubGlow 2.6s var(--ease) infinite;
+}
+@keyframes rm-hubGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 103, 31, 0);
+  }
+  50% {
+    box-shadow: 0 0 28px 0 rgba(255, 103, 31, 0.18);
+  }
+}
+
+/* G. fx-pin: 섹션 핀(sticky) */
+.route-manifesto .trust.is-pinned {
+  min-height: 170vh;
+}
+.route-manifesto .trust.is-pinned .inner {
+  position: sticky;
+  top: clamp(70px, 10vh, 110px);
 }
 
 /* =========================================================
@@ -2522,12 +2626,27 @@
     opacity: 1 !important;
     transform: none !important;
   }
-  .route-manifesto .tf-seal {
+  /* trust fusion fx: 최종 정적 */
+  .route-manifesto .fx-line .trust-fusion .tf-link i {
+    transform: scaleY(1) !important;
+  }
+  .route-manifesto .fx-nodes .tf-node,
+  .route-manifesto .fx-nodes .tf-hub {
+    opacity: 1 !important;
+  }
+  .route-manifesto .fx-glow .tf-hub {
     animation: none !important;
   }
-  .route-manifesto .tf-seal circle,
-  .route-manifesto .tf-seal path {
+  .route-manifesto .fx-draw .tf-icon circle,
+  .route-manifesto .fx-draw .tf-icon path,
+  .route-manifesto .fx-draw .tf-icon rect {
     stroke-dashoffset: 0 !important;
     transition: none !important;
+  }
+  .route-manifesto .trust.is-pinned {
+    min-height: 0 !important;
+  }
+  .route-manifesto .trust.is-pinned .inner {
+    position: static !important;
   }
 }

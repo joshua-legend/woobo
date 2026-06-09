@@ -203,7 +203,18 @@ export default function ManifestoClient({ variants }: { variants: Variants }) {
         <IdentityByVariant variant={variants.identity} stage={variants.idStage} />
         <SoftByVariant variant={variants.soft} />
         <DoorByVariant variant={variants.door} />
-        <TrustByVariant variant={variants.trust} />
+        <TrustByVariant
+          variant={variants.trust}
+          fx={{
+            line: variants.fxLine === "on",
+            nodes: variants.fxNodes === "on",
+            stagger: variants.fxStagger === "on",
+            hover: variants.fxHover === "on",
+            draw: variants.fxDraw === "on",
+            glow: variants.fxGlow === "on",
+            pin: variants.fxPin === "on",
+          }}
+        />
         <SocialProof />
         <Showroom />
       </main>

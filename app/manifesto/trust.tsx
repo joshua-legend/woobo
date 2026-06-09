@@ -1,6 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { useScrub } from "@/hooks/useScrub";
+
+export type TrustFx = {
+  line: boolean;
+  nodes: boolean;
+  stagger: boolean;
+  hover: boolean;
+  draw: boolean;
+  glow: boolean;
+  pin: boolean;
+};
 
 type Facet = {
   t: string;
@@ -208,14 +219,8 @@ function TrustFusion() {
         <span className="tf-tag">한국 독점 에이전트 · sole agent</span>
         <b className="tf-hub__title">우보브랜드샵 — 정품의 공식 통로</b>
         <div className="tf-cards">
-          {FACETS.map((f, i) => (
-            <div
-              key={f.t}
-              className="tf-card reveal-up"
-              style={
-                { "--reveal-delay": `${0.06 + i * 0.07}s` } as React.CSSProperties
-              }
-            >
+          {FACETS.map((f) => (
+            <div key={f.t} className="tf-card reveal-up">
               <svg className="tf-icon" viewBox="0 0 32 32" aria-hidden="true">
                 {f.icon}
               </svg>
@@ -237,10 +242,36 @@ function TrustFusion() {
 }
 
 /* =========================== [05] 약속 (Trust · 버저닝) =========================== */
-export function TrustByVariant({ variant }: { variant: string }) {
+export function TrustByVariant({
+  variant,
+  fx,
+}: {
+  variant: string;
+  fx: TrustFx;
+}) {
+  const secRef = useRef<HTMLElement>(null);
+  const onUpdate = useCallback((p: number) => {
+    secRef.current?.style.setProperty("--prog", p.toFixed(4));
+  }, []);
+  useScrub(secRef, onUpdate, { start: "top 75%", end: "bottom 45%" });
+
+  const cls = [
+    "section trust",
+    fx.line && "fx-line",
+    fx.nodes && "fx-nodes",
+    fx.stagger && "fx-stagger",
+    fx.hover && "fx-hover",
+    fx.draw && "fx-draw",
+    fx.glow && "fx-glow",
+    fx.pin && "is-pinned",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <section
-      className="section trust"
+      ref={secRef}
+      className={cls}
       data-section="trust"
       data-theme="light"
       data-screen-label="05 약속"
