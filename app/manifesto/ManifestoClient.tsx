@@ -213,6 +213,7 @@ export default function ManifestoClient({ variants }: { variants: Variants }) {
             draw: variants.fxDraw === "on",
             glow: variants.fxGlow === "on",
             pin: variants.fxPin === "on",
+            neon: variants.fxNeon === "on",
           }}
         />
         <SocialProof />

@@ -11,6 +11,7 @@ export type TrustFx = {
   draw: boolean;
   glow: boolean;
   pin: boolean;
+  neon: boolean;
 };
 
 type Facet = {
@@ -204,15 +205,47 @@ function TrustFlow() {
   );
 }
 
-/* ---------- fusion (flow 골격 + grid 카드 + stamp 도장) ---------- */
-function TrustFusion() {
+/* ---------- fusion (flow 골격 + grid 카드 + 직관 아이콘) ---------- */
+function TrustFusion({ neon }: { neon: boolean }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const startRef = useRef<HTMLDivElement>(null);
+
+  // 트리거: 유럽제조 노드가 뷰포트 상단 35% 라인에 닿으면 네온 발동(위로 스크롤 시 리암)
+  useEffect(() => {
+    if (!neon) return;
+    const root = rootRef.current;
+    const start = startRef.current;
+    if (!root || !start) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      root.classList.add("neon-go");
+      return;
+    }
+    const io = new IntersectionObserver(
+      (ents) => {
+        for (const e of ents) {
+          if (e.isIntersecting) root.classList.add("neon-go");
+          else if (e.boundingClientRect.top > 0) root.classList.remove("neon-go");
+        }
+      },
+      { rootMargin: "-35% 0px -65% 0px", threshold: 0 },
+    );
+    io.observe(start);
+    return () => io.disconnect();
+  }, [neon]);
+
   return (
-    <div className="trust-fusion">
-      <div className="tf-node reveal-up">
+    <div className="trust-fusion" ref={rootRef}>
+      <div className="tf-node reveal-up" ref={startRef}>
+        <span className="tf-edge" aria-hidden="true">
+          <i className="e-t" />
+          <i className="e-l" />
+          <i className="e-r" />
+          <i className="e-b" />
+        </span>
         <span className="tf-tag">유럽 제조</span>
         <b>Blum · AGOFORM · Peka</b>
       </div>
-      <div className="tf-link reveal-up d1">
+      <div className="tf-link tf-link--1 reveal-up d1">
         <i />
       </div>
       <div className="tf-hub reveal-up d1">
@@ -264,6 +297,7 @@ export function TrustByVariant({
     fx.draw && "fx-draw",
     fx.glow && "fx-glow",
     fx.pin && "is-pinned",
+    fx.neon && "fx-neon",
   ]
     .filter(Boolean)
     .join(" ");
@@ -293,7 +327,7 @@ export function TrustByVariant({
         ) : variant === "grid" ? (
           <TrustGrid />
         ) : (
-          <TrustFusion />
+          <TrustFusion neon={fx.neon} />
         )}
         <div className="brands reveal-up">
           멀티브랜드 수입 전문 — <b>Blum</b> (간판) · AGOFORM (독일) · Peka
