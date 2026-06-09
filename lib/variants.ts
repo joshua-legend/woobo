@@ -34,6 +34,11 @@ export const SECTION_VARIANTS = {
     options: ["click", "hotspots", "scrub"],
     default: "click",
   },
+  trust: {
+    label: "약속(신뢰)",
+    options: ["flow", "stamp", "grid"],
+    default: "flow",
+  },
 } as const satisfies Record<string, SectionConfig>;
 
 export type SectionKey = keyof typeof SECTION_VARIANTS;

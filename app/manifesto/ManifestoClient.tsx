@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { useReveal } from "@/hooks/useReveal";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
@@ -12,133 +12,8 @@ import { HeroByVariant } from "./heroes";
 import { IdentityByVariant } from "./identities";
 import { SoftByVariant } from "./softclose";
 import { DoorByVariant } from "./door";
+import { TrustByVariant } from "./trust";
 import "./manifesto.css";
-
-/* =========================== [05] 약속 (Trust) =========================== */
-type TrustCard = {
-  idx: string;
-  tt: string;
-  ds: string;
-  feat?: boolean;
-  mark: React.ReactNode;
-};
-
-const TRUST_CARDS: TrustCard[] = [
-  {
-    idx: "01",
-    tt: "Blum 한국 독점 에이전트",
-    ds: "정품의 공식 통로 (sole agent)",
-    feat: true,
-    mark: <path d="M4 15 L12 23 L26 6" />,
-  },
-  {
-    idx: "02",
-    tt: "정품 보장 (유사품 차단)",
-    ds: "A/S·부품 통로 확보",
-    mark: <path d="M15 3 L26 8 V16 C26 23 21 26 15 28 C9 26 4 23 4 16 V8 Z" />,
-  },
-  {
-    idx: "03",
-    tt: "프리미엄 멀티브랜드 수입",
-    ds: "유럽 하드웨어·소재 전문",
-    mark: <circle cx="15" cy="15" r="11" />,
-  },
-  {
-    idx: "04",
-    tt: "가구 하드웨어 전문성",
-    ds: "제작 현장을 아는 상담",
-    mark: <path d="M5 22 L15 5 L25 22 Z" />,
-  },
-  {
-    idx: "05",
-    tt: "전국 쇼룸 직접 체험",
-    ds: "실물 확인 · 방문 예약제",
-    mark: <path d="M6 6 H24 V24 H6 Z M6 13 H24" />,
-  },
-  {
-    idx: "06",
-    tt: "자체 가구 생산 (김포 본점)",
-    ds: "하드웨어부터 완제품까지",
-    mark: <path d="M4 26 V12 L15 5 L26 12 V26" />,
-  },
-];
-
-function Trust() {
-  const gridRef = useRef<HTMLDivElement>(null);
-
-  // 카드가 뷰포트에 들어오면 1회 마크 드로잉 (.is-draw → stroke-dashoffset 0)
-  useEffect(() => {
-    const grid = gridRef.current;
-    if (!grid) return;
-    const cards = Array.from(grid.querySelectorAll<HTMLElement>(".card"));
-    const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (reduce) {
-      cards.forEach((c) => c.classList.add("is-draw"));
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-draw");
-            io.unobserve(e.target);
-          }
-        }
-      },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0 },
-    );
-    cards.forEach((c) => io.observe(c));
-    return () => io.disconnect();
-  }, []);
-
-  return (
-    <section
-      className="section trust"
-      data-section="trust"
-      data-theme="light"
-      data-screen-label="05 약속"
-    >
-      <div className="inner">
-        <span className="eyebrow reveal-up">
-          <span className="num">05</span> / 약속
-        </span>
-        <h2 className="reveal-up d1">그래서, 우리가 독점으로 책임집니다.</h2>
-        <p className="lede reveal-up d1">
-          <span className="warn">
-            유사품에 주의하십시오 — 정품 Blum은 한국 독점 에이전트 우보에서.
-          </span>
-        </p>
-        <div className="cards" ref={gridRef}>
-          {TRUST_CARDS.map((c) => (
-            <div
-              key={c.idx}
-              className={`card${c.feat ? " feat" : ""}`}
-            >
-              <div className="idx">{c.idx}</div>
-              <svg className="mark" viewBox="0 0 30 30">
-                {c.mark}
-              </svg>
-              <div>
-                <div className="tt">{c.tt}</div>
-                <div className="ds">{c.ds}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="brands reveal-up">
-          멀티브랜드 수입 전문 — <b>Blum</b> (간판) · AGOFORM (독일) · Peka
-          (스위스) 등
-        </div>
-        <div className="footnote">
-          ※ 재고·납기 및 정확한 법적 등급 표현은 클라이언트 확인 후 확정 [TODO:
-          확인].
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* =========================== [06] 사회적 증거 (placeholder) =========================== */
 function SocialProof() {
@@ -328,7 +203,7 @@ export default function ManifestoClient({ variants }: { variants: Variants }) {
         <IdentityByVariant variant={variants.identity} stage={variants.idStage} />
         <SoftByVariant variant={variants.soft} />
         <DoorByVariant variant={variants.door} />
-        <Trust />
+        <TrustByVariant variant={variants.trust} />
         <SocialProof />
         <Showroom />
       </main>

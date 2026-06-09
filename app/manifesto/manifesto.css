@@ -2043,6 +2043,83 @@
   font-weight: 300;
 }
 
+/* ---- trust variant: stamp (도장) — identity-stamp 재사용 + 상단 여백 ---- */
+.route-manifesto .trust-stamp {
+  margin-top: clamp(40px, 6vh, 60px);
+}
+
+/* ---- trust variant: flow (정품의 공식 통로) ---- */
+.route-manifesto .trust-flow {
+  margin: clamp(40px, 6vh, 64px) auto 0;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.route-manifesto .tf-node {
+  width: 100%;
+  text-align: center;
+  padding: 20px 22px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  background: var(--c-paper);
+}
+.route-manifesto .tf-node--hub {
+  border-color: var(--c-orange);
+  background: color-mix(in srgb, var(--c-orange) 5%, var(--c-paper));
+}
+.route-manifesto .tf-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-caption);
+}
+.route-manifesto .tf-node--hub .tf-tag {
+  color: var(--c-orange);
+}
+.route-manifesto .tf-node b {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(17px, 1.8vw, 22px);
+  letter-spacing: -0.02em;
+}
+.route-manifesto .tf-facets {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.route-manifesto .tf-facet {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--c-line);
+  color: var(--c-ink-2);
+}
+.route-manifesto .tf-link {
+  width: 2px;
+  height: 34px;
+  position: relative;
+  overflow: hidden;
+}
+.route-manifesto .tf-link i {
+  position: absolute;
+  inset: 0;
+  background: var(--c-orange);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.6s var(--ease);
+}
+.route-manifesto .tf-link.is-in i {
+  transform: scaleY(1);
+}
+
 /* =========================================================
    SECTION: social (사회적 증거 · placeholder)
    ========================================================= */
