@@ -351,18 +351,28 @@ function SoftStageVideo() {
     "loading",
   );
 
-  const seek = useCallback((p: number) => {
+  // 코얼레싱 seek: seek 진행 중이면 건너뛰고, 끝나면(seeked) 최신 target 만 적용 → 끊김 방지
+  const applySeek = useCallback(() => {
     const v = videoRef.current;
-    const cp = clamp(p, 0, 1);
-    pRef.current = cp;
-    setP(stageRef.current, cp);
-    if (!v || !readyRef.current || !durRef.current) return;
-    try {
-      v.currentTime = cp * durRef.current;
-    } catch {
-      /* seek 무시 */
+    if (!v || !readyRef.current || !durRef.current || v.seeking) return;
+    const t = pRef.current * durRef.current;
+    if (Math.abs(v.currentTime - t) > 0.012) {
+      try {
+        v.currentTime = t;
+      } catch {
+        /* seek 무시 */
+      }
     }
   }, []);
+
+  const setTarget = useCallback(
+    (p: number) => {
+      pRef.current = clamp(p, 0, 1);
+      setP(stageRef.current, pRef.current);
+      applySeek();
+    },
+    [applySeek],
+  );
 
   useEffect(() => {
     const v = videoRef.current;
@@ -374,31 +384,34 @@ function SoftStageVideo() {
         readyRef.current = true;
         setStatus("ready");
         v.pause();
-        seek(pRef.current);
+        applySeek();
       }
     };
+    const onSeeked = () => applySeek(); // 직전 seek 끝나면 그동안 밀린 최신 위치로
     const onErr = () => setStatus("missing");
     v.addEventListener("loadedmetadata", markReady);
     v.addEventListener("loadeddata", markReady);
     v.addEventListener("canplay", markReady);
+    v.addEventListener("seeked", onSeeked);
     v.addEventListener("error", onErr);
-    v.load(); // 강제 로드
-    markReady(); // 이미 로드됐으면(이벤트 놓침 방지) 즉시 반영
+    v.load();
+    markReady();
     return () => {
       v.removeEventListener("loadedmetadata", markReady);
       v.removeEventListener("loadeddata", markReady);
       v.removeEventListener("canplay", markReady);
+      v.removeEventListener("seeked", onSeeked);
       v.removeEventListener("error", onErr);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [seek]);
+  }, [applySeek]);
 
   const onUpdate = useCallback(
     (p: number) => {
       if (modeRef.current !== "scrub") return;
-      seek(p);
+      setTarget(p);
     },
-    [seek],
+    [setTarget],
   );
   useScrub(stageRef, onUpdate, { start: "top 86%", end: "top 32%" });
 
@@ -414,7 +427,7 @@ function SoftStageVideo() {
     if (modeRef.current !== "drag") return;
     const w = stageRef.current?.clientWidth || 400;
     const dx = e.clientX - dragRef.current.startX;
-    seek(dragRef.current.startP - dx / w);
+    setTarget(dragRef.current.startP - dx / w);
   };
   const onPointerUp = () => {
     if (modeRef.current !== "drag") return;
@@ -426,7 +439,7 @@ function SoftStageVideo() {
     const step = (t: number) => {
       if (t0 === null) t0 = t;
       const k = clamp((t - t0) / dur, 0, 1);
-      seek(from + (1 - from) * easeOut(k));
+      setTarget(from + (1 - from) * easeOut(k));
       if (k < 1) rafRef.current = requestAnimationFrame(step);
       else modeRef.current = "scrub";
     };
