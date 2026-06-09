@@ -1539,6 +1539,22 @@
   border: none;
 }
 
+/* ---- demo-softvideo: 영상 스크럽 ---- */
+.route-manifesto .demo-softvideo {
+  cursor: grab;
+}
+.route-manifesto .demo-softvideo.is-grab {
+  cursor: grabbing;
+}
+.route-manifesto .softvideo__el {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 /* ---- demo-hinge: 무공구 힌지 3축 ---- */
 .route-manifesto .demo-hinge .wall {
   position: absolute;

@@ -334,6 +334,139 @@ function SoftStageSequence() {
   );
 }
 
+/* ---------- video (영상 스크럽) — mp4 1개를 스크롤로 감기 ---------- */
+const VIDEO_SRC = "/videos/soft-close.mp4";
+
+function SoftStageVideo() {
+  const reduce = useReducedMotion();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const durRef = useRef(0);
+  const readyRef = useRef(false);
+  const pRef = useRef(0);
+  const modeRef = useRef<"scrub" | "drag" | "closing">("scrub");
+  const dragRef = useRef({ startX: 0, startP: 0 });
+  const rafRef = useRef(0);
+  const [status, setStatus] = useState<"loading" | "ready" | "missing">(
+    "loading",
+  );
+
+  const seek = useCallback((p: number) => {
+    const v = videoRef.current;
+    const cp = clamp(p, 0, 1);
+    pRef.current = cp;
+    setP(stageRef.current, cp);
+    if (!v || !readyRef.current || !durRef.current) return;
+    try {
+      v.currentTime = cp * durRef.current;
+    } catch {
+      /* seek 무시 */
+    }
+  }, []);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const onMeta = () => {
+      durRef.current = v.duration || 0;
+      readyRef.current = true;
+      setStatus("ready");
+      v.pause();
+      seek(pRef.current);
+    };
+    const onErr = () => setStatus("missing");
+    v.addEventListener("loadedmetadata", onMeta);
+    v.addEventListener("error", onErr);
+    return () => {
+      v.removeEventListener("loadedmetadata", onMeta);
+      v.removeEventListener("error", onErr);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [seek]);
+
+  const onUpdate = useCallback(
+    (p: number) => {
+      if (modeRef.current !== "scrub") return;
+      seek(p);
+    },
+    [seek],
+  );
+  useScrub(stageRef, onUpdate, { start: "top 86%", end: "top 32%" });
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (reduce || !readyRef.current) return;
+    modeRef.current = "drag";
+    cancelAnimationFrame(rafRef.current);
+    dragRef.current = { startX: e.clientX, startP: pRef.current };
+    stageRef.current?.classList.add("is-grab");
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (modeRef.current !== "drag") return;
+    const w = stageRef.current?.clientWidth || 400;
+    const dx = e.clientX - dragRef.current.startX;
+    seek(dragRef.current.startP - dx / w);
+  };
+  const onPointerUp = () => {
+    if (modeRef.current !== "drag") return;
+    modeRef.current = "closing";
+    stageRef.current?.classList.remove("is-grab");
+    const from = pRef.current;
+    const dur = 760;
+    let t0: number | null = null;
+    const step = (t: number) => {
+      if (t0 === null) t0 = t;
+      const k = clamp((t - t0) / dur, 0, 1);
+      seek(from + (1 - from) * easeOut(k));
+      if (k < 1) rafRef.current = requestAnimationFrame(step);
+      else modeRef.current = "scrub";
+    };
+    rafRef.current = requestAnimationFrame(step);
+  };
+
+  return (
+    <div
+      className="demo__stage demo-softvideo"
+      data-demo="softvideo"
+      ref={stageRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      style={reduce ? undefined : { touchAction: "none" }}
+    >
+      <video
+        ref={videoRef}
+        className="softvideo__el"
+        src={VIDEO_SRC}
+        muted
+        playsInline
+        preload="auto"
+      />
+      {status !== "ready" && (
+        <div
+          className="softseq__ph ph"
+          data-ph={
+            status === "missing"
+              ? "영상 대기 — /public/videos/soft-close.mp4"
+              : "영상 로딩…"
+          }
+        />
+      )}
+      <div className="grabhint">
+        {reduce ? "" : "스크롤·드래그 = 서랍 / 손 떼면 사뿐히"}
+      </div>
+      <div className="stage-meter">
+        <span>OPEN</span>
+        <span className="track">
+          <i />
+        </span>
+        <span>SOFT&nbsp;CLOSE</span>
+      </div>
+    </div>
+  );
+}
+
 /* =========================== [03] 신념① · 소프트클로즈 (버저닝 래퍼) =========================== */
 export function SoftByVariant({ variant }: { variant: string }) {
   return (
@@ -374,6 +507,8 @@ export function SoftByVariant({ variant }: { variant: string }) {
               <SoftStageCompare />
             ) : variant === "sequence" ? (
               <SoftStageSequence />
+            ) : variant === "video" ? (
+              <SoftStageVideo />
             ) : (
               <SoftStageScrub />
             )}
