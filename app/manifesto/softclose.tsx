@@ -347,8 +347,8 @@ function SoftStageVideo() {
   const dispRef = useRef(0); // 화면에 보이는(부드럽게 따라오는) 진행도
   const runningRef = useRef(false);
   const closeRef = useRef({ active: false, from: 0, t0: 0 });
-  const modeRef = useRef<"scrub" | "drag" | "closing">("scrub");
-  const dragRef = useRef({ startX: 0, startP: 0 });
+  const modeRef = useRef<"scrub" | "drag" | "hover" | "closing">("scrub");
+  const dragTouchRef = useRef(false);
   const rafRef = useRef(0);
   const [status, setStatus] = useState<"loading" | "ready" | "missing">(
     "loading",
@@ -449,24 +449,15 @@ function SoftStageVideo() {
   );
   useScrub(stageRef, onUpdate, { start: "top 86%", end: "top 32%" });
 
-  const onPointerDown = (e: React.PointerEvent) => {
-    if (reduce || !readyRef.current) return;
-    modeRef.current = "drag";
+  // 스테이지 내 마우스 X(0=왼쪽=열림, 1=오른쪽=닫힘)
+  const relX = (clientX: number) => {
+    const s = stageRef.current;
+    if (!s) return 0;
+    const r = s.getBoundingClientRect();
+    return clamp((clientX - r.left) / r.width, 0, 1);
+  };
+  const startClose = () => {
     closeRef.current.active = false;
-    setShowGuide(false);
-    dragRef.current = { startX: e.clientX, startP: targetRef.current };
-    stageRef.current?.classList.add("is-grab");
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-  };
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (modeRef.current !== "drag") return;
-    const w = stageRef.current?.clientWidth || 400;
-    const dx = e.clientX - dragRef.current.startX;
-    setTarget(dragRef.current.startP - dx / w);
-  };
-  const onPointerUp = () => {
-    if (modeRef.current !== "drag") return;
-    stageRef.current?.classList.remove("is-grab");
     modeRef.current = "closing";
     closeRef.current = {
       active: true,
@@ -474,6 +465,38 @@ function SoftStageVideo() {
       t0: performance.now(),
     };
     startLoop();
+  };
+  // 마우스 = 호버로 조작(클릭 불필요) / 터치 = 손가락 드래그
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (reduce || !readyRef.current) return;
+    if (e.pointerType === "mouse") {
+      modeRef.current = "hover";
+      setShowGuide(false);
+      setTarget(relX(e.clientX));
+    } else if (dragTouchRef.current) {
+      setShowGuide(false);
+      setTarget(relX(e.clientX));
+    }
+  };
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (reduce || !readyRef.current || e.pointerType === "mouse") return;
+    dragTouchRef.current = true;
+    modeRef.current = "drag";
+    closeRef.current.active = false;
+    setShowGuide(false);
+    setTarget(relX(e.clientX));
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse" && dragTouchRef.current) {
+      dragTouchRef.current = false;
+      startClose(); // 손 떼면 사뿐히
+    }
+  };
+  const onPointerLeave = (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse" && modeRef.current === "hover") {
+      startClose(); // 마우스 벗어나면 사뿐히 닫힘
+    }
   };
 
   return (
@@ -485,6 +508,7 @@ function SoftStageVideo() {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
+      onPointerLeave={onPointerLeave}
       style={reduce ? undefined : { touchAction: "none" }}
     >
       <video
@@ -512,8 +536,19 @@ function SoftStageVideo() {
           className={`softvideo__guide${showGuide ? "" : " is-hidden"}`}
           aria-hidden="true"
         >
-          <span className="softvideo__guide-arrows">↔</span>
-          좌우로 드래그 · 스크롤
+          <span className="softvideo__hand">
+            <svg viewBox="0 0 48 48">
+              <path
+                className="sg-arrow"
+                d="M9 17 H39 M12 14 L9 17 L12 20 M36 14 L39 17 L36 20"
+              />
+              <path
+                className="sg-hand"
+                d="M21 32 V19 a2.4 2.4 0 0 1 4.8 0 V26 a2.4 2.4 0 0 1 4.8 0 V28 a2.4 2.4 0 0 1 4.8 0 V32 c0 5 -3.4 8.6 -8.6 8.6 h-2.4 c-2.9 0 -4.7 -1.4 -6.1 -4.3 l-3.2 -5.6 a2.5 2.5 0 0 1 4.3 -2.6 l2.4 3.4 Z"
+              />
+            </svg>
+          </span>
+          마우스를 좌우로 움직여보세요
         </div>
       )}
       <div className="stage-meter">

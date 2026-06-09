@@ -1539,12 +1539,9 @@
   border: none;
 }
 
-/* ---- demo-softvideo: 영상 스크럽 ---- */
+/* ---- demo-softvideo: 영상 스크럽(마우스 호버 조작) ---- */
 .route-manifesto .demo-softvideo {
-  cursor: grab;
-}
-.route-manifesto .demo-softvideo.is-grab {
-  cursor: grabbing;
+  cursor: ew-resize;
 }
 .route-manifesto .softvideo__el {
   position: absolute;
@@ -1576,18 +1573,37 @@
   );
   transition: opacity 0.5s var(--ease);
 }
-.route-manifesto .softvideo__guide-arrows {
-  font-size: 30px;
-  color: var(--c-orange);
+.route-manifesto .softvideo__hand {
+  display: block;
+  width: 46px;
+  height: 46px;
   animation: rm-guideSwipe 1.8s var(--ease) infinite;
+}
+.route-manifesto .softvideo__hand svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.route-manifesto .softvideo__hand .sg-hand {
+  fill: var(--c-paper);
+  stroke: var(--c-ink);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.route-manifesto .softvideo__hand .sg-arrow {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 @keyframes rm-guideSwipe {
   0%,
   100% {
-    transform: translateX(-9px);
+    transform: translateX(-10px);
   }
   50% {
-    transform: translateX(9px);
+    transform: translateX(10px);
   }
 }
 .route-manifesto .softvideo__guide.is-hidden {
@@ -2163,7 +2179,7 @@
   .route-manifesto .sc-drawer.is-bump {
     animation: none !important;
   }
-  .route-manifesto .softvideo__guide-arrows {
+  .route-manifesto .softvideo__hand {
     animation: none !important;
   }
 }
