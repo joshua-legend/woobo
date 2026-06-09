@@ -1541,7 +1541,7 @@
 
 /* ---- demo-softvideo: 영상 스크럽(마우스 호버 조작) ---- */
 .route-manifesto .demo-softvideo {
-  cursor: ew-resize;
+  cursor: grab;
 }
 .route-manifesto .softvideo__el {
   position: absolute;
@@ -1556,22 +1556,27 @@
   inset: 0;
   z-index: 2;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  pointer-events: none; /* 마우스는 통과해서 스테이지가 호버 감지 */
+  transition: opacity 0.45s var(--ease);
+}
+.route-manifesto .softvideo__guide-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 10px;
-  pointer-events: none;
+  padding: 20px 24px;
+  border-radius: 12px;
+  background: rgba(244, 241, 236, 0.66);
+  border: 1px solid var(--c-line);
+  backdrop-filter: blur(2px);
   font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--c-ink);
-  background: radial-gradient(
-    closest-side,
-    rgba(244, 241, 236, 0.6),
-    rgba(244, 241, 236, 0)
-  );
-  transition: opacity 0.5s var(--ease);
+  text-align: center;
 }
 .route-manifesto .softvideo__hand {
   display: block;

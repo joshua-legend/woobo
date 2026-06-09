@@ -491,12 +491,13 @@ function SoftStageVideo() {
     if (e.pointerType !== "mouse" && dragTouchRef.current) {
       dragTouchRef.current = false;
       startClose(); // 손 떼면 사뿐히
+      setShowGuide(true);
     }
   };
   const onPointerLeave = (e: React.PointerEvent) => {
-    if (e.pointerType === "mouse" && modeRef.current === "hover") {
-      startClose(); // 마우스 벗어나면 사뿐히 닫힘
-    }
+    if (e.pointerType !== "mouse") return;
+    if (modeRef.current === "hover") startClose(); // 마우스 벗어나면 사뿐히 닫힘
+    setShowGuide(true); // 안내 다시 표시
   };
 
   return (
@@ -536,19 +537,21 @@ function SoftStageVideo() {
           className={`softvideo__guide${showGuide ? "" : " is-hidden"}`}
           aria-hidden="true"
         >
-          <span className="softvideo__hand">
-            <svg viewBox="0 0 48 48">
-              <path
-                className="sg-arrow"
-                d="M9 17 H39 M12 14 L9 17 L12 20 M36 14 L39 17 L36 20"
-              />
-              <path
-                className="sg-hand"
-                d="M21 32 V19 a2.4 2.4 0 0 1 4.8 0 V26 a2.4 2.4 0 0 1 4.8 0 V28 a2.4 2.4 0 0 1 4.8 0 V32 c0 5 -3.4 8.6 -8.6 8.6 h-2.4 c-2.9 0 -4.7 -1.4 -6.1 -4.3 l-3.2 -5.6 a2.5 2.5 0 0 1 4.3 -2.6 l2.4 3.4 Z"
-              />
-            </svg>
-          </span>
-          마우스를 좌우로 움직여보세요
+          <div className="softvideo__guide-box">
+            <span className="softvideo__hand">
+              <svg viewBox="0 0 48 48">
+                <path
+                  className="sg-arrow"
+                  d="M9 17 H39 M12 14 L9 17 L12 20 M36 14 L39 17 L36 20"
+                />
+                <path
+                  className="sg-hand"
+                  d="M21 32 V19 a2.4 2.4 0 0 1 4.8 0 V26 a2.4 2.4 0 0 1 4.8 0 V28 a2.4 2.4 0 0 1 4.8 0 V32 c0 5 -3.4 8.6 -8.6 8.6 h-2.4 c-2.9 0 -4.7 -1.4 -6.1 -4.3 l-3.2 -5.6 a2.5 2.5 0 0 1 4.3 -2.6 l2.4 3.4 Z"
+                />
+              </svg>
+            </span>
+            마우스를 올려 좌우로 움직여보세요
+          </div>
         </div>
       )}
       <div className="stage-meter">
