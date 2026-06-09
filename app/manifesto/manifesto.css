@@ -2161,29 +2161,20 @@
   padding: 22px 18px;
   text-align: left;
 }
-.route-manifesto .tf-seal {
+.route-manifesto .tf-icon {
   display: block;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   margin-bottom: 12px;
 }
-.route-manifesto .tf-seal circle,
-.route-manifesto .tf-seal path {
+.route-manifesto .tf-icon circle,
+.route-manifesto .tf-icon path,
+.route-manifesto .tf-icon rect {
   fill: none;
   stroke: var(--c-orange);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 130;
-  stroke-dashoffset: 130;
-  transition: stroke-dashoffset 0.8s var(--ease);
-}
-.route-manifesto .tf-card.is-in .tf-seal {
-  animation: rm-stampPop 0.5s var(--ease-tip);
-}
-.route-manifesto .tf-card.is-in .tf-seal circle,
-.route-manifesto .tf-card.is-in .tf-seal path {
-  stroke-dashoffset: 0;
 }
 .route-manifesto .tf-card__tt {
   font-family: var(--font-head);

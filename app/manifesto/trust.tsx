@@ -2,7 +2,13 @@
 
 import { useEffect, useRef } from "react";
 
-type Facet = { t: string; d: string; feat?: boolean; mark: React.ReactNode };
+type Facet = {
+  t: string;
+  d: string;
+  feat?: boolean;
+  mark: React.ReactNode; // grid 변주용(기존)
+  icon: React.ReactNode; // fusion 변주용(직관 아이콘, viewBox 0 0 32 32)
+};
 
 const FACETS: Facet[] = [
   {
@@ -10,31 +16,74 @@ const FACETS: Facet[] = [
     d: "정품의 공식 통로 (sole agent)",
     feat: true,
     mark: <path d="M4 15 L12 23 L26 6" />,
+    // 메달/공인 배지
+    icon: (
+      <>
+        <circle cx="16" cy="12" r="7" />
+        <path d="M11 18 L8 28 L16 24 L24 28 L21 18" />
+      </>
+    ),
   },
   {
     t: "정품 보장 (유사품 차단)",
     d: "A/S·부품 통로 확보",
     mark: <path d="M15 3 L26 8 V16 C26 23 21 26 15 28 C9 26 4 23 4 16 V8 Z" />,
+    // 방패 + 체크
+    icon: (
+      <>
+        <path d="M16 4 L27 8 V15 C27 22 22 26 16 28 C10 26 5 22 5 15 V8 Z" />
+        <path d="M11 15 L15 19 L22 11" />
+      </>
+    ),
   },
   {
     t: "프리미엄 멀티브랜드 수입",
     d: "유럽 하드웨어·소재 전문",
     mark: <circle cx="15" cy="15" r="11" />,
+    // 박스 3개(멀티)
+    icon: (
+      <>
+        <rect x="4.5" y="16" width="9" height="9" />
+        <rect x="18.5" y="16" width="9" height="9" />
+        <rect x="11.5" y="6.5" width="9" height="9" />
+      </>
+    ),
   },
   {
     t: "가구 하드웨어 전문성",
     d: "제작 현장을 아는 상담",
     mark: <path d="M5 22 L15 5 L25 22 Z" />,
+    // 기어(기계·하드웨어)
+    icon: (
+      <>
+        <circle cx="16" cy="16" r="5" />
+        <path d="M16 4 V8 M16 24 V28 M4 16 H8 M24 16 H28 M7.5 7.5 L10.3 10.3 M21.7 21.7 L24.5 24.5 M24.5 7.5 L21.7 10.3 M10.3 21.7 L7.5 24.5" />
+      </>
+    ),
   },
   {
     t: "전국 쇼룸 직접 체험",
     d: "실물 확인 · 방문 예약제",
     mark: <path d="M6 6 H24 V24 H6 Z M6 13 H24" />,
+    // 지도 핀
+    icon: (
+      <>
+        <path d="M16 28 C16 28 25 19 25 13 A9 9 0 0 0 7 13 C7 19 16 28 16 28 Z" />
+        <circle cx="16" cy="13" r="3.2" />
+      </>
+    ),
   },
   {
     t: "자체 가구 생산 (김포 본점)",
     d: "하드웨어부터 완제품까지",
     mark: <path d="M4 26 V12 L15 5 L26 12 V26" />,
+    // 공장
+    icon: (
+      <>
+        <path d="M4 27 V15 L12 19 V15 L20 19 V15 L28 19 V27 Z" />
+        <path d="M23 15 V9 H26 V17" />
+      </>
+    ),
   },
 ];
 
@@ -167,9 +216,8 @@ function TrustFusion() {
                 { "--reveal-delay": `${0.06 + i * 0.07}s` } as React.CSSProperties
               }
             >
-              <svg className="tf-seal" viewBox="0 0 44 44" aria-hidden="true">
-                <circle cx="22" cy="22" r="19" />
-                <path d="M13 22.5 L19.5 29 L31 16" />
+              <svg className="tf-icon" viewBox="0 0 32 32" aria-hidden="true">
+                {f.icon}
               </svg>
               <div className="tf-card__tt">{f.t}</div>
               <div className="tf-card__ds">{f.d}</div>
