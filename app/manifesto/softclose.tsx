@@ -367,18 +367,27 @@ function SoftStageVideo() {
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const onMeta = () => {
-      durRef.current = v.duration || 0;
-      readyRef.current = true;
-      setStatus("ready");
-      v.pause();
-      seek(pRef.current);
+    const markReady = () => {
+      if (readyRef.current) return;
+      if (v.readyState >= 1 && isFinite(v.duration) && v.duration > 0) {
+        durRef.current = v.duration;
+        readyRef.current = true;
+        setStatus("ready");
+        v.pause();
+        seek(pRef.current);
+      }
     };
     const onErr = () => setStatus("missing");
-    v.addEventListener("loadedmetadata", onMeta);
+    v.addEventListener("loadedmetadata", markReady);
+    v.addEventListener("loadeddata", markReady);
+    v.addEventListener("canplay", markReady);
     v.addEventListener("error", onErr);
+    v.load(); // 강제 로드
+    markReady(); // 이미 로드됐으면(이벤트 놓침 방지) 즉시 반영
     return () => {
-      v.removeEventListener("loadedmetadata", onMeta);
+      v.removeEventListener("loadedmetadata", markReady);
+      v.removeEventListener("loadeddata", markReady);
+      v.removeEventListener("canplay", markReady);
       v.removeEventListener("error", onErr);
       cancelAnimationFrame(rafRef.current);
     };
