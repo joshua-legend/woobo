@@ -193,13 +193,20 @@ function TrustFlow() {
   );
 }
 
-/* ---------- fusion (flow 골격 + grid 카드 + stamp 도장) ---------- */
+/* ---------- fusion (flow 골격 + grid 카드 + 직관 아이콘) ---------- */
 function TrustFusion() {
   return (
     <div className="trust-fusion">
-      <div className="tf-node reveal-up">
-        <span className="tf-tag">유럽 제조</span>
+      <div className="tf-node tf-node--end reveal-up">
+        <span className="tf-node__icon">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <circle cx="16" cy="16" r="12" />
+            <path d="M4 16 H28 M16 4 V28 M16 4 C9.5 9 9.5 23 16 28 M16 4 C22.5 9 22.5 23 16 28" />
+          </svg>
+        </span>
+        <span className="tf-tag">유럽 제조 · ORIGIN</span>
         <b>Blum · AGOFORM · Peka</b>
+        <span className="tf-node__sub">프리미엄 하드웨어·소재의 원산지</span>
       </div>
       <div className="tf-link reveal-up d1">
         <i />
@@ -228,9 +235,16 @@ function TrustFusion() {
       <div className="tf-link reveal-up d2">
         <i />
       </div>
-      <div className="tf-node reveal-up d2">
-        <span className="tf-tag">고객</span>
+      <div className="tf-node tf-node--end reveal-up d2">
+        <span className="tf-node__icon">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <circle cx="16" cy="11" r="5" />
+            <path d="M6 27 C6 20 10 18 16 18 C22 18 26 20 26 27" />
+          </svg>
+        </span>
+        <span className="tf-tag">고객 · YOU</span>
         <b>정품 · A/S · 전국 쇼룸으로 안심</b>
+        <span className="tf-node__sub">손에 닿기까지, 우보가 책임집니다</span>
       </div>
     </div>
   );

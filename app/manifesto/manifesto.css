@@ -2086,6 +2086,51 @@
   font-size: clamp(17px, 1.8vw, 22px);
   letter-spacing: -0.02em;
 }
+
+/* 끝 노드(유럽 제조·고객) 디벨롭 — 아이콘 배지 + 보조 라벨 */
+.route-manifesto .tf-node--end {
+  padding: 26px 22px 24px;
+  background:
+    radial-gradient(
+      120% 80% at 50% 0%,
+      color-mix(in srgb, var(--c-orange) 5%, transparent),
+      transparent 70%
+    ),
+    var(--c-paper);
+}
+.route-manifesto .tf-node__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--c-orange) 10%, var(--c-paper));
+  border: 1px solid color-mix(in srgb, var(--c-orange) 32%, var(--c-line));
+}
+.route-manifesto .tf-node__icon svg {
+  width: 24px;
+  height: 24px;
+}
+.route-manifesto .tf-node__icon svg circle,
+.route-manifesto .tf-node__icon svg path {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.route-manifesto .tf-node--end .tf-tag {
+  color: var(--c-orange);
+}
+.route-manifesto .tf-node__sub {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--c-ink-2);
+}
 .route-manifesto .tf-facets {
   margin-top: 14px;
   display: flex;
