@@ -371,8 +371,8 @@ function SoftStageVideo() {
         modeRef.current = "scrub";
       }
     }
-    dispRef.current += (targetRef.current - dispRef.current) * 0.25;
-    if (Math.abs(targetRef.current - dispRef.current) < 0.0006)
+    dispRef.current += (targetRef.current - dispRef.current) * 0.14;
+    if (Math.abs(targetRef.current - dispRef.current) < 0.0004)
       dispRef.current = targetRef.current;
     setP(stageRef.current, dispRef.current);
     if (!v.seeking) {
