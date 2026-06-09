@@ -36,8 +36,8 @@ export const SECTION_VARIANTS = {
   },
   trust: {
     label: "약속(신뢰)",
-    options: ["flow", "stamp", "grid"],
-    default: "flow",
+    options: ["fusion", "flow", "stamp", "grid"],
+    default: "fusion",
   },
 } as const satisfies Record<string, SectionConfig>;
 

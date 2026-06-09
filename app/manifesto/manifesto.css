@@ -2120,6 +2120,84 @@
   transform: scaleY(1);
 }
 
+/* ---- trust variant: fusion (flow + grid + stamp) ---- */
+.route-manifesto .trust-fusion {
+  margin: clamp(40px, 6vh, 64px) auto 0;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.route-manifesto .tf-hub {
+  width: 100%;
+  padding: 20px 20px 22px;
+  border: 1px solid var(--c-orange);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--c-orange) 4%, var(--c-paper));
+  text-align: center;
+}
+.route-manifesto .tf-hub > .tf-tag {
+  color: var(--c-orange);
+}
+.route-manifesto .tf-hub__title {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(17px, 1.8vw, 22px);
+  letter-spacing: -0.02em;
+}
+.route-manifesto .tf-cards {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--c-line);
+  border: 1px solid var(--c-line);
+}
+.route-manifesto .tf-card {
+  position: relative;
+  background: var(--c-paper);
+  padding: 22px 18px;
+  text-align: left;
+}
+.route-manifesto .tf-seal {
+  display: block;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 12px;
+}
+.route-manifesto .tf-seal circle,
+.route-manifesto .tf-seal path {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 130;
+  stroke-dashoffset: 130;
+  transition: stroke-dashoffset 0.8s var(--ease);
+}
+.route-manifesto .tf-card.is-in .tf-seal {
+  animation: rm-stampPop 0.5s var(--ease-tip);
+}
+.route-manifesto .tf-card.is-in .tf-seal circle,
+.route-manifesto .tf-card.is-in .tf-seal path {
+  stroke-dashoffset: 0;
+}
+.route-manifesto .tf-card__tt {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(15px, 1.5vw, 19px);
+  letter-spacing: -0.02em;
+}
+.route-manifesto .tf-card__ds {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--c-ink-2);
+}
+
 /* =========================================================
    SECTION: social (사회적 증거 · placeholder)
    ========================================================= */
@@ -2307,6 +2385,7 @@
     order: 0;
   }
   .route-manifesto .trust .cards,
+  .route-manifesto .tf-cards,
   .route-manifesto .social__quotes,
   .route-manifesto .showroom .branches {
     grid-template-columns: 1fr;
@@ -2451,5 +2530,13 @@
   .route-manifesto .door-clip {
     opacity: 1 !important;
     transform: none !important;
+  }
+  .route-manifesto .tf-seal {
+    animation: none !important;
+  }
+  .route-manifesto .tf-seal circle,
+  .route-manifesto .tf-seal path {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
   }
 }

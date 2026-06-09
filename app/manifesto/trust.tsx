@@ -144,6 +144,50 @@ function TrustFlow() {
   );
 }
 
+/* ---------- fusion (flow 골격 + grid 카드 + stamp 도장) ---------- */
+function TrustFusion() {
+  return (
+    <div className="trust-fusion">
+      <div className="tf-node reveal-up">
+        <span className="tf-tag">유럽 제조</span>
+        <b>Blum · AGOFORM · Peka</b>
+      </div>
+      <div className="tf-link reveal-up d1">
+        <i />
+      </div>
+      <div className="tf-hub reveal-up d1">
+        <span className="tf-tag">한국 독점 에이전트 · sole agent</span>
+        <b className="tf-hub__title">우보브랜드샵 — 정품의 공식 통로</b>
+        <div className="tf-cards">
+          {FACETS.map((f, i) => (
+            <div
+              key={f.t}
+              className="tf-card reveal-up"
+              style={
+                { "--reveal-delay": `${0.06 + i * 0.07}s` } as React.CSSProperties
+              }
+            >
+              <svg className="tf-seal" viewBox="0 0 44 44" aria-hidden="true">
+                <circle cx="22" cy="22" r="19" />
+                <path d="M13 22.5 L19.5 29 L31 16" />
+              </svg>
+              <div className="tf-card__tt">{f.t}</div>
+              <div className="tf-card__ds">{f.d}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="tf-link reveal-up d2">
+        <i />
+      </div>
+      <div className="tf-node reveal-up d2">
+        <span className="tf-tag">고객</span>
+        <b>정품 · A/S · 전국 쇼룸으로 안심</b>
+      </div>
+    </div>
+  );
+}
+
 /* =========================== [05] 약속 (Trust · 버저닝) =========================== */
 export function TrustByVariant({ variant }: { variant: string }) {
   return (
@@ -167,8 +211,10 @@ export function TrustByVariant({ variant }: { variant: string }) {
           <TrustFlow />
         ) : variant === "stamp" ? (
           <TrustStamp />
-        ) : (
+        ) : variant === "grid" ? (
           <TrustGrid />
+        ) : (
+          <TrustFusion />
         )}
         <div className="brands reveal-up">
           멀티브랜드 수입 전문 — <b>Blum</b> (간판) · AGOFORM (독일) · Peka
