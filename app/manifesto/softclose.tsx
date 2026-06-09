@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useScrub } from "@/hooks/useScrub";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -9,6 +9,11 @@ const setP = (el: HTMLElement | null, v: number) => {
 };
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 2.2);
+
+// 이미지 시퀀스 규격 — docs/section3-sequence-spec.md 와 1:1 (디자인팀 에셋 오면 여기만 수정)
+const SEQ = { dir: "/images/soft/", prefix: "close-", count: 48, pad: 3, ext: "webp" };
+const frameSrc = (i: number) =>
+  `${SEQ.dir}${SEQ.prefix}${String(i + 1).padStart(SEQ.pad, "0")}.${SEQ.ext}`;
 
 /* ---------- scrub (현행) — 스크롤로 닫힘 + 끝 감속 ---------- */
 function SoftStageScrub() {
@@ -165,6 +170,170 @@ function SoftStageCompare() {
   );
 }
 
+/* ---------- sequence (이미지 시퀀스 스크럽) — 실물 3D 렌더 프레임 교체용 ---------- */
+function SoftStageSequence() {
+  const reduce = useReducedMotion();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const framesRef = useRef<HTMLImageElement[]>([]);
+  const readyRef = useRef(false);
+  const curRef = useRef(0);
+  const modeRef = useRef<"scrub" | "drag" | "closing">("scrub");
+  const dragRef = useRef({ startX: 0, startF: 0 });
+  const rafRef = useRef(0);
+  const [status, setStatus] = useState<"loading" | "ready" | "missing">(
+    "loading",
+  );
+
+  const drawFrame = useCallback((idx: number) => {
+    const c = canvasRef.current;
+    const img = framesRef.current[idx];
+    if (!c || !img || !img.complete || !img.naturalWidth) return;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+    const cw = c.width;
+    const ch = c.height;
+    const ir = img.naturalWidth / img.naturalHeight;
+    let w = cw;
+    let h = ch;
+    if (ir > cw / ch) h = cw / ir;
+    else w = ch * ir;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+    curRef.current = idx;
+    setP(stageRef.current, idx / (SEQ.count - 1)); // 미터 연동
+  }, []);
+
+  const sizeCanvas = useCallback(() => {
+    const c = canvasRef.current;
+    const s = stageRef.current;
+    if (!c || !s) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = Math.round(s.clientWidth * dpr);
+    c.height = Math.round(s.clientHeight * dpr);
+    if (readyRef.current) drawFrame(curRef.current);
+  }, [drawFrame]);
+
+  useEffect(() => {
+    let alive = true;
+    let loaded = 0;
+    let failed = false;
+    const imgs: HTMLImageElement[] = [];
+    for (let i = 0; i < SEQ.count; i++) {
+      const img = new Image();
+      img.onload = () => {
+        if (!alive || failed) return;
+        loaded += 1;
+        if (loaded === SEQ.count) {
+          readyRef.current = true;
+          setStatus("ready");
+          sizeCanvas();
+          drawFrame(0);
+        }
+      };
+      img.onerror = () => {
+        if (!alive) return;
+        failed = true;
+        setStatus("missing");
+      };
+      img.src = frameSrc(i);
+      imgs[i] = img;
+    }
+    framesRef.current = imgs;
+    sizeCanvas();
+    window.addEventListener("resize", sizeCanvas);
+    const raf = rafRef;
+    return () => {
+      alive = false;
+      window.removeEventListener("resize", sizeCanvas);
+      cancelAnimationFrame(raf.current);
+    };
+  }, [drawFrame, sizeCanvas]);
+
+  const onUpdate = useCallback(
+    (p: number) => {
+      if (modeRef.current !== "scrub" || !readyRef.current) return;
+      drawFrame(Math.round(clamp(p, 0, 1) * (SEQ.count - 1)));
+    },
+    [drawFrame],
+  );
+  useScrub(stageRef, onUpdate, { start: "top 86%", end: "top 32%" });
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (reduce || !readyRef.current) return;
+    modeRef.current = "drag";
+    cancelAnimationFrame(rafRef.current);
+    dragRef.current = { startX: e.clientX, startF: curRef.current };
+    stageRef.current?.classList.add("is-grab");
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (modeRef.current !== "drag") return;
+    const w = stageRef.current?.clientWidth || 400;
+    const dx = e.clientX - dragRef.current.startX;
+    // 왼쪽 드래그 = 닫힘(프레임 증가)
+    drawFrame(
+      clamp(
+        Math.round(dragRef.current.startF - (dx / w) * (SEQ.count - 1)),
+        0,
+        SEQ.count - 1,
+      ),
+    );
+  };
+  const onPointerUp = () => {
+    if (modeRef.current !== "drag") return;
+    modeRef.current = "closing";
+    stageRef.current?.classList.remove("is-grab");
+    const from = curRef.current;
+    const to = SEQ.count - 1;
+    const dur = 760;
+    let t0: number | null = null;
+    const step = (t: number) => {
+      if (t0 === null) t0 = t;
+      const k = clamp((t - t0) / dur, 0, 1);
+      drawFrame(Math.round(from + (to - from) * easeOut(k)));
+      if (k < 1) rafRef.current = requestAnimationFrame(step);
+      else modeRef.current = "scrub";
+    };
+    rafRef.current = requestAnimationFrame(step);
+  };
+
+  return (
+    <div
+      className="demo__stage demo-softseq"
+      data-demo="softseq"
+      ref={stageRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      style={reduce ? undefined : { touchAction: "none" }}
+    >
+      <canvas ref={canvasRef} className="softseq__canvas" />
+      {status !== "ready" && (
+        <div
+          className="softseq__ph ph"
+          data-ph={
+            status === "missing"
+              ? "프레임 시퀀스 대기 — /images/soft/close-001~048.webp"
+              : "시퀀스 로딩…"
+          }
+        />
+      )}
+      <div className="grabhint">
+        {reduce ? "" : "스크롤·드래그 = 서랍 / 손 떼면 사뿐히"}
+      </div>
+      <div className="stage-meter">
+        <span>OPEN</span>
+        <span className="track">
+          <i />
+        </span>
+        <span>SOFT&nbsp;CLOSE</span>
+      </div>
+    </div>
+  );
+}
+
 /* =========================== [03] 신념① · 소프트클로즈 (버저닝 래퍼) =========================== */
 export function SoftByVariant({ variant }: { variant: string }) {
   return (
@@ -203,6 +372,8 @@ export function SoftByVariant({ variant }: { variant: string }) {
               <SoftStageThrow />
             ) : variant === "compare" ? (
               <SoftStageCompare />
+            ) : variant === "sequence" ? (
+              <SoftStageSequence />
             ) : (
               <SoftStageScrub />
             )}
