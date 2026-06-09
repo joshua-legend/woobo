@@ -38,6 +38,17 @@
 
 ---
 
+### [2026-06-09] 세션 — 섹션 4+5 통합 "도어" + 영상 플레이어 공용화
+- **한 일:**
+  - 04(무공구 힌지)+05(TIP-ON) → **"도어" 한 섹션**(`?door=`)으로 통합, 좌우분할 → **가운데 단일 컬럼**. 카피 "공구 없이 달고, 손잡이 없이 연다."
+  - 변주 3종: `click`(문 클릭→TIP-ON 열림 + 무공구 장착 라벨)·`hotspots`(호버 핫스팟 2개)·`scrub`(도어 영상, `/videos/door.mp4`).
+  - 섹션3 영상 플레이어를 **`VideoScrubStage`(src prop)로 공용 추출** → soft·door 둘 다 재사용.
+  - 번호 재정렬(8→7섹션): 도어=04 → 약속05 → 함께06 → CTA07.
+- **산출물:** 신규 `VideoScrubStage.tsx`·`door.tsx`. 수정 `softclose.tsx`(공용 플레이어 사용)·`ManifestoClient.tsx`(DemoHinge/TipOn 제거+재번호)·`lib/variants.ts`·`heroes.tsx`·`manifesto.css`. 검증: tsc·build 통과, 도어 3변주 렌더·섹션3 무회귀·/problem·/origin 200.
+- **결정:** 기본 `door=click`(영상 없이 동작). 도어 영상 들어오면 기본 `scrub`로 플립.
+- **다음:** 사장님 Kling으로 **도어 영상**(무공구 장착→TIP-ON 열림) 뽑아 `public/videos/door.mp4`. 3변주 비교 후 채택.
+- **확인요청(사장님):** 도어 통합 OK? 변주 방향?
+
 ### [2026-06-08] 세션 — 섹션3(소프트클로즈) throw·compare 버저닝
 - **한 일:**
   - 신념① 소프트클로즈를 `?soft=` 버저닝으로: `scrub`(현행)·`throw`(드래그로 세게 던져도 항상 사뿐히 릴리즈 스냅)·`compare`(일반 vs BLUMOTION 대비, **절제** — 슬램 이징 안 쓰고 미세 범프만).

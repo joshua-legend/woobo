@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { useReveal } from "@/hooks/useReveal";
-import { useScrub } from "@/hooks/useScrub";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { CTA_HREF } from "@/lib/branches";
@@ -12,234 +11,10 @@ import { VariantSwitcher } from "@/components/lab/VariantSwitcher";
 import { HeroByVariant } from "./heroes";
 import { IdentityByVariant } from "./identities";
 import { SoftByVariant } from "./softclose";
+import { DoorByVariant } from "./door";
 import "./manifesto.css";
 
-const setP = (el: HTMLElement | null, v: number) => {
-  if (el) el.style.setProperty("--p", v.toFixed(4));
-};
-
-/* =========================== [04] 신념② · tool-free hinge =========================== */
-const AXIS_TARGETS = ["78%", "30%", "66%"];
-
-function DemoHinge() {
-  const reduce = useReducedMotion();
-  const stageRef = useRef<HTMLDivElement>(null);
-  const clickedRef = useRef(false);
-  const timersRef = useRef<number[]>([]);
-
-  const hingeClick = useCallback(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-    clickedRef.current = true;
-    stage.classList.add("clicked");
-    const knobs = Array.from(stage.querySelectorAll<HTMLElement>(".axis .bar i"));
-    timersRef.current.forEach((t) => clearTimeout(t));
-    timersRef.current = [];
-    knobs.forEach((k, i) => {
-      timersRef.current.push(
-        window.setTimeout(
-          () => k.style.setProperty("--ax", AXIS_TARGETS[i] || "60%"),
-          reduce ? 0 : 180 + i * 220,
-        ),
-      );
-    });
-  }, [reduce]);
-
-  const hingeReset = useCallback(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-    clickedRef.current = false;
-    stage.classList.remove("clicked");
-    stage
-      .querySelectorAll<HTMLElement>(".axis .bar i")
-      .forEach((k) => k.style.setProperty("--ax", "16%"));
-  }, []);
-
-  const onUpdate = useCallback(
-    (p: number) => {
-      setP(stageRef.current, p);
-      if (!clickedRef.current && p > 0.36) hingeClick();
-      if (clickedRef.current && p < 0.2) hingeReset();
-    },
-    [hingeClick, hingeReset],
-  );
-
-  useScrub(stageRef, onUpdate, { start: "top 86%", end: "top 30%" });
-
-  useEffect(() => {
-    const timers = timersRef.current;
-    return () => timers.forEach((t) => clearTimeout(t));
-  }, []);
-
-  return (
-    <section
-      className="section demo flip demo-hinge-wrap"
-      data-section="demo-hinge"
-      data-theme="light"
-      data-screen-label="04 신념②"
-    >
-      <div className="inner">
-        <div className="grid">
-          <div className="demo__copy">
-            <span className="eyebrow reveal-up">
-              <span className="num">04</span> / 신념 · 시공 효율
-            </span>
-            <h3 className="reveal-up d1">공구 없이, 딸깍.</h3>
-            <p className="lede reveal-up d1">
-              끼우고 상하·좌우·깊이 3방향 미세조절.{" "}
-              <strong>시공 시간과 재작업을 줄입니다.</strong>
-            </p>
-            <div className="chiprow reveal-up d2">
-              <span className="chip chip--accent">CLIP top</span>
-              <span className="chip">무공구</span>
-              <span className="chip">3방향 조절</span>
-            </div>
-            <a className="microcta reveal-up d3" href="#showroom">
-              쇼룸에서 직접 조절하고, 견적까지 상담하세요{" "}
-              <span className="arrow">→</span>
-            </a>
-          </div>
-          <div className="reveal-up d1">
-            <div className="demo__stage demo-hinge" data-demo="hinge" ref={stageRef}>
-              <div className="wall" />
-              <div className="hinge h1" />
-              <div className="hinge h2" />
-              <div className="door" />
-              <div className="click">click · 무공구 장착</div>
-              <div className="axes">
-                <div className="axis">
-                  상하 ↕
-                  <div className="bar">
-                    <i />
-                  </div>
-                </div>
-                <div className="axis">
-                  좌우 ↔
-                  <div className="bar">
-                    <i />
-                  </div>
-                </div>
-                <div className="axis">
-                  깊이 ⇲
-                  <div className="bar">
-                    <i />
-                  </div>
-                </div>
-              </div>
-              <div className="stage-meter">
-                <span>CLIP</span>
-                <span className="track">
-                  <i />
-                </span>
-                <span>3-WAY&nbsp;ADJ</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* =========================== [05] 신념③ · TIP-ON =========================== */
-function DemoTipOn() {
-  const reduce = useReducedMotion();
-  const stageRef = useRef<HTMLDivElement>(null);
-  const openedRef = useRef(false);
-
-  const onUpdate = useCallback((p: number) => {
-    const stage = stageRef.current;
-    if (!stage) return;
-    setP(stage, p);
-    if (!openedRef.current && p > 0.55) {
-      openedRef.current = true;
-      stage.classList.add("open");
-    }
-    if (openedRef.current && p < 0.15) {
-      openedRef.current = false;
-      stage.classList.remove("open");
-    }
-  }, []);
-
-  useScrub(stageRef, onUpdate, { start: "top 80%", end: "top 40%" });
-
-  // reduced-motion: 정적(닫힘) 고정
-  useEffect(() => {
-    if (reduce) {
-      const stage = stageRef.current;
-      if (stage) {
-        setP(stage, 0);
-        stage.classList.remove("open");
-      }
-    }
-  }, [reduce]);
-
-  const onClick = useCallback(() => {
-    if (reduce) return;
-    const stage = stageRef.current;
-    if (!stage) return;
-    stage.classList.toggle("open");
-    openedRef.current = stage.classList.contains("open");
-  }, [reduce]);
-
-  return (
-    <section
-      className="section section--dark demo demo-tipon-wrap"
-      data-section="demo-tipon"
-      data-theme="dark"
-      data-screen-label="05 신념③"
-    >
-      <div className="inner">
-        <div className="grid">
-          <div className="demo__copy">
-            <span className="eyebrow reveal-up">
-              <span className="num">05</span> / 신념 · 디자인 자유
-            </span>
-            <h3 className="reveal-up d1">
-              손잡이가 사라지면,
-              <br />
-              디자인이 완성됩니다.
-            </h3>
-            <p className="lede reveal-up d1">
-              톡 누르면 열리는 TIP-ON.{" "}
-              <strong>핸들 없는 미니멀, 더 넓은 제안 폭.</strong>
-            </p>
-            <div className="chiprow reveal-up d2">
-              <span className="chip chip--accent">TIP-ON</span>
-              <span className="chip">핸들리스</span>
-            </div>
-            <a className="microcta reveal-up d3" href="#showroom">
-              전국 쇼룸에서 실물의 완성도를 확인하세요{" "}
-              <span className="arrow">→</span>
-            </a>
-          </div>
-          <div className="reveal-up d1">
-            <div
-              className="demo__stage demo-tipon"
-              data-demo="tipon"
-              ref={stageRef}
-              onClick={onClick}
-              style={reduce ? undefined : { cursor: "pointer" }}
-            >
-              <div className="cab" />
-              <div className="drawerC" />
-              <div className="tap">tap · 톡</div>
-              <div className="stage-meter">
-                <span>PUSH</span>
-                <span className="track">
-                  <i />
-                </span>
-                <span>TIP-ON&nbsp;OPEN</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* =========================== [06] 약속 (Trust) =========================== */
+/* =========================== [05] 약속 (Trust) =========================== */
 type TrustCard = {
   idx: string;
   tt: string;
@@ -323,11 +98,11 @@ function Trust() {
       className="section trust"
       data-section="trust"
       data-theme="light"
-      data-screen-label="06 약속"
+      data-screen-label="05 약속"
     >
       <div className="inner">
         <span className="eyebrow reveal-up">
-          <span className="num">06</span> / 약속
+          <span className="num">05</span> / 약속
         </span>
         <h2 className="reveal-up d1">그래서, 우리가 독점으로 책임집니다.</h2>
         <p className="lede reveal-up d1">
@@ -365,18 +140,18 @@ function Trust() {
   );
 }
 
-/* =========================== [07] 사회적 증거 (placeholder) =========================== */
+/* =========================== [06] 사회적 증거 (placeholder) =========================== */
 function SocialProof() {
   return (
     <section
       className="section social"
       data-section="social"
       data-theme="light"
-      data-screen-label="07 함께"
+      data-screen-label="06 함께"
     >
       <div className="inner">
         <span className="eyebrow reveal-up">
-          <span className="num">07</span> / 함께
+          <span className="num">06</span> / 함께
         </span>
         <h2 className="reveal-up d1">
           이미 많은 제작사와 고객이 Woobo와 함께합니다.
@@ -404,7 +179,7 @@ function SocialProof() {
   );
 }
 
-/* =========================== [08] 전국 쇼룸 (CTA) =========================== */
+/* =========================== [07] 전국 쇼룸 (CTA) =========================== */
 type ShowroomCard = {
   delay: string;
   name: string;
@@ -475,11 +250,11 @@ function Showroom() {
       id="showroom"
       data-section="showroom"
       data-theme="dark"
-      data-screen-label="08 CTA"
+      data-screen-label="07 CTA"
     >
       <div className="inner">
         <span className="eyebrow reveal-up">
-          <span className="num">08</span> / 다음 움직임
+          <span className="num">07</span> / 다음 움직임
         </span>
         <h2 className="reveal-up d1">직접 만져보고 결정하세요 — 전국 쇼룸에서.</h2>
         <p className="lede reveal-up d1">
@@ -552,8 +327,7 @@ export default function ManifestoClient({ variants }: { variants: Variants }) {
         <HeroByVariant variant={variants.hero} />
         <IdentityByVariant variant={variants.identity} stage={variants.idStage} />
         <SoftByVariant variant={variants.soft} />
-        <DemoHinge />
-        <DemoTipOn />
+        <DoorByVariant variant={variants.door} />
         <Trust />
         <SocialProof />
         <Showroom />

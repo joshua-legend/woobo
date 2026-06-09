@@ -17,7 +17,7 @@ function HeroBody() {
           우리가 누구인지 ↓
         </a>
         <span className="hero__scroll">
-          Woobo · Blum 한국 독점 에이전트 + 전국 쇼룸 <span className="line" /> 8
+          Woobo · Blum 한국 독점 에이전트 + 전국 쇼룸 <span className="line" /> 7
           sections
         </span>
       </div>

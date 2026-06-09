@@ -1615,6 +1615,185 @@
   opacity: 0;
 }
 
+/* =========================================================
+   SECTION: door (4+5 통합 · 무공구 + TIP-ON) — 가운데 단일 컬럼
+   ========================================================= */
+.route-manifesto .door__inner {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+.route-manifesto .door .eyebrow {
+  justify-content: center;
+}
+.route-manifesto .door h3 {
+  font-size: clamp(28px, 4.4vw, 56px);
+  margin: 18px 0 16px;
+}
+.route-manifesto .door .lede {
+  margin: 0 auto;
+  max-width: 52ch;
+}
+.route-manifesto .door .chiprow {
+  justify-content: center;
+  margin: 24px 0 22px;
+}
+.route-manifesto .door .microcta {
+  justify-content: center;
+}
+.route-manifesto .door__stagewrap {
+  margin: clamp(36px, 6vh, 64px) auto 0;
+  max-width: 600px;
+}
+
+/* door-click: 무공구 장착(스크롤) + 핸들리스 TIP-ON(클릭) */
+.route-manifesto .door-cab {
+  position: absolute;
+  inset: 14% 16%;
+  border: 2px solid var(--c-paper-on-dark);
+  background: rgba(0, 0, 0, 0.18);
+}
+.route-manifesto .door-hinge {
+  position: absolute;
+  left: 15%;
+  width: 26px;
+  height: 16px;
+  background: var(--c-orange);
+  border-radius: 3px;
+  opacity: 0;
+  transform: translateX(-12px);
+  transition:
+    opacity 0.4s var(--ease),
+    transform 0.45s var(--ease-tip);
+}
+.route-manifesto .door-hinge--t {
+  top: 26%;
+}
+.route-manifesto .door-hinge--b {
+  bottom: 26%;
+}
+.route-manifesto .door-stage.is-mounted .door-hinge {
+  opacity: 1;
+  transform: none;
+}
+.route-manifesto .door-stage.is-mounted .door-hinge--b {
+  transition-delay: 0.1s;
+}
+.route-manifesto .door-clip {
+  position: absolute;
+  left: 16%;
+  top: 13%;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-orange);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+.route-manifesto .door-stage.is-mounted .door-clip {
+  opacity: 1;
+}
+.route-manifesto .door-panel {
+  position: absolute;
+  top: 16%;
+  bottom: 16%;
+  left: calc(16% + 8px);
+  width: 60%;
+  background: linear-gradient(120deg, #2c2820, var(--c-charcoal-card));
+  border: 2px solid var(--c-paper-on-dark);
+  transform-origin: left center;
+  transition: transform 0.6s var(--ease-tip);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.route-manifesto .door-click.is-open .door-panel {
+  transform: perspective(720px) rotateY(-34deg);
+}
+.route-manifesto .door-tap {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-paper-on-dark);
+  animation: rm-tapBlink 1.6s var(--ease) infinite;
+}
+.route-manifesto .door-click.is-open .door-tap {
+  opacity: 0;
+  animation: none;
+}
+
+/* door-hotspots: 호버로 두 기능 탐색 */
+.route-manifesto .door-spot {
+  position: absolute;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.route-manifesto .door-spot--hinge {
+  left: 18%;
+  top: 30%;
+}
+.route-manifesto .door-spot--surface {
+  left: 52%;
+  top: 52%;
+}
+.route-manifesto .door-spot__dot {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-orange);
+  animation: rm-spotPulse 2s var(--ease) infinite;
+}
+@keyframes rm-spotPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 103, 31, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 13px rgba(255, 103, 31, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 103, 31, 0);
+  }
+}
+.route-manifesto .door-spot__tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  transform: translateX(-50%) translateY(6px);
+  width: max-content;
+  max-width: 230px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--c-charcoal-card);
+  border: 1px solid var(--c-line-dark);
+  text-align: left;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--c-muted-on-dark);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.3s var(--ease),
+    transform 0.3s var(--ease);
+}
+.route-manifesto .door-spot__tip b {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .door-spot:hover .door-spot__tip,
+.route-manifesto .door-spot:focus-visible .door-spot__tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* ---- demo-hinge: 무공구 힌지 3축 ---- */
 .route-manifesto .demo-hinge .wall {
   position: absolute;
@@ -2186,5 +2365,14 @@
   }
   .route-manifesto .softvideo__hand {
     animation: none !important;
+  }
+  .route-manifesto .door-tap,
+  .route-manifesto .door-spot__dot {
+    animation: none !important;
+  }
+  .route-manifesto .door-hinge,
+  .route-manifesto .door-clip {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

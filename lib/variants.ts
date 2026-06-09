@@ -29,6 +29,11 @@ export const SECTION_VARIANTS = {
     options: ["video", "scrub", "throw", "compare", "sequence"],
     default: "video",
   },
+  door: {
+    label: "도어(4+5)",
+    options: ["click", "hotspots", "scrub"],
+    default: "click",
+  },
 } as const satisfies Record<string, SectionConfig>;
 
 export type SectionKey = keyof typeof SECTION_VARIANTS;
