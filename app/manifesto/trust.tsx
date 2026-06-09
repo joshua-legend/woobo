@@ -11,6 +11,7 @@ export type TrustFx = {
   draw: boolean;
   glow: boolean;
   pin: boolean;
+  neon: boolean;
 };
 
 type Facet = {
@@ -204,18 +205,56 @@ function TrustFlow() {
   );
 }
 
-/* ---------- fusion (flow 골격 + grid 카드 + stamp 도장) ---------- */
-function TrustFusion() {
+/* ---------- fusion (flow 골격 + grid 카드 + 직관 아이콘 + 네온 시퀀스) ---------- */
+function NeonBorder() {
   return (
-    <div className="trust-fusion">
-      <div className="tf-node reveal-up">
+    <span className="tf-neon" aria-hidden="true">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+        <rect x="1.5" y="1.5" width="97" height="97" rx="5" pathLength={100} />
+      </svg>
+    </span>
+  );
+}
+
+function TrustFusion({ neon }: { neon: boolean }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const startRef = useRef<HTMLDivElement>(null);
+
+  // 트리거: 유럽제조 노드가 뷰포트 상단 35% 라인에 닿으면 네온 시퀀스 발동
+  useEffect(() => {
+    if (!neon) return;
+    const root = rootRef.current;
+    const start = startRef.current;
+    if (!root || !start) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      root.classList.add("neon-go");
+      return;
+    }
+    const io = new IntersectionObserver(
+      (ents) => {
+        for (const e of ents) {
+          if (e.isIntersecting) root.classList.add("neon-go");
+          else if (e.boundingClientRect.top > 0) root.classList.remove("neon-go"); // 위로 스크롤 시 리암
+        }
+      },
+      { rootMargin: "-35% 0px -65% 0px", threshold: 0 },
+    );
+    io.observe(start);
+    return () => io.disconnect();
+  }, [neon]);
+
+  return (
+    <div className="trust-fusion" ref={rootRef}>
+      <div className="tf-node reveal-up" ref={startRef}>
+        <NeonBorder />
         <span className="tf-tag">유럽 제조</span>
         <b>Blum · AGOFORM · Peka</b>
       </div>
-      <div className="tf-link reveal-up d1">
+      <div className="tf-link tf-link--1 reveal-up d1">
         <i />
       </div>
       <div className="tf-hub reveal-up d1">
+        <NeonBorder />
         <span className="tf-tag">한국 독점 에이전트 · sole agent</span>
         <b className="tf-hub__title">우보브랜드샵 — 정품의 공식 통로</b>
         <div className="tf-cards">
@@ -230,10 +269,11 @@ function TrustFusion() {
           ))}
         </div>
       </div>
-      <div className="tf-link reveal-up d2">
+      <div className="tf-link tf-link--2 reveal-up d2">
         <i />
       </div>
       <div className="tf-node reveal-up d2">
+        <NeonBorder />
         <span className="tf-tag">고객</span>
         <b>정품 · A/S · 전국 쇼룸으로 안심</b>
       </div>
@@ -257,12 +297,13 @@ export function TrustByVariant({
 
   const cls = [
     "section trust",
-    fx.line && "fx-line",
+    fx.line && !fx.neon && "fx-line", // 네온이 선 등장도 제어
     fx.nodes && "fx-nodes",
-    fx.stagger && "fx-stagger",
+    fx.stagger && !fx.neon && "fx-stagger", // 네온이 카드 등장도 제어
     fx.hover && "fx-hover",
     fx.draw && "fx-draw",
     fx.glow && "fx-glow",
+    fx.neon && "fx-neon",
     fx.pin && "is-pinned",
   ]
     .filter(Boolean)
@@ -293,7 +334,7 @@ export function TrustByVariant({
         ) : variant === "grid" ? (
           <TrustGrid />
         ) : (
-          <TrustFusion />
+          <TrustFusion neon={fx.neon} />
         )}
         <div className="brands reveal-up">
           멀티브랜드 수입 전문 — <b>Blum</b> (간판) · AGOFORM (독일) · Peka

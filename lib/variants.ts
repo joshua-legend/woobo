@@ -47,6 +47,7 @@ export const SECTION_VARIANTS = {
   fxDraw: { label: "fx·아이콘draw", options: ["off", "on"], default: "off" },
   fxGlow: { label: "fx·허브글로우", options: ["on", "off"], default: "on" },
   fxPin: { label: "fx·핀", options: ["off", "on"], default: "off" },
+  fxNeon: { label: "fx·네온시퀀스", options: ["on", "off"], default: "on" },
 } as const satisfies Record<string, SectionConfig>;
 
 export type SectionKey = keyof typeof SECTION_VARIANTS;

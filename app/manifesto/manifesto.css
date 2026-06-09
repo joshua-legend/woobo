@@ -2293,6 +2293,104 @@
   top: clamp(70px, 10vh, 110px);
 }
 
+/* fx-neon: 트리거(유럽제조 35%) → 테두리 네온 순차 + 카드 팝 */
+.route-manifesto .tf-node,
+.route-manifesto .tf-hub {
+  position: relative;
+}
+.route-manifesto .tf-neon {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+.route-manifesto .tf-neon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 4px rgba(255, 103, 31, 0.6));
+}
+.route-manifesto .tf-neon rect {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+.route-manifesto .fx-neon .tf-neon {
+  opacity: 1;
+}
+/* 네온 ON: 카드·연결선 시작 숨김(시퀀스가 등장 제어) */
+.route-manifesto .fx-neon .tf-card {
+  opacity: 0;
+  transform: scale(0.4);
+}
+.route-manifesto .fx-neon .tf-link i {
+  transform: scaleY(0);
+}
+/* 시퀀스: 유럽제조 → 선1 → 허브 → 카드 6 순차 팝 → 선2 → 고객 */
+.route-manifesto .fx-neon.neon-go .tf-node:first-child .tf-neon rect {
+  animation: rm-neonTrace 0.7s var(--ease) forwards;
+}
+.route-manifesto .fx-neon.neon-go .tf-link--1 i {
+  animation: rm-neonLine 0.4s var(--ease) 0.6s forwards;
+}
+.route-manifesto .fx-neon.neon-go .tf-hub .tf-neon rect {
+  animation: rm-neonTrace 0.8s var(--ease) 1s forwards;
+}
+.route-manifesto .fx-neon.neon-go .tf-card {
+  animation: rm-cardPop 0.5s var(--ease-tip) forwards;
+}
+.route-manifesto .fx-neon.neon-go .tf-card:nth-of-type(1) {
+  animation-delay: 1.7s;
+}
+.route-manifesto .fx-neon.neon-go .tf-card:nth-of-type(2) {
+  animation-delay: 1.82s;
+}
+.route-manifesto .fx-neon.neon-go .tf-card:nth-of-type(3) {
+  animation-delay: 1.94s;
+}
+.route-manifesto .fx-neon.neon-go .tf-card:nth-of-type(4) {
+  animation-delay: 2.06s;
+}
+.route-manifesto .fx-neon.neon-go .tf-card:nth-of-type(5) {
+  animation-delay: 2.18s;
+}
+.route-manifesto .fx-neon.neon-go .tf-card:nth-of-type(6) {
+  animation-delay: 2.3s;
+}
+.route-manifesto .fx-neon.neon-go .tf-link--2 i {
+  animation: rm-neonLine 0.4s var(--ease) 2.5s forwards;
+}
+.route-manifesto .fx-neon.neon-go .tf-node:last-child .tf-neon rect {
+  animation: rm-neonTrace 0.7s var(--ease) 2.9s forwards;
+}
+@keyframes rm-neonTrace {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes rm-neonLine {
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes rm-cardPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* =========================================================
    SECTION: social (사회적 증거 · placeholder)
    ========================================================= */
@@ -2648,5 +2746,18 @@
   }
   .route-manifesto .trust.is-pinned .inner {
     position: static !important;
+  }
+  .route-manifesto .fx-neon .tf-card {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .route-manifesto .fx-neon .tf-link i {
+    transform: scaleY(1) !important;
+    animation: none !important;
+  }
+  .route-manifesto .fx-neon .tf-neon rect {
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
   }
 }
