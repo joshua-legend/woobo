@@ -9,7 +9,6 @@ type Brand = {
   role: string; // 전문분야 한 줄
   korea: string; // 한국 관계(우보 = 공식 통로)
   img?: string; // 가안 무드 이미지(없으면 빗금 폴백)
-  flagship?: boolean;
 };
 
 // 우보인터내셔날이 한국에 정식 수입·공급하는 브랜드(단일 소스).
@@ -21,7 +20,6 @@ const BRANDS: Brand[] = [
     role: "세계 1위 가구 Fitting 제조 · High-tech 혁신",
     korea: "대한민국 sole agent — 우보인터내셔날",
     img: "/brands/blum.png",
-    flagship: true,
   },
   {
     key: "agoform",
@@ -69,63 +67,6 @@ function BrandLogo({ b, className }: { b: Brand; className?: string }) {
       <span className="bf-logo__name">{b.name}</span>
       <span className="bf-logo__tag">{b.img ? "가안" : "LOGO"}</span>
     </div>
-  );
-}
-
-function BrandCard({ b, i }: { b: Brand; i: number }) {
-  return (
-    <article
-      className="bf-card"
-      style={{ "--reveal-delay": `${0.06 + i * 0.06}s` } as React.CSSProperties}
-    >
-      <BrandLogo b={b} />
-      <span className="bf-country">{b.country}</span>
-      <p className="bf-role">{b.role}</p>
-      <p className="bf-korea">{b.korea}</p>
-    </article>
-  );
-}
-
-/* ---------- flagship: Blum 간판 + 나머지 4개 2×2 ---------- */
-function BrandFlagship() {
-  const flag = BRANDS.find((b) => b.flagship) ?? BRANDS[0];
-  const rest = BRANDS.filter((b) => !b.flagship);
-  return (
-    <div className="bf-flagship">
-      <article className="bf-card bf-card--flag">
-        <BrandLogo b={flag} className="bf-logo--lg" />
-        <div className="bf-flag__meta">
-          <span className="bf-country">{flag.country} · FLAGSHIP</span>
-          <p className="bf-role">{flag.role}</p>
-          <p className="bf-korea bf-korea--em">{flag.korea}</p>
-        </div>
-      </article>
-      <div className="bf-grid2">
-        {rest.map((b, i) => (
-          <BrandCard key={b.key} b={b} i={i} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ---------- rows: 에디토리얼 가로 행 리스트 ---------- */
-function BrandRows() {
-  return (
-    <ul className="bf-rows">
-      {BRANDS.map((b, i) => (
-        <li
-          key={b.key}
-          className="bf-row"
-          style={{ "--reveal-delay": `${0.05 + i * 0.06}s` } as React.CSSProperties}
-        >
-          <BrandLogo b={b} className="bf-logo--row" />
-          <span className="bf-country">{b.country}</span>
-          <p className="bf-role">{b.role}</p>
-          <p className="bf-korea">{b.korea}</p>
-        </li>
-      ))}
-    </ul>
   );
 }
 
@@ -245,8 +186,6 @@ function BrandBands() {
 
 /* 사장님 선택용 레이아웃 후보 (오른쪽 picker 버튼) */
 const LAYOUTS: { key: string; label: string }[] = [
-  { key: "flagship", label: "간판형" },
-  { key: "rows", label: "리스트형" },
   { key: "map", label: "지도형" },
   { key: "showcase", label: "쇼케이스" },
   { key: "bands", label: "밴드형" },
@@ -254,7 +193,7 @@ const LAYOUTS: { key: string; label: string }[] = [
 
 /* =========================== [06] 멀티브랜드 수입 (Brands · 레이아웃 선택) =========================== */
 export function BrandsByVariant({ variant }: { variant: string }) {
-  const initial = LAYOUTS.some((l) => l.key === variant) ? variant : "flagship";
+  const initial = LAYOUTS.some((l) => l.key === variant) ? variant : "map";
   const [layout, setLayout] = useState(initial);
   return (
     <section
@@ -274,16 +213,12 @@ export function BrandsByVariant({ variant }: { variant: string }) {
         </p>
         <div className="bf-stage">
           <div className="bf-stage__main">
-            {layout === "rows" ? (
-              <BrandRows />
-            ) : layout === "map" ? (
-              <BrandMap />
-            ) : layout === "showcase" ? (
+            {layout === "showcase" ? (
               <BrandShowcase />
             ) : layout === "bands" ? (
               <BrandBands />
             ) : (
-              <BrandFlagship />
+              <BrandMap />
             )}
           </div>
           <aside className="bf-picker" aria-label="레이아웃 선택">
