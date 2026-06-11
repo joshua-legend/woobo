@@ -36,8 +36,8 @@ export function HeroIntro() {
     }
 
     const t0 = performance.now();
-    const MIN = 1500; // 최소 노출(깜빡임 방지)
-    const MAX = 3500; // 최대(안 받아져도 무조건 진행)
+    const MIN = v === "minimal" ? 2100 : 1500; // 합본은 시퀀스가 길어 더 노출
+    const MAX = 3800; // 최대(안 받아져도 무조건 진행)
     let dismissed = false;
     let leaveTimer = 0;
     const finish = () => {
@@ -76,6 +76,8 @@ export function HeroIntro() {
     >
       {variant === "minimal" ? (
         <div className="intro__inner">
+          <span className="intro__sweep" />
+          <span className="intro__kw">움직임</span>
           <span className="intro__mark">Woobo</span>
           <span className="intro__line" />
           <span className="intro__sub">Blum 한국 독점 에이전트</span>
