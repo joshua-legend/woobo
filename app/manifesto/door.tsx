@@ -158,12 +158,6 @@ export function DoorByVariant({ variant: _variant }: { variant: string }) {
               무공구 클립으로 딸깍 장착, 톡 누르면 열리는 TIP-ON.{" "}
               <strong>시공도 디자인도 자유롭게.</strong>
             </p>
-            <div className="chiprow reveal-up d2">
-              <span className="chip chip--accent">CLIP top</span>
-              <span className="chip">무공구</span>
-              <span className="chip chip--accent">TIP-ON</span>
-              <span className="chip">핸들리스</span>
-            </div>
             <a className="microcta reveal-up d3" href="#showroom">
               전국 쇼룸에서 직접 열어보세요 <span className="arrow">→</span>
             </a>
