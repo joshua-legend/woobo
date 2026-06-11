@@ -129,17 +129,6 @@ function BrandRows() {
   );
 }
 
-/* ---------- grid: 균일 5칸 + 호버 설명 펼침 ---------- */
-function BrandGrid() {
-  return (
-    <div className="bf-grid">
-      {BRANDS.map((b, i) => (
-        <BrandCard key={b.key} b={b} i={i} />
-      ))}
-    </div>
-  );
-}
-
 /* 점 위치 = europe-map.svg(viewBox 365 318 150 130) 위 % 좌표. 독일은 2개(AGOFORM·PWG). */
 const MAP_DOTS: { key: string; x: number; y: number }[] = [
   { key: "agoform", x: 38.2, y: 50.9 }, // 독일
@@ -254,34 +243,19 @@ function BrandBands() {
   );
 }
 
-/* ---------- marquee: 무드 이미지 카드가 끊임없이 흐름(호버 시 정지) ---------- */
-function BrandMarquee() {
-  const loop = [...BRANDS, ...BRANDS]; // 무한 루프용 2배
-  return (
-    <div className="bf-marquee">
-      <div className="bf-marquee__track">
-        {loop.map((b, i) => (
-          <div
-            className="bf-mq-card"
-            key={`${b.key}-${i}`}
-            aria-hidden={i >= BRANDS.length}
-          >
-            <span className="bf-mq-card__img">
-              {b.img && <img src={b.img} alt="" aria-hidden="true" />}
-            </span>
-            <div className="bf-mq-card__cap">
-              <b>{b.name}</b>
-              <span>{b.country}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+/* 사장님 선택용 레이아웃 후보 (오른쪽 picker 버튼) */
+const LAYOUTS: { key: string; label: string }[] = [
+  { key: "flagship", label: "간판형" },
+  { key: "rows", label: "리스트형" },
+  { key: "map", label: "지도형" },
+  { key: "showcase", label: "쇼케이스" },
+  { key: "bands", label: "밴드형" },
+];
 
-/* =========================== [06] 멀티브랜드 수입 (Brands · 버저닝) =========================== */
+/* =========================== [06] 멀티브랜드 수입 (Brands · 레이아웃 선택) =========================== */
 export function BrandsByVariant({ variant }: { variant: string }) {
+  const initial = LAYOUTS.some((l) => l.key === variant) ? variant : "flagship";
+  const [layout, setLayout] = useState(initial);
   return (
     <section
       className="section brandfolio"
@@ -298,21 +272,34 @@ export function BrandsByVariant({ variant }: { variant: string }) {
           우보인터내셔날은 유럽·세계의 프리미엄 부품·소재 브랜드를{" "}
           <strong>한국에 정식으로 수입·공급하는 공식 통로</strong>입니다.
         </p>
-        {variant === "rows" ? (
-          <BrandRows />
-        ) : variant === "grid" ? (
-          <BrandGrid />
-        ) : variant === "map" ? (
-          <BrandMap />
-        ) : variant === "showcase" ? (
-          <BrandShowcase />
-        ) : variant === "bands" ? (
-          <BrandBands />
-        ) : variant === "marquee" ? (
-          <BrandMarquee />
-        ) : (
-          <BrandFlagship />
-        )}
+        <div className="bf-stage">
+          <div className="bf-stage__main">
+            {layout === "rows" ? (
+              <BrandRows />
+            ) : layout === "map" ? (
+              <BrandMap />
+            ) : layout === "showcase" ? (
+              <BrandShowcase />
+            ) : layout === "bands" ? (
+              <BrandBands />
+            ) : (
+              <BrandFlagship />
+            )}
+          </div>
+          <aside className="bf-picker" aria-label="레이아웃 선택">
+            <span className="bf-picker__label">레이아웃 선택</span>
+            {LAYOUTS.map((l) => (
+              <button
+                type="button"
+                key={l.key}
+                className={`bf-picker__btn${layout === l.key ? " is-active" : ""}`}
+                onClick={() => setLayout(l.key)}
+              >
+                {l.label}
+              </button>
+            ))}
+          </aside>
+        </div>
         <div className="footnote">
           ※ 로고·브랜드 표기·세부 문구는 클라이언트 확인 후 확정 [TODO].
         </div>

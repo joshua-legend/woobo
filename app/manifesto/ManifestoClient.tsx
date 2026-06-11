@@ -7,7 +7,6 @@ import { useInViewOnce } from "@/hooks/useInViewOnce";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { CTA_HREF } from "@/lib/branches";
 import type { Variants } from "@/lib/variants";
-import { VariantSwitcher } from "@/components/lab/VariantSwitcher";
 import { HeroByVariant } from "./heroes";
 import { IdentityByVariant } from "./identities";
 import { SoftByVariant } from "./softclose";
@@ -169,7 +168,6 @@ export default function ManifestoClient({ variants }: { variants: Variants }) {
         <BrandsByVariant variant={variants.brands} />
         <Showroom />
       </main>
-      <VariantSwitcher current={variants} />
     </div>
   );
 }

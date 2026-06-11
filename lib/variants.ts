@@ -36,15 +36,7 @@ export const SECTION_VARIANTS = {
   },
   brands: {
     label: "06 브랜드",
-    options: [
-      "flagship",
-      "rows",
-      "grid",
-      "map",
-      "showcase",
-      "bands",
-      "marquee",
-    ],
+    options: ["flagship", "rows", "map", "showcase", "bands"],
     default: "flagship",
   },
   trust: {

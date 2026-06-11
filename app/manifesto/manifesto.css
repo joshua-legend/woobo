@@ -1969,26 +1969,59 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
 }
-/* --- grid (균일 5칸 + 호버 설명 펼침) --- */
-.route-manifesto .bf-grid {
-  margin-top: clamp(32px, 5vh, 52px);
+/* --- 06 레이아웃 picker (사장님 선택용 — 섹션 우측 버튼) --- */
+.route-manifesto .bf-stage {
+  margin-top: clamp(28px, 4vh, 44px);
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) 154px;
+  gap: clamp(20px, 3vw, 36px);
+  align-items: start;
 }
-.route-manifesto .bf-grid .bf-role,
-.route-manifesto .bf-grid .bf-korea {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
+.route-manifesto .bf-stage__main {
+  min-width: 0;
+}
+.route-manifesto .bf-stage__main > * {
+  margin-top: 0;
+}
+.route-manifesto .bf-picker {
+  position: sticky;
+  top: 88px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.route-manifesto .bf-picker__label {
+  margin-bottom: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-caption);
+}
+.route-manifesto .bf-picker__btn {
+  text-align: left;
+  padding: 11px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  background: var(--c-paper);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--c-ink-2);
+  cursor: pointer;
   transition:
-    max-height 0.4s var(--ease),
-    opacity 0.4s var(--ease);
+    border-color 0.25s var(--ease),
+    background 0.25s var(--ease),
+    color 0.25s var(--ease);
 }
-.route-manifesto .bf-grid .bf-card:hover .bf-role,
-.route-manifesto .bf-grid .bf-card:hover .bf-korea {
-  max-height: 80px;
-  opacity: 1;
+.route-manifesto .bf-picker__btn:hover {
+  border-color: var(--c-orange);
+  color: var(--c-ink);
+}
+.route-manifesto .bf-picker__btn.is-active {
+  border-color: var(--c-orange);
+  background: color-mix(in srgb, var(--c-orange) 8%, var(--c-paper));
+  color: var(--c-orange);
 }
 /* --- rows (에디토리얼 행 리스트) --- */
 .route-manifesto .bf-rows {
@@ -2275,72 +2308,6 @@
   letter-spacing: -0.02em;
 }
 
-/* --- marquee (무한 흐름 띠) --- */
-.route-manifesto .bf-marquee {
-  margin-top: clamp(32px, 5vh, 52px);
-  overflow: hidden;
-  -webkit-mask: linear-gradient(
-    90deg,
-    transparent,
-    #000 6%,
-    #000 94%,
-    transparent
-  );
-  mask: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-}
-.route-manifesto .bf-marquee__track {
-  display: flex;
-  gap: 14px;
-  width: max-content;
-  animation: bfMarquee 32s linear infinite;
-}
-.route-manifesto .bf-marquee:hover .bf-marquee__track {
-  animation-play-state: paused;
-}
-@keyframes bfMarquee {
-  to {
-    transform: translateX(-1270px);
-  }
-}
-.route-manifesto .bf-mq-card {
-  flex: 0 0 auto;
-  width: 240px;
-  border: 1px solid var(--c-line);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--c-paper);
-}
-.route-manifesto .bf-mq-card__img {
-  display: block;
-  aspect-ratio: 4 / 3;
-  background: var(--c-line);
-}
-.route-manifesto .bf-mq-card__img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.route-manifesto .bf-mq-card__cap {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px;
-}
-.route-manifesto .bf-mq-card__cap b {
-  font-family: var(--font-head);
-  font-weight: 800;
-  font-size: 14px;
-}
-.route-manifesto .bf-mq-card__cap span {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--c-caption);
-}
-
 /* =========================================================
    RESPONSIVE  (브레이크포인트 900px → 모바일 단일 컬럼)
    ========================================================= */
@@ -2364,17 +2331,27 @@
     font-size: clamp(24px, 7vw, 40px);
   }
   /* brandfolio 모바일 폴백 */
+  .route-manifesto .bf-stage {
+    grid-template-columns: 1fr;
+  }
+  .route-manifesto .bf-picker {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    order: -1;
+  }
+  .route-manifesto .bf-picker__btn {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .route-manifesto .bf-picker__label {
+    flex-basis: 100%;
+  }
   .route-manifesto .bf-card--flag {
     grid-template-columns: 1fr;
     gap: 16px;
-  }
-  .route-manifesto .bf-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .route-manifesto .bf-grid .bf-role,
-  .route-manifesto .bf-grid .bf-korea {
-    max-height: none;
-    opacity: 1;
   }
   .route-manifesto .bf-row {
     grid-template-columns: 1fr;
@@ -2631,10 +2608,6 @@
   .route-manifesto .tf-hub--center::before {
     animation: none !important;
     opacity: 0 !important;
-  }
-  /* brandfolio marquee 정지 */
-  .route-manifesto .bf-marquee__track {
-    animation: none !important;
   }
   /* brandfolio map 점 핑 정지 */
   .route-manifesto .bf-dot__pin::after {
