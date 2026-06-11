@@ -1,19 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useScrub } from "@/hooks/useScrub";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const setP = (el: HTMLElement | null, v: number) => {
   if (el) el.style.setProperty("--p", v.toFixed(4));
 };
-const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
-const easeOut = (t: number) => 1 - Math.pow(1 - t, 2.2);
 
 /**
- * 영상 스크럽 스테이지 — mp4 를 스크롤/마우스 호버로 감기.
- * - 마우스: 호버로 조작(클릭 불필요), 벗어나면 사뿐히 끝까지. 터치: 손가락 드래그.
- * - 단일 rAF 루프 lerp 보간 + seek 코얼레싱(seeking 중 스킵, seeked 에 재개).
+ * 영상 스크럽 스테이지 — 좌우 호버(마우스)/드래그(터치)로 감기.
+ * - 마우스 올리기 전에는 첫 프레임(초기 OPEN) 유지. 벗어나면 다시 초기로 사뿐히 복귀.
+ * - 단일 rAF 루프 lerp 보간 + seek 코얼레싱(seeking 중 스킵)으로 최대한 스무스.
  * - 자동재생 차단(autoPlay=false + onPlay→pause). 프레임 없으면 .ph 폴백.
  * src 만 바꾸면 어느 섹션에서나 재사용(soft / door …).
  */
@@ -23,40 +21,30 @@ export function VideoScrubStage({ src }: { src: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const durRef = useRef(0);
   const readyRef = useRef(false);
-  const targetRef = useRef(0);
-  const dispRef = useRef(0);
+  const targetRef = useRef(0); // 목표 진행도(0=OPEN, 1=CLOSE)
+  const dispRef = useRef(0); // 화면에 보이는 보간된 진행도
   const runningRef = useRef(false);
-  const closeRef = useRef({ active: false, from: 0, t0: 0 });
-  const modeRef = useRef<"scrub" | "drag" | "hover" | "closing">("scrub");
-  const dragTouchRef = useRef(false);
+  const activeRef = useRef(false); // 마우스 호버/터치 드래그 중
   const rafRef = useRef(0);
   const [status, setStatus] = useState<"loading" | "ready" | "missing">(
     "loading",
   );
   const [showGuide, setShowGuide] = useState(true);
 
-  const tick = useCallback((now: number) => {
+  // 단일 rAF 루프: disp 를 target 으로 부드럽게 수렴 + seek 코얼레싱
+  const tick = useCallback(() => {
     const v = videoRef.current;
     if (!v || !readyRef.current || !durRef.current) {
       runningRef.current = false;
       return;
     }
-    if (closeRef.current.active) {
-      const k = clamp((now - closeRef.current.t0) / 760, 0, 1);
-      targetRef.current =
-        closeRef.current.from + (1 - closeRef.current.from) * easeOut(k);
-      if (k >= 1) {
-        closeRef.current.active = false;
-        modeRef.current = "scrub";
-      }
-    }
-    dispRef.current += (targetRef.current - dispRef.current) * 0.14;
+    dispRef.current += (targetRef.current - dispRef.current) * 0.18;
     if (Math.abs(targetRef.current - dispRef.current) < 0.0004)
       dispRef.current = targetRef.current;
     setP(stageRef.current, dispRef.current);
     if (!v.seeking) {
       const t = dispRef.current * durRef.current;
-      if (Math.abs(v.currentTime - t) > 0.012) {
+      if (Math.abs(v.currentTime - t) > 0.01) {
         try {
           v.currentTime = t;
         } catch {
@@ -64,10 +52,7 @@ export function VideoScrubStage({ src }: { src: string }) {
         }
       }
     }
-    const settled =
-      !closeRef.current.active &&
-      dispRef.current === targetRef.current &&
-      !v.seeking;
+    const settled = dispRef.current === targetRef.current && !v.seeking;
     if (settled) runningRef.current = false;
     else rafRef.current = requestAnimationFrame(tick);
   }, []);
@@ -95,16 +80,22 @@ export function VideoScrubStage({ src }: { src: string }) {
         durRef.current = v.duration;
         readyRef.current = true;
         setStatus("ready");
+        // 자동재생 차단 + 초기(OPEN) 상태로 고정
         v.pause();
-        startLoop();
+        try {
+          v.currentTime = 0;
+        } catch {
+          /* seek 무시 */
+        }
+        targetRef.current = 0;
+        dispRef.current = 0;
+        setP(stageRef.current, 0);
       }
     };
-    const onSeeked = () => startLoop();
     const onErr = () => setStatus("missing");
     v.addEventListener("loadedmetadata", markReady);
     v.addEventListener("loadeddata", markReady);
     v.addEventListener("canplay", markReady);
-    v.addEventListener("seeked", onSeeked);
     v.addEventListener("error", onErr);
     v.load();
     markReady();
@@ -112,21 +103,10 @@ export function VideoScrubStage({ src }: { src: string }) {
       v.removeEventListener("loadedmetadata", markReady);
       v.removeEventListener("loadeddata", markReady);
       v.removeEventListener("canplay", markReady);
-      v.removeEventListener("seeked", onSeeked);
       v.removeEventListener("error", onErr);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [startLoop]);
-
-  const onUpdate = useCallback(
-    (p: number) => {
-      if (modeRef.current !== "scrub") return;
-      if (p > 0.02) setShowGuide(false);
-      setTarget(p);
-    },
-    [setTarget],
-  );
-  useScrub(stageRef, onUpdate, { start: "top 86%", end: "top 32%" });
+  }, []);
 
   const relX = (clientX: number) => {
     const s = stageRef.current;
@@ -134,47 +114,38 @@ export function VideoScrubStage({ src }: { src: string }) {
     const r = s.getBoundingClientRect();
     return clamp((clientX - r.left) / r.width, 0, 1);
   };
-  const startClose = () => {
-    closeRef.current.active = false;
-    modeRef.current = "closing";
-    closeRef.current = {
-      active: true,
-      from: targetRef.current,
-      t0: performance.now(),
-    };
-    startLoop();
-  };
+
   const onPointerMove = (e: React.PointerEvent) => {
     if (reduce || !readyRef.current) return;
     if (e.pointerType === "mouse") {
-      modeRef.current = "hover";
-      setShowGuide(false);
+      activeRef.current = true;
+      if (showGuide) setShowGuide(false);
       setTarget(relX(e.clientX));
-    } else if (dragTouchRef.current) {
-      setShowGuide(false);
+    } else if (activeRef.current) {
       setTarget(relX(e.clientX));
     }
   };
   const onPointerDown = (e: React.PointerEvent) => {
     if (reduce || !readyRef.current || e.pointerType === "mouse") return;
-    dragTouchRef.current = true;
-    modeRef.current = "drag";
-    closeRef.current.active = false;
+    activeRef.current = true;
     setShowGuide(false);
     setTarget(relX(e.clientX));
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
+  // 손/마우스를 떼거나 벗어나면 초기(OPEN) 상태로 사뿐히 복귀
+  const release = () => {
+    if (!activeRef.current) return;
+    activeRef.current = false;
+    setShowGuide(true);
+    setTarget(0);
+  };
   const onPointerUp = (e: React.PointerEvent) => {
-    if (e.pointerType !== "mouse" && dragTouchRef.current) {
-      dragTouchRef.current = false;
-      startClose();
-      setShowGuide(true);
-    }
+    if (e.pointerType === "mouse") return;
+    release();
   };
   const onPointerLeave = (e: React.PointerEvent) => {
     if (e.pointerType !== "mouse") return;
-    if (modeRef.current === "hover") startClose();
-    setShowGuide(true);
+    release();
   };
 
   return (
@@ -205,7 +176,7 @@ export function VideoScrubStage({ src }: { src: string }) {
           data-ph={status === "missing" ? `영상 대기 — ${src}` : "영상 로딩…"}
         />
       )}
-      {status === "ready" && (
+      {status === "ready" && !reduce && (
         <div
           className={`softvideo__guide${showGuide ? "" : " is-hidden"}`}
           aria-hidden="true"
@@ -223,7 +194,7 @@ export function VideoScrubStage({ src }: { src: string }) {
                 />
               </svg>
             </span>
-            마우스를 올려 좌우로 움직여보세요
+            좌우로 움직여보세요 — 터치·마우스
           </div>
         </div>
       )}

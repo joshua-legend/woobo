@@ -13,46 +13,8 @@ import { IdentityByVariant } from "./identities";
 import { SoftByVariant } from "./softclose";
 import { DoorByVariant } from "./door";
 import { TrustByVariant } from "./trust";
+import { BrandsByVariant } from "./brands";
 import "./manifesto.css";
-
-/* =========================== [06] 사회적 증거 (placeholder) =========================== */
-function SocialProof() {
-  return (
-    <section
-      className="section social"
-      data-section="social"
-      data-theme="light"
-      data-screen-label="06 함께"
-    >
-      <div className="inner">
-        <span className="eyebrow reveal-up">
-          <span className="num">06</span> / 함께
-        </span>
-        <h2 className="reveal-up d1">
-          이미 많은 제작사와 고객이 Woobo와 함께합니다.
-        </h2>
-        <p className="lede reveal-up d1">
-          현장에서 검증된 신뢰.{" "}
-          <span className="todoinline">[TODO: 확인 — 레퍼런스·후기]</span>
-        </p>
-        <div
-          className="social__logos ph reveal-up"
-          data-ph="제작사 · 고객 로고월 — placeholder (실물 교체)"
-        />
-        <div className="social__quotes">
-          <blockquote className="social__quote reveal-up d1">
-            <p>“[TODO: 확인 — 고객/제작사 후기 문구]”</p>
-            <cite>제작사 OO · [TODO]</cite>
-          </blockquote>
-          <blockquote className="social__quote reveal-up d2">
-            <p>“[TODO: 확인 — 고객/제작사 후기 문구]”</p>
-            <cite>고객 OO · [TODO]</cite>
-          </blockquote>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* =========================== [07] 전국 쇼룸 (CTA) =========================== */
 type ShowroomCard = {
@@ -204,7 +166,7 @@ export default function ManifestoClient({ variants }: { variants: Variants }) {
         <SoftByVariant variant={variants.soft} />
         <DoorByVariant variant={variants.door} />
         <TrustByVariant variant={variants.trust} />
-        <SocialProof />
+        <BrandsByVariant variant={variants.brands} />
         <Showroom />
       </main>
       <VariantSwitcher current={variants} />

@@ -1541,7 +1541,7 @@
 
 /* ---- demo-softvideo: 영상 스크럽(마우스 호버 조작) ---- */
 .route-manifesto .demo-softvideo {
-  cursor: grab;
+  cursor: ew-resize;
 }
 .route-manifesto .softvideo__el {
   position: absolute;
@@ -1616,34 +1616,48 @@
 }
 
 /* =========================================================
-   SECTION: door (4+5 통합 · 무공구 + TIP-ON) — 가운데 단일 컬럼
+   SECTION: door (4+5 통합 · 무공구 + TIP-ON) — 섹션3 데모와 동일한 2단(.demo .flip)
    ========================================================= */
-.route-manifesto .door__inner {
-  max-width: 900px;
-  margin: 0 auto;
-  text-align: center;
-}
-.route-manifesto .door .eyebrow {
-  justify-content: center;
-}
-.route-manifesto .door h3 {
-  font-size: clamp(28px, 4.4vw, 56px);
-  margin: 18px 0 16px;
-}
-.route-manifesto .door .lede {
-  margin: 0 auto;
-  max-width: 52ch;
-}
-.route-manifesto .door .chiprow {
-  justify-content: center;
-  margin: 24px 0 22px;
-}
-.route-manifesto .door .microcta {
-  justify-content: center;
-}
 .route-manifesto .door__stagewrap {
-  margin: clamp(36px, 6vh, 64px) auto 0;
-  max-width: 600px;
+  margin: 0;
+}
+.route-manifesto .door__phnote {
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--c-caption-on-dark);
+}
+/* tap: 누르면 자동 1회 재생 — 탭 큐 */
+.route-manifesto .door-tapstage {
+  cursor: pointer;
+}
+.route-manifesto .door-tap-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid color-mix(in srgb, var(--c-orange) 40%, transparent);
+  background: color-mix(in srgb, var(--c-charcoal) 55%, transparent);
+  backdrop-filter: blur(4px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--c-paper-on-dark);
+  pointer-events: none;
+  z-index: 3;
+}
+.route-manifesto .door-tap-cue__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-orange);
+  animation: rm-tapBlink 1.6s var(--ease) infinite;
 }
 
 /* door-click: 무공구 장착(스크롤) + 핸들리스 TIP-ON(클릭) */
@@ -1958,70 +1972,6 @@
   color: var(--c-orange);
   font-weight: 600;
 }
-.route-manifesto .trust .cards {
-  margin-top: clamp(40px, 6vh, 64px);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--c-line);
-  border: 1px solid var(--c-line);
-}
-.route-manifesto .trust .card {
-  background: var(--c-paper);
-  padding: 30px 26px 34px;
-  min-height: 190px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-}
-.route-manifesto .trust .card .idx {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  color: var(--c-caption);
-}
-.route-manifesto .trust .card .tt {
-  font-size: clamp(18px, 1.7vw, 23px);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-.route-manifesto .trust .card .ds {
-  font-size: 14px;
-  color: var(--c-ink-2);
-  margin-top: 8px;
-  font-weight: 300;
-}
-.route-manifesto .trust .card.feat {
-  background: var(--c-ink);
-  color: var(--c-paper);
-}
-.route-manifesto .trust .card.feat .idx {
-  color: var(--c-orange);
-}
-.route-manifesto .trust .card.feat .ds {
-  color: var(--c-muted-on-dark);
-}
-.route-manifesto .trust .card .mark {
-  position: absolute;
-  top: 28px;
-  right: 26px;
-  width: 30px;
-  height: 30px;
-}
-.route-manifesto .trust .card .mark path,
-.route-manifesto .trust .card .mark circle {
-  stroke: var(--c-orange);
-  stroke-width: 2;
-  fill: none;
-  stroke-dasharray: 120;
-  stroke-dashoffset: 120;
-  transition: stroke-dashoffset 1s var(--ease);
-}
-.route-manifesto .trust .card.is-draw .mark path,
-.route-manifesto .trust .card.is-draw .mark circle {
-  stroke-dashoffset: 0;
-}
 .route-manifesto .trust .brands {
   margin-top: 22px;
   font-family: var(--font-mono);
@@ -2043,19 +1993,7 @@
   font-weight: 300;
 }
 
-/* ---- trust variant: stamp (도장) — identity-stamp 재사용 + 상단 여백 ---- */
-.route-manifesto .trust-stamp {
-  margin-top: clamp(40px, 6vh, 60px);
-}
-
-/* ---- trust variant: flow (정품의 공식 통로) ---- */
-.route-manifesto .trust-flow {
-  margin: clamp(40px, 6vh, 64px) auto 0;
-  max-width: 560px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+/* ---- trust 노드/링크 공용(fusion 端 노드에서 사용) ---- */
 .route-manifesto .tf-node {
   width: 100%;
   text-align: center;
@@ -2064,19 +2002,12 @@
   border-radius: 8px;
   background: var(--c-paper);
 }
-.route-manifesto .tf-node--hub {
-  border-color: var(--c-orange);
-  background: color-mix(in srgb, var(--c-orange) 5%, var(--c-paper));
-}
 .route-manifesto .tf-tag {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--c-caption);
-}
-.route-manifesto .tf-node--hub .tf-tag {
-  color: var(--c-orange);
 }
 .route-manifesto .tf-node b {
   display: block;
@@ -2129,22 +2060,6 @@
   margin-top: 8px;
   font-size: 13px;
   font-weight: 300;
-  color: var(--c-ink-2);
-}
-.route-manifesto .tf-facets {
-  margin-top: 14px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-.route-manifesto .tf-facet {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  padding: 6px 11px;
-  border-radius: 999px;
-  border: 1px solid var(--c-line);
   color: var(--c-ink-2);
 }
 .route-manifesto .tf-link {
@@ -2232,6 +2147,612 @@
   font-size: 13px;
   font-weight: 300;
   color: var(--c-ink-2);
+}
+
+/* ====================================================================
+   trust variant: hybrid (pillars 가로 여정 + fusion 끝노드/카드 허브)
+   — .tf-node--end / .tf-hub / .tf-cards(fusion) + .tf-pipe(pillars) 재사용
+   ==================================================================== */
+/* 허브 네온 보더 빛줄기 회전각(애니메이션 가능하도록 등록) */
+@property --tf-a {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.route-manifesto .tf-hybrid {
+  margin: clamp(40px, 6vh, 64px) auto 0;
+  max-width: 1240px;
+  display: flex;
+  align-items: center;
+}
+.route-manifesto .tf-hybrid .tf-end {
+  flex: 0 0 168px;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  text-align: center;
+}
+.route-manifesto .tf-end__word {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(18px, 2vw, 26px);
+  letter-spacing: -0.02em;
+  color: var(--c-ink);
+  word-break: keep-all;
+}
+.route-manifesto .tf-end__rule {
+  width: 26px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--c-orange);
+}
+.route-manifesto .tf-end__desc {
+  font-size: 12.5px;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--c-ink-2);
+  word-break: keep-all;
+}
+.route-manifesto .tf-hybrid .tf-hub--center {
+  flex: 1 1 auto;
+  width: auto;
+  position: relative;
+  isolation: isolate;
+  /* 점화 전: 테두리 흐릿(dim) */
+  border-color: color-mix(in srgb, var(--c-orange) 30%, var(--c-line));
+}
+/* 섹션 진입(is-in) 시: 네온 점화(플리커) → 은은한 글로우 펄스 */
+.route-manifesto .tf-hybrid.is-in .tf-hub--center {
+  animation:
+    tfNeonOn 1.2s var(--ease) forwards,
+    tfNeonPulse 6s var(--ease) 1.2s infinite;
+}
+@keyframes tfNeonOn {
+  0% {
+    border-color: color-mix(in srgb, var(--c-orange) 30%, var(--c-line));
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-orange) 0%, transparent);
+  }
+  16% {
+    border-color: var(--c-orange);
+    box-shadow:
+      0 0 8px -3px color-mix(in srgb, var(--c-orange) 45%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--c-orange) 28%, transparent);
+  }
+  22% {
+    border-color: color-mix(in srgb, var(--c-orange) 32%, var(--c-line));
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-orange) 0%, transparent);
+  }
+  34% {
+    border-color: var(--c-orange);
+    box-shadow:
+      0 0 10px -3px color-mix(in srgb, var(--c-orange) 50%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--c-orange) 32%, transparent);
+  }
+  100% {
+    border-color: var(--c-orange);
+    box-shadow:
+      0 0 14px -5px color-mix(in srgb, var(--c-orange) 36%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--c-orange) 28%, transparent);
+  }
+}
+@keyframes tfNeonPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 12px -5px color-mix(in srgb, var(--c-orange) 30%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--c-orange) 26%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 18px -4px color-mix(in srgb, var(--c-orange) 42%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--c-orange) 34%, transparent);
+  }
+}
+/* 테두리를 도는 빛줄기(border beam) */
+.route-manifesto .tf-hub--center::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1.6px;
+  background: conic-gradient(
+    from var(--tf-a),
+    transparent 0deg 300deg,
+    color-mix(in srgb, var(--c-orange) 40%, transparent) 336deg,
+    color-mix(in srgb, var(--c-orange) 85%, #fff) 350deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+}
+.route-manifesto .tf-hybrid.is-in .tf-hub--center::before {
+  opacity: 0.8;
+  animation: tfBeam 7s linear 1.1s infinite;
+}
+@keyframes tfBeam {
+  to {
+    --tf-a: 360deg;
+  }
+}
+.route-manifesto .tf-hybrid .tf-pipe {
+  flex: 0 0 28px;
+}
+.route-manifesto .tf-hybrid.is-in .tf-pipe i {
+  animation-play-state: running;
+}
+/* 6개 카드 뿅뿅 stagger 팝(--ease-tip 오버슈트) — is-pop 시 발화 */
+.route-manifesto .tf-card--pop {
+  opacity: 0;
+  transform: scale(0.55) translateY(8px);
+  transform-origin: center;
+}
+.route-manifesto .tf-hybrid .tf-cards.is-pop .tf-card--pop {
+  animation: tfCardPop 0.5s var(--ease-tip) both;
+  animation-delay: var(--reveal-delay, 0s);
+}
+@keyframes tfCardPop {
+  from {
+    opacity: 0;
+    transform: scale(0.55) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ====================================================================
+   trust variant: A. conveyor (여정 컨베이어 — 유통 과정)
+   ==================================================================== */
+.route-manifesto .tf-conveyor {
+  margin: clamp(40px, 6vh, 64px) auto 0;
+  max-width: 760px;
+}
+.route-manifesto .tf-conv__rail {
+  position: relative;
+  padding-top: 60px;
+}
+.route-manifesto .tf-conv__track {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 60px;
+  height: 2px;
+  background: var(--c-line);
+}
+.route-manifesto .tf-conv__box {
+  position: absolute;
+  top: 39px;
+  left: 5%;
+  width: 30px;
+  height: 22px;
+  border-radius: 3px;
+  background: var(--c-orange);
+  box-shadow: 0 6px 16px -8px var(--c-orange);
+  animation: tfConvRide 6s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  animation-play-state: paused;
+}
+.route-manifesto .tf-conveyor.is-in .tf-conv__box {
+  animation-play-state: running;
+}
+@keyframes tfConvRide {
+  0% {
+    left: 5%;
+  }
+  42% {
+    left: calc(50% - 15px);
+  }
+  56% {
+    left: calc(50% - 15px);
+  }
+  100% {
+    left: calc(95% - 30px);
+  }
+}
+.route-manifesto .tf-conv__stamp {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.7);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--c-orange);
+  border: 1px solid var(--c-orange);
+  border-radius: var(--r-pill);
+  padding: 3px 9px;
+  background: var(--c-paper);
+  white-space: nowrap;
+  opacity: 0;
+  animation: tfConvStamp 6s ease infinite;
+  animation-play-state: paused;
+}
+.route-manifesto .tf-conveyor.is-in .tf-conv__stamp {
+  animation-play-state: running;
+}
+@keyframes tfConvStamp {
+  0%,
+  38% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.6);
+  }
+  48% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.06);
+  }
+  56%,
+  66% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(1);
+  }
+}
+.route-manifesto .tf-conv__stops {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 18px;
+}
+.route-manifesto .tf-conv__stop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 0 6px;
+}
+.route-manifesto .tf-conv__dot {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-charcoal);
+  background: var(--c-paper);
+  display: grid;
+  place-items: center;
+}
+.route-manifesto .tf-conv__stop.is-hub .tf-conv__dot {
+  border-color: var(--c-orange);
+  background: color-mix(in srgb, var(--c-orange) 8%, var(--c-paper));
+}
+.route-manifesto .tf-conv__dot svg {
+  width: 24px;
+  height: 24px;
+}
+.route-manifesto .tf-conv__dot svg circle,
+.route-manifesto .tf-conv__dot svg path {
+  fill: none;
+  stroke: var(--c-charcoal);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.route-manifesto .tf-conv__stop.is-hub .tf-conv__dot svg circle,
+.route-manifesto .tf-conv__stop.is-hub .tf-conv__dot svg path {
+  stroke: var(--c-orange);
+}
+.route-manifesto .tf-conv__stop b {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(14px, 1.4vw, 17px);
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+}
+.route-manifesto .tf-conv__stop span {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--c-ink-2);
+  word-break: keep-all;
+}
+.route-manifesto .tf-conv__cap {
+  margin-top: 26px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--c-caption);
+}
+.route-manifesto .tf-conv__facets {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.route-manifesto .tf-chip {
+  font-size: 12px;
+  color: var(--c-ink);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  padding: 6px 12px;
+  background: var(--c-paper);
+  word-break: keep-all;
+}
+
+/* ====================================================================
+   trust variant: B. pillars (3 기둥 + 흐르는 파이프)
+   ==================================================================== */
+.route-manifesto .tf-pillars {
+  margin: clamp(40px, 6vh, 64px) auto 0;
+  max-width: 840px;
+  display: flex;
+  align-items: stretch;
+}
+.route-manifesto .tf-pillar {
+  flex: 1 1 0;
+  min-width: 0;
+  align-self: center;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  padding: 22px 18px;
+  text-align: center;
+  background: var(--c-paper);
+}
+.route-manifesto .tf-pillar .tf-tag {
+  color: var(--c-ink-2);
+}
+.route-manifesto .tf-pillar > b {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(15px, 1.6vw, 19px);
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+}
+.route-manifesto .tf-pillar__sub {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--c-ink-2);
+  word-break: keep-all;
+}
+.route-manifesto .tf-pillar--hub {
+  align-self: stretch;
+  padding: 26px 20px;
+  background: var(--c-charcoal);
+  border-color: var(--c-charcoal);
+  box-shadow: 0 20px 50px -28px rgba(0, 0, 0, 0.6);
+}
+.route-manifesto .tf-pillar--hub .tf-tag {
+  color: var(--c-orange);
+}
+.route-manifesto .tf-pillar--hub > b {
+  color: #fff;
+}
+.route-manifesto .tf-pillar__list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+.route-manifesto .tf-pillar__list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--c-paper-on-dark);
+  word-break: keep-all;
+}
+.route-manifesto .tf-pillar__list .tf-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  margin: 0;
+}
+.route-manifesto .tf-pipe {
+  flex: 0 0 36px;
+  align-self: center;
+  height: 2px;
+  position: relative;
+  background: var(--c-line);
+}
+.route-manifesto .tf-pipe i {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-orange);
+  animation: tfPipeDot 1.8s linear infinite;
+  animation-play-state: paused;
+}
+.route-manifesto .tf-pillars.is-in .tf-pipe i {
+  animation-play-state: running;
+}
+@keyframes tfPipeDot {
+  0% {
+    left: -4px;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 32px;
+    opacity: 0;
+  }
+}
+
+/* ====================================================================
+   trust variant: D. hub (허브 노드 다이어그램 — 탐색형)
+   ==================================================================== */
+.route-manifesto .tf-hubg {
+  position: relative;
+  margin: clamp(40px, 6vh, 64px) auto 0;
+  max-width: 720px;
+  height: 340px;
+}
+.route-manifesto .tf-hubg__wires {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.route-manifesto .tf-wire {
+  stroke: var(--c-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.route-manifesto .tf-wire--axis {
+  stroke: var(--c-orange);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 4;
+  animation: tfDash 1s linear infinite;
+  animation-play-state: paused;
+}
+.route-manifesto .tf-hubg.is-in .tf-wire--axis {
+  animation-play-state: running;
+}
+@keyframes tfDash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+.route-manifesto .tf-hubg__end,
+.route-manifesto .tf-hubg__core,
+.route-manifesto .tf-orb {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+.route-manifesto .tf-hubg__end {
+  text-align: center;
+  z-index: 2;
+}
+.route-manifesto .tf-hubg__end--l {
+  left: 9%;
+  top: 50%;
+}
+.route-manifesto .tf-hubg__end--r {
+  left: 91%;
+  top: 50%;
+}
+.route-manifesto .tf-hubg__core {
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 138px;
+  padding: 16px 12px;
+  text-align: center;
+  background: var(--c-charcoal);
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 18px 44px -22px rgba(0, 0, 0, 0.6);
+}
+.route-manifesto .tf-hubg__core .tf-tag {
+  color: var(--c-orange);
+}
+.route-manifesto .tf-hubg__core b {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+.route-manifesto .tf-hubg__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-charcoal);
+  background: var(--c-paper);
+}
+.route-manifesto .tf-hubg__icon svg {
+  width: 26px;
+  height: 26px;
+}
+.route-manifesto .tf-hubg__icon svg circle,
+.route-manifesto .tf-hubg__icon svg path {
+  fill: none;
+  stroke: var(--c-charcoal);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.route-manifesto .tf-hubg__end b {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+}
+.route-manifesto .tf-hubg__end span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--c-caption);
+  letter-spacing: 0.08em;
+}
+.route-manifesto .tf-orb {
+  width: 134px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.route-manifesto .tf-orb .tf-icon {
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  padding: 7px;
+  box-sizing: content-box;
+  border-radius: 50%;
+  border: 1px solid var(--c-line);
+  background: var(--c-paper);
+  transition:
+    border-color 0.3s var(--ease),
+    background 0.3s var(--ease),
+    transform 0.3s var(--ease);
+}
+.route-manifesto .tf-orb__t {
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--c-ink);
+  word-break: keep-all;
+}
+.route-manifesto .tf-orb__d {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  font-size: 10.5px;
+  font-weight: 300;
+  color: var(--c-ink-2);
+  word-break: keep-all;
+  transition:
+    max-height 0.3s var(--ease),
+    opacity 0.3s var(--ease);
+}
+.route-manifesto .tf-orb:hover .tf-icon {
+  border-color: var(--c-orange);
+  background: color-mix(in srgb, var(--c-orange) 8%, var(--c-paper));
+  transform: scale(1.08);
+}
+.route-manifesto .tf-orb:hover .tf-orb__d {
+  max-height: 44px;
+  opacity: 1;
 }
 
 /* =========================================================
@@ -2410,6 +2931,536 @@
 }
 
 /* =========================================================
+   SECTION: brandfolio (06 멀티브랜드 수입 · flagship/rows/grid)
+   ========================================================= */
+.route-manifesto .brandfolio h2 {
+  font-size: clamp(28px, 4vw, 52px);
+  max-width: 22ch;
+  margin-bottom: 16px;
+}
+/* 로고 슬롯 — 워드마크 placeholder(빗금 + LOGO 태그) */
+.route-manifesto .bf-logo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      color-mix(in srgb, var(--c-line) 55%, transparent) 0 1px,
+      transparent 1px 7px
+    ),
+    var(--c-paper);
+}
+.route-manifesto .bf-logo__name {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(16px, 1.7vw, 20px);
+  letter-spacing: -0.01em;
+  color: var(--c-ink);
+}
+.route-manifesto .bf-logo__tag {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.12em;
+  color: var(--c-caption);
+}
+/* 이미지(가안 무드) + 워드마크 오버레이 */
+.route-manifesto .bf-logo--img {
+  display: block;
+  overflow: hidden;
+  min-height: 132px;
+  padding: 0;
+  background: var(--c-line);
+}
+.route-manifesto .bf-logo__img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.route-manifesto .bf-logo--img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--c-paper) 94%, transparent) 0%,
+    color-mix(in srgb, var(--c-paper) 36%, transparent) 32%,
+    transparent 58%
+  );
+}
+.route-manifesto .bf-logo--img .bf-logo__name {
+  position: absolute;
+  left: 13px;
+  bottom: 10px;
+  z-index: 2;
+}
+.route-manifesto .bf-logo--img .bf-logo__tag {
+  padding: 1px 6px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--c-paper) 82%, transparent);
+}
+.route-manifesto .bf-logo--lg.bf-logo--img {
+  min-height: 180px;
+}
+.route-manifesto .bf-logo--row.bf-logo--img {
+  min-height: 72px;
+}
+/* 카드(grid·flagship 보조) */
+.route-manifesto .bf-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  background: var(--c-paper);
+}
+.route-manifesto .bf-country {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-caption);
+}
+.route-manifesto .bf-role {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(14px, 1.4vw, 16px);
+  letter-spacing: -0.01em;
+  color: var(--c-ink);
+  word-break: keep-all;
+}
+.route-manifesto .bf-korea {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--c-ink-2);
+  word-break: keep-all;
+}
+.route-manifesto .bf-korea--em {
+  color: var(--c-orange);
+  font-weight: 500;
+}
+/* --- flagship --- */
+.route-manifesto .bf-flagship {
+  margin-top: clamp(32px, 5vh, 52px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.route-manifesto .bf-card--flag {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  gap: 28px;
+  align-items: center;
+  padding: 24px;
+  border-color: var(--c-orange);
+  background: color-mix(in srgb, var(--c-orange) 4%, var(--c-paper));
+}
+.route-manifesto .bf-logo--lg {
+  min-height: 120px;
+}
+.route-manifesto .bf-logo--lg .bf-logo__name {
+  font-size: clamp(24px, 3vw, 34px);
+}
+.route-manifesto .bf-flag__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.route-manifesto .bf-flag__meta .bf-role {
+  font-size: clamp(16px, 1.8vw, 20px);
+}
+.route-manifesto .bf-grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+/* --- grid (균일 5칸 + 호버 설명 펼침) --- */
+.route-manifesto .bf-grid {
+  margin-top: clamp(32px, 5vh, 52px);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+.route-manifesto .bf-grid .bf-role,
+.route-manifesto .bf-grid .bf-korea {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.4s var(--ease),
+    opacity 0.4s var(--ease);
+}
+.route-manifesto .bf-grid .bf-card:hover .bf-role,
+.route-manifesto .bf-grid .bf-card:hover .bf-korea {
+  max-height: 80px;
+  opacity: 1;
+}
+/* --- rows (에디토리얼 행 리스트) --- */
+.route-manifesto .bf-rows {
+  list-style: none;
+  margin: clamp(32px, 5vh, 52px) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--c-line);
+}
+.route-manifesto .bf-row {
+  display: grid;
+  grid-template-columns: 190px 130px 1fr 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 20px 4px;
+  border-bottom: 1px solid var(--c-line);
+}
+.route-manifesto .bf-logo--row {
+  min-height: 56px;
+}
+.route-manifesto .bf-logo--row .bf-logo__name {
+  font-size: clamp(15px, 1.5vw, 18px);
+}
+
+/* --- map (유럽 지도 + 각국 점 호버) --- */
+.route-manifesto .bf-map {
+  margin-top: clamp(32px, 5vh, 52px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 48px);
+  align-items: center;
+}
+.route-manifesto .bf-map__geo {
+  position: relative;
+  aspect-ratio: 15 / 13;
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  background: var(--c-paper);
+  overflow: hidden;
+}
+.route-manifesto .bf-map__europe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 14px;
+}
+.route-manifesto .bf-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  z-index: 2;
+}
+.route-manifesto .bf-dot__pin {
+  position: relative;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--c-orange);
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-orange) 35%, transparent);
+  transition: box-shadow 0.3s var(--ease);
+}
+.route-manifesto .bf-dot__pin::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--c-orange);
+  animation: bfPing 2s var(--ease) infinite;
+}
+@keyframes bfPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.route-manifesto .bf-dot__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--c-ink);
+  background: color-mix(in srgb, var(--c-paper) 86%, transparent);
+  padding: 2px 6px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+.route-manifesto .bf-dot:hover .bf-dot__label,
+.route-manifesto .bf-dot.is-active .bf-dot__label {
+  opacity: 1;
+  transform: translateX(0);
+}
+.route-manifesto .bf-dot.is-active .bf-dot__pin {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-orange) 28%, transparent);
+}
+.route-manifesto .bf-map__legend {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--c-caption);
+}
+.route-manifesto .bf-map__focus {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.route-manifesto .bf-map__img {
+  display: block;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--c-line);
+}
+.route-manifesto .bf-map__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.route-manifesto .bf-map__name {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(18px, 2vw, 24px);
+  letter-spacing: -0.02em;
+}
+.route-manifesto .bf-map__focus .bf-role {
+  margin-top: 6px;
+}
+
+/* --- showcase (큰 이미지 히어로 + 썸네일) --- */
+.route-manifesto .bf-showcase {
+  margin-top: clamp(32px, 5vh, 52px);
+}
+.route-manifesto .bf-showcase__hero {
+  position: relative;
+  aspect-ratio: 16 / 8;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--c-line);
+}
+.route-manifesto .bf-showcase__hero img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.route-manifesto .bf-showcase__cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  padding: clamp(16px, 3vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--c-charcoal) 82%, transparent),
+    transparent
+  );
+}
+.route-manifesto .bf-showcase__cap .bf-country {
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .bf-showcase__name {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(22px, 3vw, 34px);
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.route-manifesto .bf-showcase__cap .bf-role {
+  color: #fff;
+}
+.route-manifesto .bf-showcase__cap .bf-korea {
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .bf-showcase__thumbs {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.route-manifesto .bf-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  background: var(--c-line);
+}
+.route-manifesto .bf-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s var(--ease);
+}
+.route-manifesto .bf-thumb span {
+  position: absolute;
+  left: 6px;
+  bottom: 5px;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.route-manifesto .bf-thumb.is-active {
+  border-color: var(--c-orange);
+  box-shadow: inset 0 0 0 2px var(--c-orange);
+}
+.route-manifesto .bf-thumb:hover img {
+  transform: scale(1.06);
+}
+
+/* --- bands (세로 풀폭 밴드, 좌우 교차) --- */
+.route-manifesto .bf-bands {
+  margin-top: clamp(32px, 5vh, 52px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 3vh, 28px);
+}
+.route-manifesto .bf-band {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3vw, 40px);
+  align-items: center;
+}
+.route-manifesto .bf-band--rev .bf-band__img {
+  order: 2;
+}
+.route-manifesto .bf-band__img {
+  display: block;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--c-line);
+}
+.route-manifesto .bf-band__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.route-manifesto .bf-band__txt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.route-manifesto .bf-band__name {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(22px, 3vw, 34px);
+  letter-spacing: -0.02em;
+}
+
+/* --- marquee (무한 흐름 띠) --- */
+.route-manifesto .bf-marquee {
+  margin-top: clamp(32px, 5vh, 52px);
+  overflow: hidden;
+  -webkit-mask: linear-gradient(
+    90deg,
+    transparent,
+    #000 6%,
+    #000 94%,
+    transparent
+  );
+  mask: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.route-manifesto .bf-marquee__track {
+  display: flex;
+  gap: 14px;
+  width: max-content;
+  animation: bfMarquee 32s linear infinite;
+}
+.route-manifesto .bf-marquee:hover .bf-marquee__track {
+  animation-play-state: paused;
+}
+@keyframes bfMarquee {
+  to {
+    transform: translateX(-1270px);
+  }
+}
+.route-manifesto .bf-mq-card {
+  flex: 0 0 auto;
+  width: 240px;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--c-paper);
+}
+.route-manifesto .bf-mq-card__img {
+  display: block;
+  aspect-ratio: 4 / 3;
+  background: var(--c-line);
+}
+.route-manifesto .bf-mq-card__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.route-manifesto .bf-mq-card__cap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.route-manifesto .bf-mq-card__cap b {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 14px;
+}
+.route-manifesto .bf-mq-card__cap span {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-caption);
+}
+
+/* =========================================================
    RESPONSIVE  (브레이크포인트 900px → 모바일 단일 컬럼)
    ========================================================= */
 @media (max-width: 900px) {
@@ -2420,7 +3471,6 @@
   .route-manifesto .demo.flip .demo__copy {
     order: 0;
   }
-  .route-manifesto .trust .cards,
   .route-manifesto .tf-cards,
   .route-manifesto .social__quotes,
   .route-manifesto .showroom .branches {
@@ -2431,6 +3481,100 @@
   }
   .route-manifesto .identity__kw {
     font-size: clamp(24px, 7vw, 40px);
+  }
+  /* brandfolio 모바일 폴백 */
+  .route-manifesto .bf-card--flag {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .route-manifesto .bf-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .route-manifesto .bf-grid .bf-role,
+  .route-manifesto .bf-grid .bf-korea {
+    max-height: none;
+    opacity: 1;
+  }
+  .route-manifesto .bf-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .route-manifesto .bf-map {
+    grid-template-columns: 1fr;
+  }
+  .route-manifesto .bf-band,
+  .route-manifesto .bf-band--rev {
+    grid-template-columns: 1fr;
+  }
+  .route-manifesto .bf-band--rev .bf-band__img {
+    order: 0;
+  }
+  /* trust 변주 모바일 폴백 */
+  .route-manifesto .tf-pillars,
+  .route-manifesto .tf-hybrid {
+    flex-direction: column;
+  }
+  .route-manifesto .tf-hybrid .tf-end {
+    flex-basis: auto;
+    width: 100%;
+  }
+  .route-manifesto .tf-hybrid .tf-hub--center {
+    width: 100%;
+  }
+  /* hybrid 허브: 모바일에서도 3그리드 유지(축소판) — 공통 1fr 붕괴 무시 */
+  .route-manifesto .tf-hybrid .tf-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .route-manifesto .tf-hybrid .tf-card {
+    padding: 12px 8px;
+  }
+  .route-manifesto .tf-hybrid .tf-card .tf-icon {
+    width: 22px;
+    height: 22px;
+    margin-bottom: 8px;
+  }
+  .route-manifesto .tf-hybrid .tf-card__tt {
+    font-size: 11.5px;
+    line-height: 1.3;
+  }
+  .route-manifesto .tf-hybrid .tf-card__ds {
+    margin-top: 4px;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  .route-manifesto .tf-pipe {
+    flex-basis: 26px;
+    width: 2px;
+    height: 26px;
+    align-self: center;
+  }
+  .route-manifesto .tf-pipe i {
+    display: none;
+  }
+  .route-manifesto .tf-hubg {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .route-manifesto .tf-hubg__wires {
+    display: none;
+  }
+  .route-manifesto .tf-hubg__end,
+  .route-manifesto .tf-hubg__core,
+  .route-manifesto .tf-orb {
+    position: static;
+    transform: none;
+    width: auto;
+  }
+  .route-manifesto .tf-orb {
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+  }
+  .route-manifesto .tf-orb__d {
+    max-height: none;
+    opacity: 1;
   }
 }
 
@@ -2574,5 +3718,45 @@
   .route-manifesto .tf-seal path {
     stroke-dashoffset: 0 !important;
     transition: none !important;
+  }
+  /* trust 변주(conveyor/pillars/hub): 애니메이션 정지 + 최종 정적 상태 */
+  .route-manifesto .tf-conv__box,
+  .route-manifesto .tf-conv__stamp,
+  .route-manifesto .tf-pipe i,
+  .route-manifesto .tf-wire--axis {
+    animation: none !important;
+  }
+  .route-manifesto .tf-conv__box {
+    left: calc(50% - 15px) !important;
+  }
+  .route-manifesto .tf-conv__stamp {
+    opacity: 1 !important;
+    transform: translateX(-50%) scale(1) !important;
+  }
+  /* hybrid 카드 팝: 정적 최종 상태 */
+  .route-manifesto .tf-card--pop {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  /* hybrid 허브 네온: 점멸/빛줄기 정지 + 정적 글로우 */
+  .route-manifesto .tf-hub--center {
+    animation: none !important;
+    border-color: var(--c-orange) !important;
+    box-shadow:
+      0 0 20px -6px color-mix(in srgb, var(--c-orange) 40%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--c-orange) 30%, transparent) !important;
+  }
+  .route-manifesto .tf-hub--center::before {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+  /* brandfolio marquee 정지 */
+  .route-manifesto .bf-marquee__track {
+    animation: none !important;
+  }
+  /* brandfolio map 점 핑 정지 */
+  .route-manifesto .bf-dot__pin::after {
+    animation: none !important;
   }
 }

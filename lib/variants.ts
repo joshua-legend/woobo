@@ -31,12 +31,25 @@ export const SECTION_VARIANTS = {
   },
   door: {
     label: "도어(4+5)",
-    options: ["click", "hotspots", "scrub"],
-    default: "click",
+    options: ["click", "hotspots", "scrub", "tap"],
+    default: "tap",
+  },
+  brands: {
+    label: "06 브랜드",
+    options: [
+      "flagship",
+      "rows",
+      "grid",
+      "map",
+      "showcase",
+      "bands",
+      "marquee",
+    ],
+    default: "flagship",
   },
   trust: {
     label: "약속(신뢰)",
-    options: ["fusion", "flow", "stamp", "grid"],
+    options: ["fusion", "hybrid", "conveyor", "pillars", "hub"],
     default: "fusion",
   },
 } as const satisfies Record<string, SectionConfig>;

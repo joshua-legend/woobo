@@ -87,114 +87,38 @@ const FACETS: Facet[] = [
   },
 ];
 
-/* ---------- D. grid (현행 카드 그리드) ---------- */
-function TrustGrid() {
-  const gridRef = useRef<HTMLDivElement>(null);
+/* ---------- fusion (flow 골격 + grid 카드 + 직관 아이콘) ---------- */
+function TrustFusion() {
+  // 독점 에이전트 허브의 카드 스태커 — 전역 reveal(-10%)보다 조금 더 일찍 발동.
+  const hubRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const grid = gridRef.current;
-    if (!grid) return;
-    const cards = Array.from(grid.querySelectorAll<HTMLElement>(".card"));
+    const el = hubRef.current;
+    if (!el) return;
+    const reveal = () =>
+      [el, ...el.querySelectorAll<HTMLElement>(".reveal-up")].forEach((n) =>
+        n.classList.add("is-in"),
+      );
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
-      cards.forEach((c) => c.classList.add("is-draw"));
+      reveal();
       return;
     }
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (e.isIntersecting) {
-            e.target.classList.add("is-draw");
+            reveal();
             io.unobserve(e.target);
           }
         }
       },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0 },
+      // 뷰포트 하단보다 12% 아래에서 미리 발화(전역 -10% 대비 더 이르게).
+      { rootMargin: "0px 0px 12% 0px", threshold: 0 },
     );
-    cards.forEach((c) => io.observe(c));
+    io.observe(el);
     return () => io.disconnect();
   }, []);
-  return (
-    <div className="cards" ref={gridRef}>
-      {FACETS.map((c, i) => (
-        <div key={c.t} className={`card${c.feat ? " feat" : ""}`}>
-          <div className="idx">{String(i + 1).padStart(2, "0")}</div>
-          <svg className="mark" viewBox="0 0 30 30">
-            {c.mark}
-          </svg>
-          <div>
-            <div className="tt">{c.t}</div>
-            <div className="ds">{c.d}</div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
-/* ---------- C. stamp (인증 도장 — identity-stamp 클래스 재사용) ---------- */
-function TrustStamp() {
-  return (
-    <ul className="identity-stamp__list trust-stamp">
-      {FACETS.map((f, i) => (
-        <li
-          key={f.t}
-          className="identity-stamp__row reveal-up"
-          style={
-            { "--reveal-delay": `${0.08 + i * 0.08}s` } as React.CSSProperties
-          }
-        >
-          <svg className="identity-stamp__seal" viewBox="0 0 44 44" aria-hidden="true">
-            <circle cx="22" cy="22" r="19" />
-            <path d="M13 22.5 L19.5 29 L31 16" />
-          </svg>
-          <div className="identity-stamp__txt">
-            <b>{f.t}</b>
-            <span>{f.d}</span>
-          </div>
-          <span className="identity-stamp__no">
-            {String(i + 1).padStart(2, "0")}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/* ---------- A. flow (정품의 공식 통로) ---------- */
-function TrustFlow() {
-  return (
-    <div className="trust-flow">
-      <div className="tf-node reveal-up">
-        <span className="tf-tag">유럽 제조</span>
-        <b>Blum · AGOFORM · Peka</b>
-      </div>
-      <div className="tf-link reveal-up d1">
-        <i />
-      </div>
-      <div className="tf-node tf-node--hub reveal-up d1">
-        <span className="tf-tag">한국 독점 에이전트 · sole agent</span>
-        <b>우보브랜드샵 — 정품의 공식 통로</b>
-        <div className="tf-facets">
-          {FACETS.map((f) => (
-            <span key={f.t} className="tf-facet">
-              {f.t}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="tf-link reveal-up d2">
-        <i />
-      </div>
-      <div className="tf-node reveal-up d2">
-        <span className="tf-tag">고객</span>
-        <b>정품 · A/S · 전국 쇼룸으로 안심</b>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- fusion (flow 골격 + grid 카드 + 직관 아이콘) ---------- */
-function TrustFusion() {
   return (
     <div className="trust-fusion">
       <div className="tf-node tf-node--end reveal-up">
@@ -211,7 +135,7 @@ function TrustFusion() {
       <div className="tf-link reveal-up d1">
         <i />
       </div>
-      <div className="tf-hub reveal-up d1">
+      <div className="tf-hub reveal-up d1" ref={hubRef}>
         <span className="tf-tag">한국 독점 에이전트 · sole agent</span>
         <b className="tf-hub__title">우보브랜드샵 — 정품의 공식 통로</b>
         <div className="tf-cards">
@@ -250,6 +174,255 @@ function TrustFusion() {
   );
 }
 
+/* ---------- hybrid (pillars 가로 여정 + fusion 끝노드 + 아이콘 카드 허브) ---------- */
+function TrustHybrid() {
+  // 6개 카드 뿅뿅 stagger 팝 — 뷰포트 '가운데'에 카드 그리드가 닿으면 시작.
+  const cardsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = cardsRef.current;
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      el.classList.add("is-pop");
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            el.classList.add("is-pop");
+            io.unobserve(e.target);
+          }
+        }
+      },
+      // 뷰포트 세로 중앙의 0px 라인 — 그리드 상단이 가운데 닿는 순간 발화.
+      { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div className="tf-hybrid reveal-up">
+      <div className="tf-end">
+        <b className="tf-end__word">유럽 제조</b>
+        <span className="tf-end__rule" aria-hidden="true" />
+        <span className="tf-end__desc">Blum · AGOFORM · Peka 원산지</span>
+      </div>
+
+      <div className="tf-pipe" aria-hidden="true">
+        <i />
+      </div>
+
+      <div className="tf-hub tf-hub--center">
+        <span className="tf-tag">한국 독점 에이전트 · sole agent</span>
+        <b className="tf-hub__title">우보브랜드샵 — 정품의 공식 통로</b>
+        <div className="tf-cards" ref={cardsRef}>
+          {FACETS.map((f, i) => (
+            <div
+              key={f.t}
+              className="tf-card tf-card--pop"
+              style={
+                { "--reveal-delay": `${i * 0.09}s` } as React.CSSProperties
+              }
+            >
+              <svg className="tf-icon" viewBox="0 0 32 32" aria-hidden="true">
+                {f.icon}
+              </svg>
+              <div className="tf-card__tt">{f.t}</div>
+              <div className="tf-card__ds">{f.d}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="tf-pipe" aria-hidden="true">
+        <i />
+      </div>
+
+      <div className="tf-end">
+        <b className="tf-end__word">고객</b>
+        <span className="tf-end__rule" aria-hidden="true" />
+        <span className="tf-end__desc">정품 그대로, 손에 닿기까지</span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 공용 작은 아이콘(여정 노드용) ---------- */
+const IconOrigin = (
+  <svg viewBox="0 0 32 32" aria-hidden="true">
+    <circle cx="16" cy="16" r="12" />
+    <path d="M4 16 H28 M16 4 V28 M16 4 C9.5 9 9.5 23 16 28 M16 4 C22.5 9 22.5 23 16 28" />
+  </svg>
+);
+const IconHub = (
+  <svg viewBox="0 0 32 32" aria-hidden="true">
+    <circle cx="16" cy="13" r="6" />
+    <path d="M9 20 L6.5 28 L16 24 L25.5 28 L23 20" />
+  </svg>
+);
+const IconYou = (
+  <svg viewBox="0 0 32 32" aria-hidden="true">
+    <circle cx="16" cy="11" r="5" />
+    <path d="M6 27 C6 20 10 18 16 18 C22 18 26 20 26 27" />
+  </svg>
+);
+
+/* ---------- A. conveyor (여정 컨베이어 — 유통 ‘과정’) ---------- */
+function TrustConveyor() {
+  return (
+    <div className="tf-conveyor reveal-up">
+      <div className="tf-conv__rail">
+        <div className="tf-conv__track" />
+        <div className="tf-conv__box" aria-hidden="true" />
+        <div className="tf-conv__stamp" aria-hidden="true">
+          ✓ 정품 · A/S
+        </div>
+        <div className="tf-conv__stops">
+          {[
+            { i: IconOrigin, t: "유럽 제조", d: "Blum · AGOFORM · Peka" },
+            {
+              i: IconHub,
+              t: "우보 검수·보관",
+              d: "한국 독점 에이전트 · sole agent",
+              hub: true,
+            },
+            { i: IconYou, t: "고객 인도", d: "정품 · A/S · 전국 쇼룸" },
+          ].map((s) => (
+            <div
+              key={s.t}
+              className={`tf-conv__stop${s.hub ? " is-hub" : ""}`}
+            >
+              <span className="tf-conv__dot">{s.i}</span>
+              <b>{s.t}</b>
+              <span>{s.d}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="tf-conv__cap">
+        우보 구간에서 정품에 더해지는 것 —
+      </div>
+      <div className="tf-conv__facets">
+        {FACETS.map((f) => (
+          <span key={f.t} className="tf-chip">
+            {f.t}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- B. pillars (3 기둥 + 흐르는 파이프) ---------- */
+function TrustPillars() {
+  return (
+    <div className="tf-pillars reveal-up">
+      <div className="tf-pillar">
+        <span className="tf-tag">유럽 제조 · ORIGIN</span>
+        <b>Blum · AGOFORM · Peka</b>
+        <span className="tf-pillar__sub">프리미엄 하드웨어·소재의 원산지</span>
+      </div>
+      <div className="tf-pipe" aria-hidden="true">
+        <i />
+      </div>
+      <div className="tf-pillar tf-pillar--hub">
+        <span className="tf-tag">한국 독점 에이전트 · sole agent</span>
+        <b>우보브랜드샵 — 정품의 공식 통로</b>
+        <ul className="tf-pillar__list">
+          {FACETS.map((f, i) => (
+            <li
+              key={f.t}
+              className="reveal-up"
+              style={
+                {
+                  "--reveal-delay": `${0.1 + i * 0.07}s`,
+                } as React.CSSProperties
+              }
+            >
+              <svg className="tf-icon" viewBox="0 0 32 32" aria-hidden="true">
+                {f.icon}
+              </svg>
+              <span>{f.t}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="tf-pipe" aria-hidden="true">
+        <i />
+      </div>
+      <div className="tf-pillar">
+        <span className="tf-tag">고객 · YOU</span>
+        <b>정품 · A/S · 전국 쇼룸으로 안심</b>
+        <span className="tf-pillar__sub">손에 닿기까지, 우보가 책임집니다</span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- D. hub (허브 노드 다이어그램 — 탐색형) ---------- */
+function TrustHub() {
+  // 6개 가치를 허브 위·아래 호로 배치(좌=유럽, 우=고객은 가로축 양끝).
+  const pos = [
+    { x: 24, y: 16 },
+    { x: 50, y: 9 },
+    { x: 76, y: 16 },
+    { x: 24, y: 84 },
+    { x: 50, y: 91 },
+    { x: 76, y: 84 },
+  ];
+  return (
+    <div className="tf-hubg reveal-up">
+      <svg className="tf-hubg__wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line className="tf-wire tf-wire--axis" x1="9" y1="50" x2="50" y2="50" />
+        <line className="tf-wire tf-wire--axis" x1="50" y1="50" x2="91" y2="50" />
+        {pos.map((p, i) => (
+          <line
+            key={i}
+            className="tf-wire"
+            x1="50"
+            y1="50"
+            x2={p.x}
+            y2={p.y}
+          />
+        ))}
+      </svg>
+
+      <div className="tf-hubg__end tf-hubg__end--l">
+        <span className="tf-hubg__icon">{IconOrigin}</span>
+        <b>유럽 제조</b>
+        <span>ORIGIN</span>
+      </div>
+      <div className="tf-hubg__core">
+        <span className="tf-tag">독점 에이전트</span>
+        <b>우보브랜드샵</b>
+      </div>
+      <div className="tf-hubg__end tf-hubg__end--r">
+        <span className="tf-hubg__icon">{IconYou}</span>
+        <b>고객</b>
+        <span>YOU</span>
+      </div>
+
+      {FACETS.map((f, i) => (
+        <div
+          key={f.t}
+          className="tf-orb"
+          style={
+            { left: `${pos[i].x}%`, top: `${pos[i].y}%` } as React.CSSProperties
+          }
+        >
+          <svg className="tf-icon" viewBox="0 0 32 32" aria-hidden="true">
+            {f.icon}
+          </svg>
+          <span className="tf-orb__t">{f.t}</span>
+          <span className="tf-orb__d">{f.d}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* =========================== [05] 약속 (Trust · 버저닝) =========================== */
 export function TrustByVariant({ variant }: { variant: string }) {
   return (
@@ -269,12 +442,14 @@ export function TrustByVariant({ variant }: { variant: string }) {
             유사품에 주의하십시오 — 정품 Blum은 한국 독점 에이전트 우보에서.
           </span>
         </p>
-        {variant === "flow" ? (
-          <TrustFlow />
-        ) : variant === "stamp" ? (
-          <TrustStamp />
-        ) : variant === "grid" ? (
-          <TrustGrid />
+        {variant === "conveyor" ? (
+          <TrustConveyor />
+        ) : variant === "pillars" ? (
+          <TrustPillars />
+        ) : variant === "hub" ? (
+          <TrustHub />
+        ) : variant === "hybrid" ? (
+          <TrustHybrid />
         ) : (
           <TrustFusion />
         )}
