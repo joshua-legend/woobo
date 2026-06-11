@@ -11,27 +11,27 @@ export type SectionConfig = {
 export const SECTION_VARIANTS = {
   hero: {
     label: "히어로",
-    options: ["kinetic", "slot", "aperture-a", "aperture-b", "aperture-c"],
-    default: "kinetic",
+    options: ["slot"],
+    default: "slot",
   },
   identity: {
     label: "정체성",
-    options: ["pin", "stamp", "marquee"],
+    options: ["pin"],
     default: "pin",
   },
   idStage: {
     label: "정체성 우측(pin)",
-    options: ["card", "demo", "image", "diagram", "story"],
-    default: "card",
+    options: ["story"],
+    default: "story",
   },
   soft: {
     label: "신념① 소프트",
-    options: ["video", "scrub", "throw", "compare", "sequence"],
+    options: ["video"],
     default: "video",
   },
   door: {
     label: "도어(4+5)",
-    options: ["click", "hotspots", "scrub", "tap"],
+    options: ["tap"],
     default: "tap",
   },
   brands: {
@@ -49,8 +49,8 @@ export const SECTION_VARIANTS = {
   },
   trust: {
     label: "약속(신뢰)",
-    options: ["fusion", "hybrid", "conveyor", "pillars", "hub"],
-    default: "fusion",
+    options: ["hybrid"],
+    default: "hybrid",
   },
 } as const satisfies Record<string, SectionConfig>;
 

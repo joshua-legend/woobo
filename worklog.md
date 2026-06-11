@@ -38,6 +38,27 @@
 
 ---
 
+### [2026-06-11] 세션 — 섹션06 브랜드 포트폴리오 신설 + 변주 총정리(확정안만 잔존)
+- **한 일:**
+  - **섹션06 신설**: 기존 가짜 후기 placeholder(`SocialProof`) → **정식 수입 브랜드 포트폴리오**(`brands.tsx`). 5개 브랜드(Blum·AGOFORM·Peka·BekaertDeslee·PWG) 실제 콘텐츠 + 가드레일 프레임(우보=공식 통로). 7개 레이아웃 변주(flagship/rows/grid/map/showcase/bands/marquee).
+  - **AI 무드 이미지** 5종 슬롯 연결(`public/brands/*.png`) — 워드마크는 CSS, 배경은 가안 이미지 + "가안" 태그. 프롬프트 `brand-image-prompts.md`.
+  - **유럽 지도(map 변주)**: `flekschas/simple-world-map`(CC BY-SA) 크롭 → `public/europe-map.svg`, 4개국 점 호버 → 우측 포커스 전환(독일 2점).
+  - **도어(04)**: 탭→자동 1회 재생 + **다시 탭=역재생 토글**(rAF currentTime 구동, 배속 1.8).
+  - **약속(05) hybrid**: 독점 에이전트 허브 **네온 보더**(점화 플리커+빛줄기+글로우, 톤다운), 끝노드 미니멀 텍스트화, **모바일 3그리드 축소판** 유지.
+  - **변주 총정리**: 확정안만 잔존 — hero=slot · identity=pin · idStage=story · soft=video · door=tap · trust=hybrid (brands는 7종 유지). 죽은 변주 컴포넌트·옵션·CSS(약 1,120줄) 폐기.
+- **산출물:**
+  - `app/manifesto/brands.tsx`(신규), `europe-map.svg`, `public/brands/`(5), `brand-image-prompts.md`
+  - 변주 축소: `lib/variants.ts`. 정리: heroes/identities/softclose/door/trust + `manifesto.css`
+- **결정:**
+  - 도어/브랜드 이미지는 **AI=가안까지만**(정품 메시지 충돌 회피), 출시 전 실물·공식 영상 교체 전제. 06 로고도 실제 로고 확보 시 교체.
+  - CSS 정리: hybrid가 fusion/pillars의 클래스(`.tf-hub/.tf-cards/.tf-card/.tf-pipe/.tf-tag`)를 재사용 → **인터리브된 블록은 보존**, 격리된 죽은 블록만 제거(나머지는 무해 orphan).
+- **막힘/배운 점:**
+  - 실제 브랜드 로고가 사이트에 잘 안 나와 AI 무드 이미지로 대체. 유럽 지도는 월드 SVG를 viewBox 크롭 + 좌표 계산으로 점 배치(시각 미세조정 필요).
+- **다음:**
+  - 06 브랜드 레이아웃 1개 확정 → 나머지 정리. 지도 점 위치/크롭 시각 튜닝. 실제 로고·Blum 공식 영상 수급.
+- **확인요청(사장님):**
+  - 06 레이아웃 선택, 브랜드 카피/표기 확정, 로고·제품 영상 자산.
+
 ### [2026-06-11] 세션 — 영상 인터랙션 정비 + 섹션4 레이아웃을 섹션3과 통일
 - **한 일:**
   - `VideoScrubStage` 정비: 자동재생 무조건 차단(준비 시 `pause`+`currentTime 0`), 스크롤 스크럽 제거 → **좌우 호버(마우스)/드래그(터치)** 스크럽으로 교체. 마우스 올리기 전엔 첫 프레임(OPEN) 유지, 벗어나면 초기로 사뿐히 복귀. 단일 rAF lerp(0.18)+seek 코얼레싱으로 버벅임 최소화. 가운데 "좌우로 움직여보세요 — 터치·마우스" 가이드.

@@ -1,7 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useScrub } from "@/hooks/useScrub";
+import { useEffect, useState } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 /* 히어로 공통 하단(서브 + 푸터). 3안이 동일하게 사용. */
@@ -22,41 +21,6 @@ function HeroBody() {
         </span>
       </div>
     </>
-  );
-}
-
-/* =========================== kinetic (기본) =========================== */
-// 현행 히어로 + '움직임' --ease-tip 팝 + 미세 드리프트. 이미지 0장, 신규 JS 0.
-export function HeroKinetic() {
-  return (
-    <section
-      className="section section--dark hero hero--kinetic"
-      data-section="hero"
-      data-theme="dark"
-      data-screen-label="01 선언"
-    >
-      <div className="inner">
-        <span className="eyebrow reveal-up">
-          <span className="num">01</span> / 선언
-        </span>
-        <h1>
-          <span className="reveal-mask">
-            <span>우리는</span>
-          </span>
-          <br />
-          <span className="reveal-mask d1">
-            <span>
-              <span className="hero__pop">움직임</span>을
-            </span>
-          </span>
-          <br />
-          <span className="reveal-mask d2">
-            <span>믿습니다.</span>
-          </span>
-        </h1>
-        <HeroBody />
-      </div>
-    </section>
   );
 }
 
@@ -136,56 +100,7 @@ export function HeroSlot() {
   );
 }
 
-/* =========================== aperture (단어 = 조리개) =========================== */
-export function HeroAperture({ bg = "a" }: { bg?: string }) {
-  const secRef = useRef<HTMLDivElement>(null);
-
-  // 진행도(--ap)를 섹션에 세팅 → 배경/스크림/글자가 상속해 읽음.
-  const onUpdate = useCallback((p: number) => {
-    secRef.current?.style.setProperty("--ap", p.toFixed(4));
-  }, []);
-
-  useScrub(secRef, onUpdate, { start: "top top", end: "bottom top" });
-
-  return (
-    <section
-      ref={secRef}
-      className="section section--dark hero hero--aperture"
-      data-section="hero"
-      data-theme="dark"
-      data-screen-label="01 선언"
-    >
-      <div
-        className="hero--aperture__bg"
-        style={{ backgroundImage: `url(/images/hero/hero-bg-aperture-${bg}.png)` }}
-        aria-hidden="true"
-      />
-      <div className="hero--aperture__scrim" aria-hidden="true" />
-      <div className="inner">
-        <span className="eyebrow reveal-up">
-          <span className="num">01</span> / 선언
-        </span>
-        <h1 className="hero--aperture__h1">
-          <span className="reveal-mask">
-            <span>우리는</span>
-          </span>
-          <span className="hero--aperture__word">움직임</span>
-          <span className="reveal-mask d1">
-            <span>을 믿습니다.</span>
-          </span>
-        </h1>
-        <HeroBody />
-      </div>
-    </section>
-  );
-}
-
 /* =========================== 셀렉터 =========================== */
-export function HeroByVariant({ variant }: { variant: string }) {
-  if (variant === "slot") return <HeroSlot />;
-  if (variant.startsWith("aperture")) {
-    const bg = variant.split("-")[1] || "a"; // aperture-a|b|c
-    return <HeroAperture bg={bg} />;
-  }
-  return <HeroKinetic />;
+export function HeroByVariant({ variant: _variant }: { variant: string }) {
+  return <HeroSlot />;
 }
