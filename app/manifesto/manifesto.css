@@ -388,7 +388,7 @@
   background-size: cover;
   background-position: center;
   opacity: 0;
-  transition: opacity 0.8s var(--ease);
+  transition: opacity 1.3s var(--ease);
 }
 .route-manifesto .hero--slot__bg.is-active {
   opacity: 1;
@@ -423,17 +423,14 @@
   color: var(--c-orange);
   white-space: nowrap;
   opacity: 0;
-  transform: translateY(0.42em);
+  transform: translateY(0.34em);
   transition:
-    opacity 0.5s var(--ease),
-    transform 0.5s var(--ease);
+    opacity 0.85s var(--ease),
+    transform 0.85s var(--ease);
 }
 .route-manifesto .hero--slot__word.is-active {
   opacity: 1;
   transform: translateY(0);
-  transition:
-    opacity 0.5s var(--ease-tip),
-    transform 0.5s var(--ease-tip);
 }
 
 /* =========================================================

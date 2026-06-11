@@ -51,17 +51,28 @@ export function HeroSlot() {
         return;
       }
       setIdx(count % SLOT_WORDS.length);
-    }, 1800);
+    }, 2800);
     return () => window.clearInterval(id);
   }, [reduce]);
 
   return (
-    <section
-      className="section section--dark hero hero--slot"
-      data-section="hero"
-      data-theme="dark"
-      data-screen-label="01 선언"
-    >
+    <>
+      {/* 배경 이미지 프리로드 — 첫 장(움직임)은 high, 나머지는 회전 시 깜빡임 방지용 */}
+      {SLOT_WORDS.map((s, i) => (
+        <link
+          key={`pre-${s.bg}`}
+          rel="preload"
+          as="image"
+          href={`/images/hero/${s.bg}.png`}
+          fetchPriority={i === 0 ? "high" : "low"}
+        />
+      ))}
+      <section
+        className="section section--dark hero hero--slot"
+        data-section="hero"
+        data-theme="dark"
+        data-screen-label="01 선언"
+      >
       <div className="hero--slot__bgs" aria-hidden="true">
         {SLOT_WORDS.map((s, i) => (
           <div
@@ -96,7 +107,8 @@ export function HeroSlot() {
         </h1>
         <HeroBody />
       </div>
-    </section>
+      </section>
+    </>
   );
 }
 

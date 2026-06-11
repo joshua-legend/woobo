@@ -108,8 +108,8 @@ function TrustHybrid() {
           }
         }
       },
-      // 뷰포트 세로 중앙의 0px 라인 — 그리드 상단이 가운데 닿는 순간 발화.
-      { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
+      // 그리드 상단이 뷰포트 약 72% 지점에 닿으면 발화(중앙보다 조금 더 일찍).
+      { rootMargin: "0px 0px -28% 0px", threshold: 0 },
     );
     io.observe(el);
     return () => io.disconnect();
