@@ -63,7 +63,7 @@ export function HeroSlot() {
           key={`pre-${s.bg}`}
           rel="preload"
           as="image"
-          href={`/images/hero/${s.bg}.png`}
+          href={`/images/hero/${s.bg}.webp`}
           fetchPriority={i === 0 ? "high" : "low"}
         />
       ))}
@@ -78,7 +78,7 @@ export function HeroSlot() {
           <div
             key={s.bg}
             className={`hero--slot__bg${i === idx ? " is-active" : ""}`}
-            style={{ backgroundImage: `url(/images/hero/${s.bg}.png)` }}
+            style={{ backgroundImage: `url(/images/hero/${s.bg}.webp)` }}
           />
         ))}
         <div className="hero--slot__scrim" />

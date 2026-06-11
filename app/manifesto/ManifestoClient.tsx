@@ -11,6 +11,7 @@ import { DoorByVariant } from "./door";
 import { TrustByVariant } from "./trust";
 import { BrandsByVariant } from "./brands";
 import { ShowroomSection } from "./showrooms";
+import { HeroIntro } from "./HeroIntro";
 import "./manifesto.css";
 
 /* =========================== PAGE =========================== */
@@ -20,6 +21,7 @@ export default function ManifestoClient({ variants }: { variants: Variants }) {
 
   return (
     <div className="route-manifesto" ref={rootRef}>
+      <HeroIntro />
       <SiteHeader
         brand="우보"
         sub="Blum 한국 독점 에이전트"

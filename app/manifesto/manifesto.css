@@ -434,6 +434,152 @@
 }
 
 /* =========================================================
+   HERO INTRO (진입 오프닝 오버레이 · minimal / scene)
+   ========================================================= */
+.route-manifesto .hero-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: var(--c-charcoal);
+  opacity: 1;
+  transition: opacity 0.76s var(--ease);
+  /* JS 미동작 대비 안전장치 — 5s 후 무조건 사라짐 */
+  animation: introFailsafe 1ms linear 5s forwards;
+}
+.route-manifesto .hero-intro.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes introFailsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+.route-manifesto .hero-intro .intro__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+/* 공용 하단 진행바 */
+.route-manifesto .hero-intro .intro__bar {
+  position: absolute;
+  left: 50%;
+  bottom: 13%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+.route-manifesto .hero-intro .intro__bar i {
+  position: absolute;
+  inset: 0;
+  transform-origin: left;
+  background: var(--c-orange);
+  animation: introBar 1.7s var(--ease) forwards;
+}
+@keyframes introBar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+/* --- minimal --- */
+.route-manifesto .intro--minimal .intro__mark {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(34px, 7vw, 72px);
+  letter-spacing: -0.02em;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: introUp 0.85s var(--ease) 0.1s forwards;
+}
+.route-manifesto .intro--minimal .intro__line {
+  width: 0;
+  height: 2px;
+  background: var(--c-orange);
+  animation: introLine 0.7s var(--ease) 0.55s forwards;
+}
+@keyframes introLine {
+  to {
+    width: 72px;
+  }
+}
+.route-manifesto .intro--minimal .intro__sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  transform: translateY(12px);
+  animation: introUp 0.85s var(--ease) 0.72s forwards;
+}
+@keyframes introUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* --- scene --- */
+.route-manifesto .intro--scene .intro__kw {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(40px, 9vw, 96px);
+  letter-spacing: -0.03em;
+  color: var(--c-orange);
+  opacity: 0;
+  transform: scale(0.7);
+  animation: introPop 0.7s var(--ease-tip) 0.15s forwards;
+}
+@keyframes introPop {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.route-manifesto .intro--scene .intro__mark--scene {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: introUp 0.7s var(--ease) 0.66s forwards;
+}
+.route-manifesto .intro--scene .intro__sweep {
+  position: absolute;
+  left: -60%;
+  top: 50%;
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--c-orange),
+    transparent
+  );
+  animation: introSweep 1.15s var(--ease) 0.1s forwards;
+}
+@keyframes introSweep {
+  to {
+    left: 120%;
+  }
+}
+
+/* =========================================================
    SECTION: identity (정체성 핀 · sticky + scrub 키워드 교체)
    ========================================================= */
 .route-manifesto .identity {
