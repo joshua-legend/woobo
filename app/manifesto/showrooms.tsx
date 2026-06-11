@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
 import { CTA_HREF } from "@/lib/branches";
+import { KakaoMiniMap } from "./KakaoMiniMap";
 
 type Shop = {
   key: string;
@@ -112,6 +113,7 @@ function ShopDetail({ s }: { s: Shop }) {
         T. {s.tel}
       </a>
       <ShopActions s={s} />
+      <KakaoMiniMap address={s.address} />
     </div>
   );
 }

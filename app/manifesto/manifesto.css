@@ -2540,6 +2540,31 @@
 .route-manifesto .sr-detail {
   align-self: center;
 }
+/* 선택 지점 라이브 카카오 미니맵 */
+.route-manifesto .sr-kakaomini {
+  position: relative;
+  margin-top: 16px;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--c-line-dark);
+  background: var(--c-charcoal-card);
+}
+.route-manifesto .sr-kakaomini__map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.route-manifesto .sr-kakaomini__err {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--c-caption-on-dark);
+}
 /* split */
 .route-manifesto .sr-split {
   display: grid;
