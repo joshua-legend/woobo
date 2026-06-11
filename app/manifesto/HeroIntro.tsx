@@ -18,7 +18,7 @@ type Variant = "scene" | "minimal" | "off";
  * reduced-motion·SSR-안전·타임아웃 보장(절대 안 멈춤).
  */
 export function HeroIntro() {
-  const [variant, setVariant] = useState<Variant>("scene");
+  const [variant, setVariant] = useState<Variant>("minimal");
   const [phase, setPhase] = useState<"show" | "leaving" | "done">("show");
 
   useEffect(() => {
@@ -26,9 +26,10 @@ export function HeroIntro() {
       setPhase("done");
       return;
     }
+    // 기본 = 합본(minimal). 비교용: ?intro=scene / ?intro=off
     const q = new URLSearchParams(window.location.search).get("intro");
     const v: Variant =
-      q === "minimal" ? "minimal" : q === "off" ? "off" : "scene";
+      q === "scene" ? "scene" : q === "off" ? "off" : "minimal";
     setVariant(v);
     if (v === "off") {
       setPhase("done");

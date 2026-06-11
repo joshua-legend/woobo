@@ -608,12 +608,12 @@
    ========================================================= */
 .route-manifesto .identity {
   position: relative;
-  height: 220vh;
+  height: 220svh;
 }
 .route-manifesto .identity__sticky {
   position: sticky;
   top: 0;
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   padding: clamp(120px, 16vh, 200px) var(--pad);
@@ -669,7 +669,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 100svh;
   overflow: hidden;
 }
 .route-manifesto .story-bg {

@@ -328,7 +328,7 @@
 
 /* ============ HERO ============ */
 .route-origin .hero {
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   background: var(--c-charcoal);
@@ -434,13 +434,13 @@
   color: var(--c-d-fg);
 }
 .route-origin .pin-outer {
-  height: 380vh;
+  height: 380svh;
   position: relative;
 }
 .route-origin .pin-stage {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100svh;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -1416,7 +1416,7 @@
     gap: 36px;
   }
   .route-origin .timeline {
-    height: 46vh;
+    height: 46svh;
   }
   .route-origin .demo-grid,
   .route-origin .demo-grid--rev {

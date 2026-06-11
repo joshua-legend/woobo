@@ -239,7 +239,7 @@
 
 /* ============ SECTION 1 · HERO ============ */
 .route-problem .hero {
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   padding: 120px 0 80px;
@@ -458,12 +458,12 @@
   position: relative;
 }
 .route-problem .demo[data-scrub] {
-  height: 240vh;
+  height: 240svh;
 }
 .route-problem .demo-sticky {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100svh;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -1009,7 +1009,7 @@
   .route-problem .demo-sticky {
     position: relative;
     height: auto;
-    min-height: 100vh;
+    min-height: 100svh;
     padding: 100px 0;
   }
   .route-problem .trust-grid,
