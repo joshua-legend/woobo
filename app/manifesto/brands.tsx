@@ -75,7 +75,7 @@ function BrandLogo({ b, className }: { b: Brand; className?: string }) {
 function BrandCard({ b, i }: { b: Brand; i: number }) {
   return (
     <article
-      className="bf-card reveal-up"
+      className="bf-card"
       style={{ "--reveal-delay": `${0.06 + i * 0.06}s` } as React.CSSProperties}
     >
       <BrandLogo b={b} />
@@ -92,7 +92,7 @@ function BrandFlagship() {
   const rest = BRANDS.filter((b) => !b.flagship);
   return (
     <div className="bf-flagship">
-      <article className="bf-card bf-card--flag reveal-up">
+      <article className="bf-card bf-card--flag">
         <BrandLogo b={flag} className="bf-logo--lg" />
         <div className="bf-flag__meta">
           <span className="bf-country">{flag.country} · FLAGSHIP</span>
@@ -116,7 +116,7 @@ function BrandRows() {
       {BRANDS.map((b, i) => (
         <li
           key={b.key}
-          className="bf-row reveal-up"
+          className="bf-row"
           style={{ "--reveal-delay": `${0.05 + i * 0.06}s` } as React.CSSProperties}
         >
           <BrandLogo b={b} className="bf-logo--row" />
@@ -226,7 +226,7 @@ function BrandBands() {
       {BRANDS.map((b, i) => (
         <div
           key={b.key}
-          className={`bf-band reveal-up${i % 2 ? " bf-band--rev" : ""}`}
+          className={`bf-band${i % 2 ? " bf-band--rev" : ""}`}
         >
           <span className="bf-band__img">
             {b.img && <img src={b.img} alt="" aria-hidden="true" />}

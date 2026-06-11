@@ -2309,6 +2309,337 @@
 }
 
 /* =========================================================
+   SECTION 07: 전국 우보브랜드샵 (sr-* · 다크 · 레이아웃 picker)
+   ========================================================= */
+.route-manifesto .sr-stage {
+  margin-top: clamp(28px, 4vh, 44px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 154px;
+  gap: clamp(20px, 3vw, 36px);
+  align-items: start;
+}
+.route-manifesto .sr-stage__main {
+  min-width: 0;
+}
+.route-manifesto .sr-stage__main > * {
+  margin-top: 0;
+}
+.route-manifesto .sr-picker {
+  position: sticky;
+  top: 88px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.route-manifesto .sr-picker__label {
+  margin-bottom: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-caption-on-dark);
+}
+.route-manifesto .sr-picker__btn {
+  text-align: left;
+  padding: 11px 14px;
+  border: 1px solid var(--c-line-dark);
+  border-radius: 8px;
+  background: var(--c-charcoal-card);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--c-muted-on-dark);
+  cursor: pointer;
+  transition:
+    border-color 0.25s var(--ease),
+    background 0.25s var(--ease),
+    color 0.25s var(--ease);
+}
+.route-manifesto .sr-picker__btn:hover {
+  border-color: var(--c-orange);
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .sr-picker__btn.is-active {
+  border-color: var(--c-orange);
+  background: color-mix(in srgb, var(--c-orange) 14%, var(--c-charcoal-card));
+  color: var(--c-orange);
+}
+/* 지도(map/split 공용) */
+.route-manifesto .sr-map {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 40px);
+  align-items: center;
+}
+.route-manifesto .sr-map__geo {
+  position: relative;
+  aspect-ratio: 130 / 204;
+  max-height: 460px;
+  margin: 0 auto;
+}
+.route-manifesto .sr-map__korea {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.route-manifesto .sr-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  z-index: 2;
+}
+.route-manifesto .sr-dot__pin {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-muted-on-dark);
+  flex: 0 0 auto;
+  transition:
+    background 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+}
+.route-manifesto .sr-dot.is-key .sr-dot__pin {
+  background: var(--c-orange);
+}
+.route-manifesto .sr-dot__label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  color: var(--c-muted-on-dark);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-3px);
+  transition:
+    opacity 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+.route-manifesto .sr-dot:hover .sr-dot__label,
+.route-manifesto .sr-dot.is-active .sr-dot__label {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .sr-dot.is-active .sr-dot__pin {
+  background: var(--c-orange);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-orange) 28%, transparent);
+}
+.route-manifesto .sr-dot.is-active .sr-dot__pin::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--c-orange);
+  animation: srPing 1.8s var(--ease) infinite;
+}
+@keyframes srPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+/* 상세/카드 공통 텍스트 */
+.route-manifesto .sr-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.route-manifesto .sr-region {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--c-caption-on-dark);
+}
+.route-manifesto .sr-badge {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--c-line-dark);
+  color: var(--c-muted-on-dark);
+}
+.route-manifesto .sr-badge.is-key {
+  border-color: var(--c-orange);
+  color: var(--c-orange);
+}
+.route-manifesto .sr-name {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(17px, 1.8vw, 22px);
+  letter-spacing: -0.02em;
+  color: var(--c-paper-on-dark);
+  word-break: keep-all;
+}
+.route-manifesto .sr-name em {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 0.8em;
+  color: var(--c-muted-on-dark);
+}
+.route-manifesto .sr-addr {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--c-muted-on-dark);
+  word-break: keep-all;
+}
+.route-manifesto .sr-tel {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--c-paper-on-dark);
+  text-decoration: none;
+}
+.route-manifesto .sr-tel:hover {
+  color: var(--c-orange);
+}
+.route-manifesto .sr-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.route-manifesto .sr-book,
+.route-manifesto .sr-kakao {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  padding: 8px 13px;
+  border-radius: var(--r-pill);
+  text-decoration: none;
+}
+.route-manifesto .sr-book {
+  background: var(--c-orange);
+  color: #fff;
+}
+.route-manifesto .sr-kakao {
+  border: 1px solid var(--c-line-dark);
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .sr-kakao:hover {
+  border-color: var(--c-orange);
+  color: var(--c-orange);
+}
+.route-manifesto .sr-detail {
+  align-self: center;
+}
+/* split */
+.route-manifesto .sr-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 36px);
+  align-items: start;
+}
+.route-manifesto .sr-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 440px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.route-manifesto .sr-list__item {
+  padding: 12px 14px;
+  border: 1px solid var(--c-line-dark);
+  border-radius: 8px;
+  background: var(--c-charcoal-card);
+  cursor: pointer;
+  transition:
+    border-color 0.25s var(--ease),
+    background 0.25s var(--ease);
+}
+.route-manifesto .sr-list__item.is-active {
+  border-color: var(--c-orange);
+  background: color-mix(in srgb, var(--c-orange) 10%, var(--c-charcoal-card));
+}
+.route-manifesto .sr-list__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.route-manifesto .sr-list__head b {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .sr-list__item small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--c-muted-on-dark);
+  word-break: keep-all;
+}
+.route-manifesto .sr-list__item .sr-tel {
+  margin-top: 6px;
+  font-size: 12px;
+}
+/* grid */
+.route-manifesto .sr-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.route-manifesto .sr-card {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  border: 1px solid var(--c-line-dark);
+  border-radius: 10px;
+  background: var(--c-charcoal-card);
+}
+/* finder */
+.route-manifesto .sr-finder__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.route-manifesto .sr-finder__q {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(16px, 1.8vw, 20px);
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .sr-finder__sel {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--c-orange);
+  background: var(--c-charcoal-card);
+  border: 1px solid var(--c-orange);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.route-manifesto .sr-finder__list {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* =========================================================
    RESPONSIVE  (브레이크포인트 900px → 모바일 단일 컬럼)
    ========================================================= */
 @media (max-width: 900px) {
@@ -2329,6 +2660,32 @@
   }
   .route-manifesto .identity__kw {
     font-size: clamp(24px, 7vw, 40px);
+  }
+  /* 07 우보브랜드샵 모바일 폴백 */
+  .route-manifesto .sr-stage,
+  .route-manifesto .sr-map,
+  .route-manifesto .sr-split,
+  .route-manifesto .sr-grid,
+  .route-manifesto .sr-finder__list {
+    grid-template-columns: 1fr;
+  }
+  .route-manifesto .sr-picker {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    order: -1;
+  }
+  .route-manifesto .sr-picker__btn {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .route-manifesto .sr-picker__label {
+    flex-basis: 100%;
+  }
+  .route-manifesto .sr-map__geo {
+    max-height: 380px;
   }
   /* brandfolio 모바일 폴백 */
   .route-manifesto .bf-stage {
@@ -2611,6 +2968,10 @@
   }
   /* brandfolio map 점 핑 정지 */
   .route-manifesto .bf-dot__pin::after {
+    animation: none !important;
+  }
+  /* 07 우보브랜드샵 핀 핑 정지 */
+  .route-manifesto .sr-dot.is-active .sr-dot__pin::after {
     animation: none !important;
   }
 }

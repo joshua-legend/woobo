@@ -38,6 +38,18 @@
 
 ---
 
+### [2026-06-11] 세션 — 섹션07 전국 우보브랜드샵(실데이터) + 06 인-섹션 picker
+- **한 일:**
+  - **섹션07 재구성**(`showrooms.tsx` 신규): placeholder 3개 → **전국 우보브랜드샵 10개 실데이터**(주소·전화). 4 레이아웃(지도/지도+리스트/카드/지점찾기) + 섹션 우측 picker(사장님 선택용). 기존 CTA·closeline·signoff 이관.
+  - **한국 지도**(`public/korea-map.svg`): popong SK provinces SVG 다크 톤 가공, 10핀 호버/클릭 → 우측 상세. (핀 좌표 시각 튜닝 필요)
+  - 가드레일: 본점(김포)/직영지사(부산)/브랜드샵/**파트너샵(청주 가구철물닷컴·제주 루미채)** type 배지로 구분. 카카오맵 링크(새창), 임베드는 후순위 [TODO].
+  - **06 브랜드**: grid·marquee 삭제(5종), **검수용 VariantSwitcher 제거**, 06 우측에 레이아웃 picker(사장님 선택). reveal-up 전환 버그 수정(버튼 전환 시 안 보이던 문제).
+- **산출물:** `app/manifesto/showrooms.tsx`, `public/korea-map.svg`, `brands.tsx`/`ManifestoClient.tsx`/`manifesto.css` 갱신
+- **결정:** 07도 06처럼 사장님이 picker로 1개 고르는 방식. 지도는 실 SVG 가공(유럽맵과 동일 패턴).
+- **막힘/배운 점:** 월드맵의 한국은 13점짜리라 부적합 → 전용 SK SVG 사용. 핀 좌표는 투영 계산이 까다로워 지리 추정값 + 시각 튜닝.
+- **다음:** 한국 지도 핀 위치 스크린샷 보고 튜닝. 06·07 각 1개 레이아웃 확정 → 정리.
+- **확인요청(사장님):** 06·07 레이아웃 선택, 지점 정보 최신 여부, 카카오맵 임베드 필요 여부.
+
 ### [2026-06-11] 세션 — 섹션06 브랜드 포트폴리오 신설 + 변주 총정리(확정안만 잔존)
 - **한 일:**
   - **섹션06 신설**: 기존 가짜 후기 placeholder(`SocialProof`) → **정식 수입 브랜드 포트폴리오**(`brands.tsx`). 5개 브랜드(Blum·AGOFORM·Peka·BekaertDeslee·PWG) 실제 콘텐츠 + 가드레일 프레임(우보=공식 통로). 7개 레이아웃 변주(flagship/rows/grid/map/showcase/bands/marquee).
