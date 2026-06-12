@@ -68,6 +68,21 @@ export function HeroIntro() {
     };
   }, []);
 
+  // 인트로 진행 중(show/leaving)에는 스크롤 잠금 — 디졸브 끝나면(또는 unmount) 복구.
+  useEffect(() => {
+    if (phase === "done") return;
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtml = html.style.overflow;
+    const prevBody = body.style.overflow;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = prevHtml;
+      body.style.overflow = prevBody;
+    };
+  }, [phase]);
+
   if (phase === "done") return null;
 
   return (

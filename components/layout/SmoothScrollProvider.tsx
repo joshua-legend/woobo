@@ -12,11 +12,20 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // 모바일(터치)은 Lenis가 어차피 터치를 부드럽게 잡지 않음 → 미장착해
-    // 네이티브 스크롤-스냅(섹션02 스냅-스탑)이 충돌 없이 작동하게 둔다.
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    if (reduce || coarse) return;
+    if (reduce) return;
 
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    if (coarse) {
+      // 모바일/터치: Lenis 대신 ScrollTrigger.normalizeScroll.
+      // 스크롤을 JS 스레드에서 처리해 주소창/툴바가 스크롤 도중 show/hide 되며
+      // 스크롤 위치가 한 칸 튀던 문제(뷰포트 리사이즈 점프)를 제거한다.
+      ScrollTrigger.normalizeScroll(true);
+      return () => {
+        ScrollTrigger.normalizeScroll(false);
+      };
+    }
+
+    // 데스크톱: Lenis 부드러운 휠 스크롤
     const lenis = new Lenis({ lerp: 0.12, smoothWheel: true });
 
     lenis.on("scroll", ScrollTrigger.update);
