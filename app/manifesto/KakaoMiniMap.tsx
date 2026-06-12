@@ -38,9 +38,28 @@ export function KakaoMiniMap({ address }: { address: string }) {
   const [status, setStatus] = useState<"loading" | "ready" | "nokey" | "error">(
     KAKAO_KEY ? "loading" : "nokey",
   );
+  // 뷰포트 진입 전까지 SDK 로드·맵 초기화 보류 → 5~6번 구간 스크롤 부담 제거.
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
-    if (!KAKAO_KEY || !boxRef.current) return;
+    const box = boxRef.current;
+    if (!KAKAO_KEY || !box || active) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setActive(true);
+          io.disconnect();
+        }
+      },
+      // 도착 직전 살짝 미리 로드(도착 시 빈 화면 방지).
+      { rootMargin: "200px 0px", threshold: 0 },
+    );
+    io.observe(box);
+    return () => io.disconnect();
+  }, [active]);
+
+  useEffect(() => {
+    if (!active || !KAKAO_KEY || !boxRef.current) return;
     let alive = true;
     loadKakao()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,7 +99,7 @@ export function KakaoMiniMap({ address }: { address: string }) {
     return () => {
       alive = false;
     };
-  }, [address]);
+  }, [address, active]);
 
   if (status === "nokey") {
     return (

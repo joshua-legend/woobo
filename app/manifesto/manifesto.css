@@ -1603,9 +1603,9 @@
 }
 /* 섹션 진입(is-in) 시: 네온 점화(플리커) → 은은한 글로우 펄스 */
 .route-manifesto .tf-hybrid.is-in .tf-hub--center {
-  animation:
-    tfNeonOn 1.2s var(--ease) forwards,
-    tfNeonPulse 6s var(--ease) 1.2s infinite;
+  /* 1회 점화만 — 무한 box-shadow 맥동(tfNeonPulse) 제거로 상시 리페인트 차단.
+     점화 후엔 정적 글로우라 페인트 비용 없음 → 5번 구간 스크롤 버벅임 해소. */
+  animation: tfNeonOn 1.2s var(--ease) forwards;
 }
 @keyframes tfNeonOn {
   0% {
@@ -1673,7 +1673,9 @@
 }
 .route-manifesto .tf-hybrid.is-in .tf-hub--center::before {
   opacity: 0.8;
-  animation: tfBeam 7s linear 1.1s infinite;
+  /* conic-gradient+mask 는 회전 시 매 프레임 통째 리페인트 → 가장 무거움.
+     무한 회전 대신 1회 스윕 후 정지(forwards). 멈추면 정적 그라데이션이라 비용 0. */
+  animation: tfBeam 1.4s linear 1.1s 1 forwards;
 }
 @keyframes tfBeam {
   to {
