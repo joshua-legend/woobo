@@ -398,8 +398,8 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(22, 20, 15, 0.74),
-    rgba(22, 20, 15, 0.9)
+    rgba(22, 20, 15, 0.56),
+    rgba(22, 20, 15, 0.76)
   );
 }
 .route-manifesto .hero--slot .inner {
@@ -821,8 +821,33 @@
   width: calc(var(--story-local, 0) * 100%);
   background: var(--c-orange);
 }
+/* 스냅 앵커: 데스크톱은 미사용(모바일 미디어쿼리에서만 활성) */
+.route-manifesto .story-snaps {
+  display: none;
+}
 
 @media (max-width: 900px) {
+  /* 02 정체성(story): 부드러운 proximity 스냅 — 자유롭게 스크롤되다 멈추면
+     가까운 비트로 살짝 정렬. 강제정지(snap-stop)는 끊김 느낌이라 미사용.
+     모바일은 Lenis 미장착(네이티브 스크롤)이라 CSS 스냅이 그대로 동작. */
+  html {
+    scroll-snap-type: y proximity;
+  }
+  .route-manifesto .identity--story {
+    height: 500svh;
+  }
+  .route-manifesto .story-snaps {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .route-manifesto .story-snap {
+    display: block;
+    height: 100svh;
+    scroll-snap-align: start;
+  }
   /* split 세로 스택 — 단, 핀(sticky+220vh)·스크럽 인터랙션은 유지(모바일 인터랙션) */
   .route-manifesto .identity__grid {
     grid-template-columns: 1fr;
@@ -1981,9 +2006,17 @@
 /* =========================================================
    SECTION: brandfolio (06 멀티브랜드 수입 · flagship/rows/grid)
    ========================================================= */
+/* 05 약속 ↔ 06 브랜드 경계 여백 축소(같은 라이트 배경이라 사이가 과하게 떴음) */
+.route-manifesto .trust {
+  padding-bottom: clamp(44px, 6vh, 84px);
+}
+.route-manifesto .brandfolio {
+  padding-top: clamp(44px, 6vh, 84px);
+}
 .route-manifesto .brandfolio h2 {
   font-size: clamp(28px, 4vw, 52px);
   max-width: 22ch;
+  margin-top: clamp(20px, 3.4vh, 36px);
   margin-bottom: 16px;
 }
 /* 로고 슬롯 — 워드마크 placeholder(빗금 + LOGO 태그) */
@@ -2958,6 +2991,49 @@
   border-radius: 10px;
   background: var(--c-charcoal-card);
 }
+/* swiper(카드 가로 무한 스와이프 — 드래그/스와이프 + 좌우 화살표) */
+.route-manifesto .sr-swiper {
+  position: relative;
+}
+.route-manifesto .sr-slide {
+  width: clamp(256px, 72vw, 300px);
+  height: auto; /* 슬라이드 균일 높이(가장 큰 카드 기준 stretch) */
+}
+.route-manifesto .sr-slide .sr-card {
+  height: 100%;
+}
+/* nav 화살표 — swiper 기본 파란색/44px를 다크 테마 원형 버튼으로 오버라이드 */
+.route-manifesto .sr-swiper .swiper-button-prev,
+.route-manifesto .sr-swiper .swiper-button-next {
+  width: 38px;
+  height: 38px;
+  margin-top: 0;
+  border: 1px solid var(--c-line-dark);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--c-charcoal-card) 88%, transparent);
+  color: var(--c-paper-on-dark);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  transition:
+    border-color 0.25s var(--ease),
+    color 0.25s var(--ease);
+}
+.route-manifesto .sr-swiper .swiper-button-prev {
+  left: 2px;
+}
+.route-manifesto .sr-swiper .swiper-button-next {
+  right: 2px;
+}
+.route-manifesto .sr-swiper .swiper-button-prev:hover,
+.route-manifesto .sr-swiper .swiper-button-next:hover {
+  border-color: var(--c-orange);
+  color: var(--c-orange);
+}
+.route-manifesto .sr-swiper .swiper-button-prev::after,
+.route-manifesto .sr-swiper .swiper-button-next::after {
+  font-size: 15px;
+  font-weight: 700;
+}
 /* finder */
 .route-manifesto .sr-finder__bar {
   display: flex;
@@ -3000,6 +3076,23 @@
   .route-manifesto .demo.flip .demo__copy {
     order: 0;
   }
+  /* 03 데모: 칩row 모바일 숨김 — display:none 이라 위아래 여백도 함께 제거됨 */
+  .route-manifesto .demo .chiprow {
+    display: none;
+  }
+  /* 05 약속: footnote 모바일 숨김 */
+  .route-manifesto .trust .footnote {
+    display: none;
+  }
+  /* 03 소프트클로즈 · 05 약속: 모바일 섹션 상하 여백 축소 */
+  .route-manifesto .demo-softclose-wrap.section {
+    padding-top: clamp(54px, 8vh, 100px);
+    padding-bottom: clamp(54px, 8vh, 100px);
+  }
+  .route-manifesto .trust.section {
+    padding-top: clamp(54px, 8vh, 100px);
+    padding-bottom: clamp(40px, 6vh, 76px);
+  }
   .route-manifesto .tf-cards,
   .route-manifesto .social__quotes,
   .route-manifesto .showroom .branches {
@@ -3011,6 +3104,22 @@
   .route-manifesto .identity__kw {
     font-size: clamp(24px, 7vw, 40px);
   }
+  /* 01 히어로: 하단 메타(hero__scroll) 모바일 정리 — 세로 스택 */
+  .route-manifesto .hero__foot {
+    gap: 18px 22px;
+    padding-top: 22px;
+  }
+  .route-manifesto .hero__scroll {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    line-height: 1.5;
+  }
+  .route-manifesto .hero__scroll .line {
+    width: 64px;
+  }
   /* 07 우보브랜드샵 모바일 폴백 */
   .route-manifesto .sr-stage,
   .route-manifesto .sr-map,
@@ -3019,23 +3128,48 @@
   .route-manifesto .sr-finder__list {
     grid-template-columns: 1fr;
   }
+  /* 알약(레이아웃 선택) ↔ 지도 간격 확대 */
+  .route-manifesto .sr-stage {
+    margin-top: clamp(24px, 4vh, 36px);
+    gap: clamp(32px, 7vw, 44px);
+  }
+  /* 지도 ↔ 상세 간격 확대 */
+  .route-manifesto .sr-map {
+    gap: clamp(28px, 6vw, 36px);
+    align-items: start;
+  }
   .route-manifesto .sr-picker {
     position: static;
     flex-direction: row;
     flex-wrap: wrap;
     order: -1;
+    gap: 8px;
   }
   .route-manifesto .sr-picker__btn {
     flex: 1 1 auto;
     text-align: center;
-    padding: 8px 10px;
+    padding: 9px 10px;
     font-size: 12px;
   }
   .route-manifesto .sr-picker__label {
     flex-basis: 100%;
+    margin-bottom: 0;
   }
+  /* 지도 크기/중앙정렬 정리 */
   .route-manifesto .sr-map__geo {
-    max-height: 380px;
+    width: 100%;
+    max-width: 300px;
+    max-height: 360px;
+    margin: 0 auto;
+  }
+  /* 상세 패널 — 모바일에선 위로 정렬, 텍스트 좌측 */
+  .route-manifesto .sr-detail {
+    align-self: start;
+    text-align: left;
+  }
+  /* 섹션 하단 CTA 여백 정리 */
+  .route-manifesto .showroom .actions {
+    margin-top: clamp(28px, 5vh, 40px);
   }
   /* brandfolio 모바일 폴백 */
   .route-manifesto .bf-stage {
@@ -3150,6 +3284,17 @@
   .route-manifesto .tf-orb__d {
     max-height: none;
     opacity: 1;
+  }
+  /* 05 약속: 멀티브랜드 한 줄 캡션 — 모바일 폰트/줄간격 정리(흩어진 flex → 단정한 본문 흐름) */
+  .route-manifesto .trust .brands {
+    display: block;
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    line-height: 1.7;
+  }
+  /* 05 약속: 섹션 하단 여백 축소(모바일에서 과한 빈 공간 제거) */
+  .route-manifesto .trust {
+    padding-bottom: clamp(52px, 8vh, 96px);
   }
 }
 

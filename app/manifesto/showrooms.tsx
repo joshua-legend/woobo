@@ -1,10 +1,14 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Keyboard } from "swiper/modules";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
 import { CTA_HREF } from "@/lib/branches";
 import { KakaoMiniMap } from "./KakaoMiniMap";
+import "swiper/css";
+import "swiper/css/navigation";
 
 type Shop = {
   key: string;
@@ -21,16 +25,16 @@ type Shop = {
 
 // 전국 우보브랜드샵 (우보 현 페이지 실데이터). 핀 좌표는 1~2회 시각 튜닝 필요.
 const SHOPS: Shop[] = [
-  { key: "gimpo", region: "수도권", short: "김포", name: "우보브랜드샵 김포", type: "본점", address: "경기 김포시 양촌읍 학운리 263-3", tel: "010-4847-3545", x: 25, y: 25 },
-  { key: "yongin", region: "수도권", short: "용인", name: "우보브랜드샵 용인", type: "브랜드샵", address: "경기 용인시 기흥구 고매로253번길 4", tel: "031-274-4241", x: 34, y: 32 },
-  { key: "gju", region: "수도권", short: "경기광주", name: "우보브랜드샵 경기광주", type: "브랜드샵", address: "경기 광주시 포은대로 442-18 (추자동)", tel: "031-766-4606", x: 40, y: 31 },
-  { key: "incheon", region: "수도권", short: "인천", name: "우보브랜드샵 인천", type: "브랜드샵", address: "인천 서구 봉수대로 268, 109호 (석남동)", tel: "032-577-3545", x: 23, y: 28 },
-  { key: "cheongju", region: "충청", short: "청주", name: "우보브랜드샵 청주", type: "파트너샵", sub: "가구철물닷컴", address: "충북 청주시 청원구 내수읍 충청대로 889", tel: "070-8835-2002", x: 44, y: 42 },
-  { key: "busan", region: "영남", short: "부산", name: "우보인터내셔날 부산지사", type: "직영 지사", address: "부산 동래구 안락동 459-29번지 1층", tel: "051-323-2532", x: 70, y: 71 },
-  { key: "daegu", region: "영남", short: "대구", name: "우보브랜드샵 대구", type: "브랜드샵", address: "대구 중구 국채보상로149길 121 1층", tel: "010-2532-8456", x: 62, y: 57 },
-  { key: "gyeongnam", region: "영남", short: "경남", name: "우보브랜드샵 경남", type: "브랜드샵", address: "부산 동래구 안연로102번길 67, 1층 (안락동)", tel: "010-7155-2532", x: 75, y: 74 },
-  { key: "honam", region: "호남", short: "호남", name: "우보브랜드샵 호남", type: "브랜드샵", address: "광주 서구 풍서우로 303", tel: "010-3634-6581", x: 34, y: 67 },
-  { key: "jeju", region: "제주", short: "제주", name: "우보브랜드샵 제주", type: "파트너샵", sub: "루미채", address: "제주시 번영로 168", tel: "064-753-7005", x: 30, y: 94 },
+  { key: "gimpo", region: "수도권", short: "김포", name: "우보브랜드샵 김포", type: "본점", address: "경기 김포시 양촌읍 학운리 263-3", tel: "010-4847-3545", x: 25, y: 20 },
+  { key: "yongin", region: "수도권", short: "용인", name: "우보브랜드샵 용인", type: "브랜드샵", address: "경기 용인시 기흥구 고매로253번길 4", tel: "031-274-4241", x: 35, y: 27 },
+  { key: "gju", region: "수도권", short: "경기광주", name: "우보브랜드샵 경기광주", type: "브랜드샵", address: "경기 광주시 포은대로 442-18 (추자동)", tel: "031-766-4606", x: 38, y: 24 },
+  { key: "incheon", region: "수도권", short: "인천", name: "우보브랜드샵 인천", type: "브랜드샵", address: "인천 서구 봉수대로 268, 109호 (석남동)", tel: "032-577-3545", x: 24, y: 22 },
+  { key: "cheongju", region: "충청", short: "청주", name: "우보브랜드샵 청주", type: "파트너샵", sub: "가구철물닷컴", address: "충북 청주시 청원구 내수읍 충청대로 889", tel: "070-8835-2002", x: 44, y: 38 },
+  { key: "busan", region: "영남", short: "부산", name: "우보인터내셔날 부산지사", type: "직영 지사", address: "부산 동래구 안락동 459-29번지 1층", tel: "051-323-2532", x: 81, y: 69 },
+  { key: "daegu", region: "영남", short: "대구", name: "우보브랜드샵 대구", type: "브랜드샵", address: "대구 중구 국채보상로149길 121 1층", tel: "010-2532-8456", x: 69, y: 55 },
+  { key: "gyeongnam", region: "영남", short: "경남", name: "우보브랜드샵 경남", type: "브랜드샵", address: "부산 동래구 안연로102번길 67, 1층 (안락동)", tel: "010-7155-2532", x: 84, y: 73 },
+  { key: "honam", region: "호남", short: "호남", name: "우보브랜드샵 호남", type: "브랜드샵", address: "광주 서구 풍서우로 303", tel: "010-3634-6581", x: 26, y: 70 },
+  { key: "jeju", region: "제주", short: "제주", name: "우보브랜드샵 제주", type: "파트너샵", sub: "루미채", address: "제주시 번영로 168", tel: "064-753-7005", x: 22, y: 93 },
 ];
 
 const kakaoHref = (s: Shop) =>
@@ -65,7 +69,6 @@ function ShopPins({
           aria-label={`${s.name} · ${s.region}`}
         >
           <span className="sr-dot__pin" />
-          <span className="sr-dot__label">{s.short}</span>
         </button>
       ))}
     </div>
@@ -148,77 +151,26 @@ function ShopMap() {
   );
 }
 
-/* ---------- split: 지도 + 스크롤 리스트(호버 연동) ---------- */
-function ShopSplit() {
-  const [active, setActive] = useState(SHOPS[0].key);
+/* ---------- swiper: 카드 가로 무한 스와이프(드래그/스와이프) ---------- */
+function ShopSwiper() {
   return (
-    <div className="sr-split">
-      <ShopPins active={active} onPick={setActive} />
-      <ul className="sr-list">
+    <div className="sr-swiper">
+      <Swiper
+        className="sr-swiper__track"
+        modules={[Navigation, Keyboard]}
+        slidesPerView="auto"
+        spaceBetween={14}
+        loop
+        grabCursor
+        keyboard={{ enabled: true }}
+        navigation
+      >
         {SHOPS.map((s) => (
-          <li
-            key={s.key}
-            className={`sr-list__item${s.key === active ? " is-active" : ""}`}
-            onMouseEnter={() => setActive(s.key)}
-            onClick={() => setActive(s.key)}
-          >
-            <div className="sr-list__head">
-              <b>{s.name}</b>
-              <span className={`sr-badge${isKey(s) ? " is-key" : ""}`}>
-                {s.type}
-              </span>
-            </div>
-            <small>
-              {s.region} · {s.address}
-            </small>
-            <a className="sr-tel" href={telHref(s)}>
-              T. {s.tel}
-            </a>
-          </li>
+          <SwiperSlide key={s.key} className="sr-slide">
+            <ShopCard s={s} />
+          </SwiperSlide>
         ))}
-      </ul>
-    </div>
-  );
-}
-
-/* ---------- grid: 10개 카드 전체 ---------- */
-function ShopGrid() {
-  return (
-    <div className="sr-grid">
-      {SHOPS.map((s) => (
-        <ShopCard key={s.key} s={s} />
-      ))}
-    </div>
-  );
-}
-
-/* ---------- finder: 지역 셀렉터 → 해당 지점 ---------- */
-const REGIONS = ["수도권", "충청", "영남", "호남", "제주"] as const;
-function ShopFinder() {
-  const [region, setRegion] = useState<string>("수도권");
-  const list = SHOPS.filter((s) => s.region === region);
-  return (
-    <div className="sr-finder">
-      <div className="sr-finder__bar">
-        <span className="sr-finder__q">가까운 우보브랜드샵 찾기 —</span>
-        <select
-          className="sr-finder__sel"
-          value={region}
-          onChange={(e) => setRegion(e.target.value)}
-          aria-label="지역 선택"
-        >
-          {REGIONS.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="sr-finder__list">
-        {list.map((s) => (
-          <ShopCard key={s.key} s={s} />
-        ))}
-      </div>
+      </Swiper>
     </div>
   );
 }
@@ -226,9 +178,7 @@ function ShopFinder() {
 /* 레이아웃 후보(섹션 우측 picker) */
 const SR_LAYOUTS: { key: string; label: string }[] = [
   { key: "map", label: "지도" },
-  { key: "split", label: "지도+리스트" },
-  { key: "grid", label: "카드" },
-  { key: "finder", label: "지점 찾기" },
+  { key: "card", label: "카드" },
 ];
 
 /* =========================== [07] 전국 우보브랜드샵 (CTA) =========================== */
@@ -274,15 +224,7 @@ export function ShowroomSection() {
 
         <div className="sr-stage">
           <div className="sr-stage__main">
-            {layout === "split" ? (
-              <ShopSplit />
-            ) : layout === "grid" ? (
-              <ShopGrid />
-            ) : layout === "finder" ? (
-              <ShopFinder />
-            ) : (
-              <ShopMap />
-            )}
+            {layout === "card" ? <ShopSwiper /> : <ShopMap />}
           </div>
           <aside className="sr-picker" aria-label="레이아웃 선택">
             <span className="sr-picker__label">레이아웃 선택</span>

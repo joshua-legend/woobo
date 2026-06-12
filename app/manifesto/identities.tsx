@@ -55,6 +55,13 @@ export function IdentityPin() {
         data-screen-label="02 정체성"
         ref={secRef}
       >
+        {/* 모바일 네이티브 스냅 앵커 — 비트 5개에 1:1 대응(데스크톱 display:none).
+            proximity 소프트 스냅: 자유 스크롤 후 멈추면 가까운 비트로 살짝 정렬(강제정지 X). */}
+        <div className="story-snaps" aria-hidden="true">
+          {FACETS.map((_f, i) => (
+            <span className="story-snap" key={`snap-${i}`} />
+          ))}
+        </div>
         <div className="identity__sticky">
           <div className="story-bg" aria-hidden="true">
             <div className="story-bg__far" />

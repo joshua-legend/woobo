@@ -209,38 +209,7 @@ function SoftVideoScrub({ src }: { src: string }) {
   );
 }
 
-/* 모바일(터치)용 — 드래그-스크럽 대신 자동재생 루프. 터치 가로채기 없음 → 페이지 정상 스크롤. */
-function SoftVideoLoop({ src }: { src: string }) {
-  const reduce = useReducedMotion();
-  return (
-    <div className="demo__stage demo-softvideo" data-demo="softvideo">
-      <video
-        className="softvideo__el"
-        src={src}
-        muted
-        loop={!reduce}
-        playsInline
-        preload="auto"
-        autoPlay={!reduce}
-      />
-      <div className="stage-meter">
-        <span>OPEN</span>
-        <span className="track">
-          <i />
-        </span>
-        <span>SOFT&nbsp;CLOSE</span>
-      </div>
-    </div>
-  );
-}
-
-/* 입력장치에 따라 분기: 터치/coarse = 자동재생 루프, 그 외 = 호버 스크럽. */
+/* 입력장치 무관 — 호버(마우스)/드래그(터치) 스크럽 인터랙션 사용. */
 export function VideoScrubStage({ src }: { src: string }) {
-  const [isTouch, setIsTouch] = useState(false);
-  useEffect(() => {
-    setIsTouch(
-      window.matchMedia("(hover: none), (pointer: coarse)").matches,
-    );
-  }, []);
-  return isTouch ? <SoftVideoLoop src={src} /> : <SoftVideoScrub src={src} />;
+  return <SoftVideoScrub src={src} />;
 }

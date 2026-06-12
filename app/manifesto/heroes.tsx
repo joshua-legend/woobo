@@ -44,14 +44,9 @@ export function HeroSlot() {
     let count = 0;
     const id = window.setInterval(() => {
       count += 1;
-      if (count > 6) {
-        // ~1.5바퀴 후 '움직임'(idx 0)에서 정지
-        setIdx(0);
-        window.clearInterval(id);
-        return;
-      }
+      // 무한 반복(인피니티) — 단어/배경을 계속 순환
       setIdx(count % SLOT_WORDS.length);
-    }, 2800);
+    }, 3300);
     return () => window.clearInterval(id);
   }, [reduce]);
 

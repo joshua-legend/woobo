@@ -68,14 +68,12 @@ const MAP_DOTS: { key: string; x: number; y: number }[] = [
 const MAP_MODES: { key: string; label: string }[] = [
   { key: "swipe", label: "스와이프" },
   { key: "list", label: "리스트" },
-  { key: "chips", label: "칩" },
 ];
 
 /* ---------- map: 유럽 지도 + 3가지 브라우징 방식(스와이프/리스트/칩) ---------- */
 function BrandMap() {
   const [mode, setMode] = useState("swipe");
   const [active, setActive] = useState(BRANDS[0].key);
-  const cur = BRANDS.find((b) => b.key === active) ?? BRANDS[0];
   const cardsRef = useRef<HTMLUListElement>(null);
 
   // 핀(또는 칩) 선택 → active 갱신 + 스와이프 모드면 해당 카드로 스크롤
@@ -117,20 +115,6 @@ function BrandMap() {
     </div>
   );
 
-  const focus = (
-    <figure className="bf-map__focus">
-      <span className="bf-map__img">
-        {cur.img && <img src={cur.img} alt="" aria-hidden="true" />}
-      </span>
-      <figcaption>
-        <span className="bf-country">{cur.country}</span>
-        <b className="bf-map__name">{cur.name}</b>
-        <p className="bf-role">{cur.role}</p>
-        <p className="bf-korea bf-korea--em">{cur.korea}</p>
-      </figcaption>
-    </figure>
-  );
-
   return (
     <div className="bf-map" data-mode={mode}>
       <div className="bf-map__modes" role="tablist" aria-label="지도형 표시 방식">
@@ -146,26 +130,7 @@ function BrandMap() {
         ))}
       </div>
 
-      {mode === "chips" ? (
-        <div className="bf-map__chipswrap">
-          <div className="bf-chips">
-            {BRANDS.map((b) => (
-              <button
-                type="button"
-                key={b.key}
-                className={`bf-chip${b.key === active ? " is-active" : ""}`}
-                onMouseEnter={() => setActive(b.key)}
-                onFocus={() => setActive(b.key)}
-                onClick={() => setActive(b.key)}
-              >
-                {b.name}
-              </button>
-            ))}
-          </div>
-          {focus}
-        </div>
-      ) : (
-        <div className="bf-map__split">
+      <div className="bf-map__split">
           {geo}
           {mode === "list" ? (
             <ul className="bf-maplist" aria-label="브랜드 목록">
@@ -205,7 +170,6 @@ function BrandMap() {
             </ul>
           )}
         </div>
-      )}
     </div>
   );
 }
@@ -270,14 +234,14 @@ function BrandBands() {
 
 /* 사장님 선택용 레이아웃 후보 (오른쪽 picker 버튼) */
 const LAYOUTS: { key: string; label: string }[] = [
-  { key: "map", label: "지도형" },
   { key: "showcase", label: "쇼케이스" },
+  { key: "map", label: "지도형" },
   { key: "bands", label: "밴드형" },
 ];
 
 /* =========================== [06] 멀티브랜드 수입 (Brands · 레이아웃 선택) =========================== */
 export function BrandsByVariant({ variant }: { variant: string }) {
-  const initial = LAYOUTS.some((l) => l.key === variant) ? variant : "map";
+  const initial = LAYOUTS.some((l) => l.key === variant) ? variant : "showcase";
   const [layout, setLayout] = useState(initial);
   return (
     <section
