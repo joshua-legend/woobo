@@ -3285,16 +3285,20 @@
     max-height: none;
     opacity: 1;
   }
-  /* 05 약속: 멀티브랜드 한 줄 캡션 — 모바일 폰트/줄간격 정리(흩어진 flex → 단정한 본문 흐름) */
+  /* 05 약속: 멀티브랜드 한 줄 캡션 — 모바일에선 숨김(display:none → 위아래 여백도 함께 제거) */
   .route-manifesto .trust .brands {
-    display: block;
-    font-size: 11.5px;
-    letter-spacing: 0.04em;
-    line-height: 1.7;
+    display: none;
   }
-  /* 05 약속: 섹션 하단 여백 축소(모바일에서 과한 빈 공간 제거) */
+  /* 05 약속: 섹션 하단 여백 더 축소(모바일) */
   .route-manifesto .trust {
-    padding-bottom: clamp(52px, 8vh, 96px);
+    padding-bottom: clamp(24px, 3.5vh, 48px);
+  }
+  /* 06 브랜드: footnote 모바일 숨김 + 하단 여백 확 축소 */
+  .route-manifesto .brandfolio .footnote {
+    display: none;
+  }
+  .route-manifesto .brandfolio {
+    padding-bottom: clamp(20px, 3vh, 44px);
   }
 }
 
