@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { pretendard, plexKR, plexMono } from "./fonts";
 import { SmoothScrollProvider } from "@/components/layout/SmoothScrollProvider";
-import { KakaoEscape } from "@/components/KakaoEscape";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,7 +18,6 @@ export default function RootLayout({
       className={`${pretendard.variable} ${plexKR.variable} ${plexMono.variable}`}
     >
       <body>
-        <KakaoEscape />
         <SmoothScrollProvider>{children}</SmoothScrollProvider>
       </body>
     </html>

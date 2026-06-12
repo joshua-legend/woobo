@@ -827,27 +827,19 @@
 }
 
 @media (max-width: 900px) {
-  /* 02 정체성(story): 부드러운 proximity 스냅 — 자유롭게 스크롤되다 멈추면
-     가까운 비트로 살짝 정렬. 강제정지(snap-stop)는 끊김 느낌이라 미사용.
-     모바일은 Lenis 미장착(네이티브 스크롤)이라 CSS 스냅이 그대로 동작. */
-  html {
-    scroll-snap-type: y proximity;
-  }
-  .route-manifesto .identity--story {
-    height: 500svh;
-  }
+  /* 02 정체성(story) 모바일 스크롤-스냅 — 1→2 경계에서 proximity 스냅이
+     스크롤을 잡아채 버벅임 유발 → 1차 가안 매끄러움 우선으로 비활성.
+     (스냅 앵커 .story-snaps 는 기본 display:none 이라 자동으로 비활성)
+     ── 나중에 스텝 스냅 복구하려면 아래 주석 해제 + mandatory/위치 재조정 ──
+  html { scroll-snap-type: y proximity; }
+  .route-manifesto .identity--story { height: 500svh; }
   .route-manifesto .story-snaps {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
+    display: block; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   }
   .route-manifesto .story-snap {
-    display: block;
-    height: 100svh;
-    scroll-snap-align: start;
+    display: block; height: 100svh; scroll-snap-align: start;
   }
+  */
   /* split 세로 스택 — 단, 핀(sticky+220vh)·스크럽 인터랙션은 유지(모바일 인터랙션) */
   .route-manifesto .identity__grid {
     grid-template-columns: 1fr;
@@ -1879,6 +1871,8 @@
    ========================================================= */
 .route-manifesto .showroom {
   text-align: center;
+  /* 섹션 상단 여백 축소(기본 --space-section 보다 작게) */
+  padding-top: clamp(52px, 7vh, 104px);
 }
 .route-manifesto .showroom h2 {
   font-size: clamp(32px, 5vw, 68px);
@@ -1978,7 +1972,7 @@
 .route-manifesto .closeline {
   position: relative;
   height: 2px;
-  margin: clamp(54px, 8vh, 90px) auto 26px;
+  margin: clamp(32px, 5vh, 56px) auto 26px;
   max-width: 560px;
 }
 .route-manifesto .closeline i {
@@ -3170,6 +3164,10 @@
   /* 섹션 하단 CTA 여백 정리 */
   .route-manifesto .showroom .actions {
     margin-top: clamp(28px, 5vh, 40px);
+  }
+  /* 모바일에선 파트너샵 안내 footnote 숨김 */
+  .route-manifesto .showroom .footnote {
+    display: none;
   }
   /* brandfolio 모바일 폴백 */
   .route-manifesto .bf-stage {
