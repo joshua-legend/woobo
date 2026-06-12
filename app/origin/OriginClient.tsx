@@ -164,7 +164,12 @@ function Heritage() {
       });
     }, pin);
 
+    // 모바일 주소창 접힘/펼침은 가로폭은 그대로 두고 세로만 바꾼다.
+    // 그때마다 refresh 하면 스크롤이 한 칸 튀므로, 가로폭이 실제로 바뀐 경우만 갱신.
+    let lastW = window.innerWidth;
     const onResize = () => {
+      if (window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
       measure();
       ScrollTrigger.refresh();
     };
@@ -677,7 +682,12 @@ function Partners() {
       });
     }, wrap);
 
+    // 모바일 주소창 접힘/펼침은 가로폭은 그대로 두고 세로만 바꾼다.
+    // 그때마다 refresh 하면 스크롤이 한 칸 튀므로, 가로폭이 실제로 바뀐 경우만 갱신.
+    let lastW = window.innerWidth;
     const onResize = () => {
+      if (window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
       measure();
       ScrollTrigger.refresh();
     };

@@ -57,7 +57,8 @@
   box-sizing: border-box;
 }
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth 제거 — Lenis 가상 스크롤과 이중 제어되어 모바일에서
+     스크롤이 끊겨 보임. 부드러움은 Lenis 가 담당. */
   -webkit-text-size-adjust: 100%;
 }
 body {
