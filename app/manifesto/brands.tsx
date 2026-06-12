@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type Brand = {
   key: string;
@@ -55,21 +55,6 @@ const BRANDS: Brand[] = [
   },
 ];
 
-/* 로고 자리 — 실제 로고 받기 전까지 워드마크 placeholder(빗금 + LOGO 태그). */
-function BrandLogo({ b, className }: { b: Brand; className?: string }) {
-  return (
-    <div
-      className={`bf-logo${b.img ? " bf-logo--img" : ""}${className ? ` ${className}` : ""}`}
-    >
-      {b.img && (
-        <img className="bf-logo__img" src={b.img} alt="" aria-hidden="true" />
-      )}
-      <span className="bf-logo__name">{b.name}</span>
-      <span className="bf-logo__tag">{b.img ? "가안" : "LOGO"}</span>
-    </div>
-  );
-}
-
 /* 점 위치 = europe-map.svg(viewBox 365 318 150 130) 위 % 좌표. 독일은 2개(AGOFORM·PWG). */
 const MAP_DOTS: { key: string; x: number; y: number }[] = [
   { key: "agoform", x: 38.2, y: 50.9 }, // 독일
@@ -79,49 +64,148 @@ const MAP_DOTS: { key: string; x: number; y: number }[] = [
   { key: "bekaert", x: 32.7, y: 56.7 }, // 벨기에
 ];
 
-/* ---------- map: 유럽 지도 + 각국 점 호버 → 우측 포커스 전환 ---------- */
+/* 지도형 표시 방식 3종 */
+const MAP_MODES: { key: string; label: string }[] = [
+  { key: "swipe", label: "스와이프" },
+  { key: "list", label: "리스트" },
+  { key: "chips", label: "칩" },
+];
+
+/* ---------- map: 유럽 지도 + 3가지 브라우징 방식(스와이프/리스트/칩) ---------- */
 function BrandMap() {
+  const [mode, setMode] = useState("swipe");
   const [active, setActive] = useState(BRANDS[0].key);
   const cur = BRANDS.find((b) => b.key === active) ?? BRANDS[0];
+  const cardsRef = useRef<HTMLUListElement>(null);
+
+  // 핀(또는 칩) 선택 → active 갱신 + 스와이프 모드면 해당 카드로 스크롤
+  const pick = (key: string) => {
+    setActive(key);
+    if (mode === "swipe") {
+      const idx = BRANDS.findIndex((b) => b.key === key);
+      const el = cardsRef.current?.children[idx] as HTMLElement | undefined;
+      el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  };
+
+  const geo = (
+    <div className="bf-map__geo">
+      <img
+        className="bf-map__europe"
+        src="/europe-map.svg"
+        alt="유럽 원산지 지도"
+      />
+      {MAP_DOTS.map((d) => {
+        const b = BRANDS.find((x) => x.key === d.key) ?? BRANDS[0];
+        return (
+          <button
+            key={d.key}
+            type="button"
+            className={`bf-dot${d.key === active ? " is-active" : ""}`}
+            style={{ left: `${d.x}%`, top: `${d.y}%` }}
+            onMouseEnter={() => setActive(d.key)}
+            onFocus={() => setActive(d.key)}
+            onClick={() => pick(d.key)}
+            aria-label={`${b.name} · ${b.country}`}
+          >
+            <span className="bf-dot__pin" />
+            <span className="bf-dot__label">{b.name}</span>
+          </button>
+        );
+      })}
+      <span className="bf-map__legend">유럽 원산지 → 한국 · 우보 정식 수입</span>
+    </div>
+  );
+
+  const focus = (
+    <figure className="bf-map__focus">
+      <span className="bf-map__img">
+        {cur.img && <img src={cur.img} alt="" aria-hidden="true" />}
+      </span>
+      <figcaption>
+        <span className="bf-country">{cur.country}</span>
+        <b className="bf-map__name">{cur.name}</b>
+        <p className="bf-role">{cur.role}</p>
+        <p className="bf-korea bf-korea--em">{cur.korea}</p>
+      </figcaption>
+    </figure>
+  );
+
   return (
-    <div className="bf-map">
-      <div className="bf-map__geo">
-        <img
-          className="bf-map__europe"
-          src="/europe-map.svg"
-          alt="유럽 원산지 지도"
-        />
-        {MAP_DOTS.map((d) => {
-          const b = BRANDS.find((x) => x.key === d.key) ?? BRANDS[0];
-          return (
-            <button
-              key={d.key}
-              type="button"
-              className={`bf-dot${d.key === active ? " is-active" : ""}`}
-              style={{ left: `${d.x}%`, top: `${d.y}%` }}
-              onMouseEnter={() => setActive(d.key)}
-              onFocus={() => setActive(d.key)}
-              onClick={() => setActive(d.key)}
-              aria-label={`${b.name} · ${b.country}`}
-            >
-              <span className="bf-dot__pin" />
-              <span className="bf-dot__label">{b.name}</span>
-            </button>
-          );
-        })}
-        <span className="bf-map__legend">유럽 원산지 → 한국 · 우보 정식 수입</span>
+    <div className="bf-map" data-mode={mode}>
+      <div className="bf-map__modes" role="tablist" aria-label="지도형 표시 방식">
+        {MAP_MODES.map((m) => (
+          <button
+            type="button"
+            key={m.key}
+            className={`bf-map__mode${mode === m.key ? " is-active" : ""}`}
+            onClick={() => setMode(m.key)}
+          >
+            {m.label}
+          </button>
+        ))}
       </div>
-      <figure className="bf-map__focus">
-        <span className="bf-map__img">
-          {cur.img && <img src={cur.img} alt="" aria-hidden="true" />}
-        </span>
-        <figcaption>
-          <span className="bf-country">{cur.country}</span>
-          <b className="bf-map__name">{cur.name}</b>
-          <p className="bf-role">{cur.role}</p>
-          <p className="bf-korea bf-korea--em">{cur.korea}</p>
-        </figcaption>
-      </figure>
+
+      {mode === "chips" ? (
+        <div className="bf-map__chipswrap">
+          <div className="bf-chips">
+            {BRANDS.map((b) => (
+              <button
+                type="button"
+                key={b.key}
+                className={`bf-chip${b.key === active ? " is-active" : ""}`}
+                onMouseEnter={() => setActive(b.key)}
+                onFocus={() => setActive(b.key)}
+                onClick={() => setActive(b.key)}
+              >
+                {b.name}
+              </button>
+            ))}
+          </div>
+          {focus}
+        </div>
+      ) : (
+        <div className="bf-map__split">
+          {geo}
+          {mode === "list" ? (
+            <ul className="bf-maplist" aria-label="브랜드 목록">
+              {BRANDS.map((b) => (
+                <li
+                  key={b.key}
+                  className={`bf-maplistitem${b.key === active ? " is-active" : ""}`}
+                >
+                  <span className="bf-maplistitem__img">
+                    {b.img && <img src={b.img} alt="" aria-hidden="true" />}
+                  </span>
+                  <div className="bf-maplistitem__txt">
+                    <span className="bf-country">{b.country}</span>
+                    <b className="bf-mapcard__name">{b.name}</b>
+                    <p className="bf-role">{b.role}</p>
+                    <p className="bf-korea bf-korea--em">{b.korea}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <ul className="bf-mapcards" ref={cardsRef} aria-label="브랜드 목록">
+              {BRANDS.map((b) => (
+                <li
+                  key={b.key}
+                  className={`bf-mapcard${b.key === active ? " is-active" : ""}`}
+                >
+                  <span className="bf-mapcard__img">
+                    {b.img && <img src={b.img} alt="" aria-hidden="true" />}
+                  </span>
+                  <span className="bf-country">{b.country}</span>
+                  <b className="bf-mapcard__name">{b.name}</b>
+                  <p className="bf-role">{b.role}</p>
+                  <p className="bf-korea bf-korea--em">{b.korea}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 }
