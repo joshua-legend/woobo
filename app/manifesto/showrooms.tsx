@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Keyboard } from "swiper/modules";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -104,6 +104,13 @@ function ShopBadges({ s }: { s: Shop }) {
 
 /* 상세 패널(map) — 선택 지점 */
 function ShopDetail({ s }: { s: Shop }) {
+  // 모바일(터치)에선 라이브 카카오 미니맵을 마운트하지 않는다.
+  // 늦게 로드된 SDK가 스크롤 도중 맵을 생성하며 페이지 하단으로 튕기는 이슈 →
+  // 모바일은 "카카오맵 ↗" 링크로 유도, 데스크톱만 임베드.
+  const [showMiniMap, setShowMiniMap] = useState(false);
+  useEffect(() => {
+    setShowMiniMap(!window.matchMedia("(pointer: coarse)").matches);
+  }, []);
   return (
     <div className="sr-detail">
       <ShopBadges s={s} />
@@ -116,7 +123,7 @@ function ShopDetail({ s }: { s: Shop }) {
         T. {s.tel}
       </a>
       <ShopActions s={s} />
-      <KakaoMiniMap address={s.address} />
+      {showMiniMap && <KakaoMiniMap address={s.address} />}
     </div>
   );
 }
