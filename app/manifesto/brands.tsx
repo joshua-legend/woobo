@@ -19,7 +19,7 @@ const BRANDS: Brand[] = [
     country: "오스트리아",
     role: "세계 1위 가구 Fitting 제조 · High-tech 혁신",
     korea: "대한민국 sole agent — 우보인터내셔날",
-    img: "/brands/blum.png",
+    img: "/brands/blum.webp",
   },
   {
     key: "agoform",
@@ -27,7 +27,7 @@ const BRANDS: Brand[] = [
     country: "독일",
     role: "플라스틱 열성형(thermoforming) 전문 · 가구·주방·욕실",
     korea: "대형 가구사 등에 논슬립매트·수저분리함 공급",
-    img: "/brands/agoform.png",
+    img: "/brands/agoform.webp",
   },
   {
     key: "peka",
@@ -35,7 +35,7 @@ const BRANDS: Brand[] = [
     country: "스위스",
     role: "주방·거실 부속 · 풀아웃 시스템",
     korea: "주방·가구 산업용 풀아웃 시스템 개발·생산",
-    img: "/brands/peka.png",
+    img: "/brands/peka.webp",
   },
   {
     key: "bekaert",
@@ -43,7 +43,7 @@ const BRANDS: Brand[] = [
     country: "벨기에",
     role: "세계 1위 매트리스 원단 공급",
     korea: "한국 에이스·시몬스 침대에 공급",
-    img: "/brands/bekaertdeslee.png",
+    img: "/brands/bekaertdeslee.webp",
   },
   {
     key: "pwg",
@@ -51,7 +51,7 @@ const BRANDS: Brand[] = [
     country: "독일",
     role: "Glue-coated veneer backing 소재 · world-wide leader",
     korea: "한국에 부직포·본드 함침 부직포 공급",
-    img: "/brands/pwg.png",
+    img: "/brands/pwg.webp",
   },
 ];
 

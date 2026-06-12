@@ -69,7 +69,13 @@ export function KakaoMiniMap({ address }: { address: string }) {
           mapRef.current = new kakao.maps.Map(boxRef.current, {
             center: new kakao.maps.LatLng(36.5, 127.8),
             level: 5,
+            // 정적 미리보기 — 페이지 스크롤/드래그를 지도가 가로채지 않게.
+            // 상세 탐색은 "카카오맵 ↗" 링크로 유도.
+            draggable: false,
+            scrollwheel: false,
+            disableDoubleClickZoom: true,
           });
+          mapRef.current.setZoomable(false);
         }
         const geocoder = new kakao.maps.services.Geocoder();
         geocoder.addressSearch(
