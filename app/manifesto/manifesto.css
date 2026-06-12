@@ -2919,6 +2919,40 @@
   font-size: 11px;
   color: var(--c-caption-on-dark);
 }
+/* 지도 로딩 스켈레톤 — 타일 뜨기 전 빈 칸 대신 표시(ready 되면 사라짐) */
+.route-manifesto .sr-kakaomini__skel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--c-caption-on-dark);
+  background: var(--c-charcoal-card);
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(239, 233, 223, 0.06) 50%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  animation: srSkel 1.3s var(--ease) infinite;
+}
+@keyframes srSkel {
+  from {
+    background-position: 180% 0;
+  }
+  to {
+    background-position: -80% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-manifesto .sr-kakaomini__skel {
+    animation: none;
+  }
+}
 /* split */
 .route-manifesto .sr-split {
   display: grid;

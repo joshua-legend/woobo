@@ -112,6 +112,11 @@ export function KakaoMiniMap({ address }: { address: string }) {
   return (
     <div className="sr-kakaomini">
       <div ref={boxRef} className="sr-kakaomini__map" />
+      {status === "loading" && (
+        <div className="sr-kakaomini__skel" aria-hidden="true">
+          지도 불러오는 중…
+        </div>
+      )}
       {status === "error" && (
         <span className="sr-kakaomini__err">
           지도에서 주소를 못 찾았습니다 — 카카오맵 링크를 이용하세요.
