@@ -38,6 +38,33 @@
 
 ---
 
+### [2026-06-21] 세션 — 섹션04 도어 영상 → 프레임 시퀀스 + 좌우 드래그 스크럽
+- **한 일:**
+  - `videos/door.mp4`(1660×1244·24fps·121f)를 ffmpeg로 **webp 프레임 121장** 추출(`public/videos/door-frames/frame_0001~0121.webp`, 1280폭·q80, 총 2.85MB < 원본 4.43MB).
+  - 1차로 `DoorTapPlay`(탭 토글)를 프레임+canvas로 옮겼다가, **사장님 결정으로 인터랙션을 좌우 드래그 스크럽으로 변경** → `DoorTapPlay` 통째 제거하고 섹션03의 `VideoScrubStage` 재사용.
+  - `VideoScrubStage`에 미터 라벨 prop(`leftLabel`/`rightLabel`) 추가 → door는 "닫힘↔열림"(좌=닫힘, 우=열림). 다크 섹션 미터 텍스트 가독성 보정(`section--dark .stage-meter` color).
+- **산출물:** `app/manifesto/door.tsx`(VideoScrubStage 사용으로 축소), `VideoScrubStage.tsx`(라벨 prop), `manifesto.css`(다크 미터 색), `public/videos/door-frames/*`(121장)
+- **결정:** 도어도 섹션03과 동일 좌우 스크럽으로 통일. 두 스테이지 모두 `.demo__stage` 1:1이라 비율 동일. mp4 원본 삭제 안 함.
+- **막힘/배운 점:** 컨셉상 TIP-ON(손잡이 없이 톡)엔 탭이 더 맞다고 의견 냈으나, 제스처 통일 우선으로 드래그 채택. → **카피 "톡 누르면/손잡이 없이 연다"가 드래그와 어긋남, 추후 문구 재검토 필요.**
+- **다음:** 섹션03·04 둘 다 **실기기 터치 검증** + 섹션04 카피 톤 재검토.
+- **확인요청(사장님):** 도어 좌우 드래그 개폐 감 + 카피 수정 여부.
+
+---
+
+### [2026-06-21] 세션 — 섹션03 소프트클로즈 영상 → 프레임 시퀀스 스크럽
+- **한 일:**
+  - `videos/soft-close.mp4`(24fps·5초·121f)를 ffmpeg로 **webp 프레임 121장** 추출(`public/videos/soft-close-frames/frame_0001~0121.webp`, 1280폭·q80, 총 3.06MB < 원본 5.1MB). ffmpeg는 winget으로 설치.
+  - `VideoScrubStage.tsx` 재작성: mp4 `currentTime` seek → **canvas + 사전 프리로드 프레임 `drawImage`**. 모바일 seek 끊김 원인 제거.
+  - 데스크탑/터치 분기 통합(기존 터치 autoplay 루프 폐기) → **양쪽 다 좌우 스크럽**. rAF+lerp·가이드·OPEN/CLOSE 미터(`--p`)는 그대로 재활용.
+  - 터치 세로스크롤 충돌은 `touch-action: pan-y`로 해결(가로만 스크럽, 세로는 페이지 양보). DPR·리사이즈는 ResizeObserver.
+- **산출물:** `app/manifesto/VideoScrubStage.tsx`(재작성), `app/manifesto/softclose.tsx`(prop 교체), `app/manifesto/manifesto.css`(pan-y), `public/videos/soft-close-frames/*`(121장)
+- **결정:** 렌더는 `<img>` 교체 대신 canvas(깜빡임 방지). 프레임은 전량 프리로드(단순). mp4 원본은 삭제 안 함(참조만 제거).
+- **막힘/배운 점:** 모바일 mp4 scrub이 끊긴 건 브라우저 seek 디코드 코얼레싱 탓 → 프레임 시퀀스가 정석.
+- **다음:** **실기기(iOS Safari) 터치 검증** — pan-y+pointerCapture 조합 동작 확인, 안 되면 수동 축 판별로 폴백.
+- **확인요청(사장님):** 모바일에서 좌우 감기 + 세로 스크롤 둘 다 자연스러운지.
+
+---
+
 ### [2026-06-12] 세션 — 섹션07 모바일 레이아웃 간격/정렬 정리
 - **한 일:**
   - **섹션07 모바일(≤900px) 레이아웃 수정**(`manifesto.css` 내 미디어쿼리): 알약(레이아웃 선택) ↔ 지도 간격 확대(`.sr-stage` gap `clamp(32px,7vw,44px)`), 지도 ↔ 상세 간격 확대(`.sr-map` gap `clamp(28px,6vw,36px)`).

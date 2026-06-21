@@ -8,21 +8,39 @@ const setP = (el: HTMLElement | null, v: number) => {
   if (el) el.style.setProperty("--p", v.toFixed(4));
 };
 
+const PAD = 4; // frame_0001.webp
+
 /**
- * 영상 스크럽 스테이지 — 좌우 호버(마우스)/드래그(터치)로 감기.
- * - 마우스 올리기 전에는 첫 프레임(초기 OPEN) 유지. 벗어나면 다시 초기로 사뿐히 복귀.
- * - 단일 rAF 루프 lerp 보간 + seek 코얼레싱(seeking 중 스킵)으로 최대한 스무스.
- * - 자동재생 차단(autoPlay=false + onPlay→pause). 프레임 없으면 .ph 폴백.
- * src 만 바꾸면 어느 섹션에서나 재사용(soft / door …).
+ * 프레임 시퀀스 스크럽 스테이지 — 좌우 호버(마우스)/드래그(터치)로 감기.
+ * - mp4 seek 대신 미리 받은 webp 프레임을 canvas에 그려, 모바일에서도 끊김 없이 양방향 스크럽.
+ * - 단일 rAF 루프 lerp 보간. 진행도(0=OPEN, 1=CLOSE)를 프레임 인덱스로 매핑.
+ * - 터치: touch-action:pan-y 로 세로 페이지 스크롤은 양보, 가로 드래그만 스크럽.
+ * - reduced-motion: 첫 프레임 1장만 정적 표시.
+ * frames(번호 앞 prefix) + count 만 바꾸면 어느 섹션에서나 재사용.
  */
-function SoftVideoScrub({ src }: { src: string }) {
+export function VideoScrubStage({
+  frames,
+  count,
+  ext = "webp",
+  leftLabel = "OPEN",
+  rightLabel = "SOFT CLOSE",
+}: {
+  /** 0패딩 번호 앞까지의 URL prefix. 예: "/videos/soft-close-frames/frame_" */
+  frames: string;
+  count: number;
+  ext?: string;
+  /** 진행도 미터 좌/우 라벨(좌=진행0, 우=진행1) */
+  leftLabel?: string;
+  rightLabel?: string;
+}) {
   const reduce = useReducedMotion();
   const stageRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const durRef = useRef(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgsRef = useRef<HTMLImageElement[]>([]);
   const readyRef = useRef(false);
   const targetRef = useRef(0); // 목표 진행도(0=OPEN, 1=CLOSE)
   const dispRef = useRef(0); // 화면에 보이는 보간된 진행도
+  const lastIdxRef = useRef(-1); // 마지막으로 그린 프레임(중복 draw 방지)
   const runningRef = useRef(false);
   const activeRef = useRef(false); // 마우스 호버/터치 드래그 중
   const rafRef = useRef(0);
@@ -31,10 +49,49 @@ function SoftVideoScrub({ src }: { src: string }) {
   );
   const [showGuide, setShowGuide] = useState(true);
 
-  // 단일 rAF 루프: disp 를 target 으로 부드럽게 수렴 + seek 코얼레싱
+  const url = useCallback(
+    (n: number) => `${frames}${String(n).padStart(PAD, "0")}.${ext}`,
+    [frames, ext],
+  );
+
+  // canvas 백킹스토어를 표시 박스(×DPR)에 맞춤
+  const sizeCanvas = useCallback(() => {
+    const c = canvasRef.current;
+    const s = stageRef.current;
+    if (!c || !s) return;
+    const r = s.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.round(r.width * dpr);
+    const h = Math.round(r.height * dpr);
+    if (c.width !== w || c.height !== h) {
+      c.width = w;
+      c.height = h;
+      lastIdxRef.current = -1; // 사이즈 바뀌면 재그림 강제
+    }
+  }, []);
+
+  // object-fit: cover 로 프레임 그리기
+  const drawIdx = useCallback((idx: number) => {
+    const c = canvasRef.current;
+    const img = imgsRef.current[idx];
+    if (!c || !img || !img.complete || !img.naturalWidth) return;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+    const cw = c.width;
+    const ch = c.height;
+    const iw = img.naturalWidth;
+    const ih = img.naturalHeight;
+    const scale = Math.max(cw / iw, ch / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+    lastIdxRef.current = idx;
+  }, []);
+
+  // 단일 rAF 루프: disp 를 target 으로 부드럽게 수렴 + 인덱스 바뀔 때만 draw
   const tick = useCallback(() => {
-    const v = videoRef.current;
-    if (!v || !readyRef.current || !durRef.current) {
+    if (!readyRef.current) {
       runningRef.current = false;
       return;
     }
@@ -42,20 +99,11 @@ function SoftVideoScrub({ src }: { src: string }) {
     if (Math.abs(targetRef.current - dispRef.current) < 0.0004)
       dispRef.current = targetRef.current;
     setP(stageRef.current, dispRef.current);
-    if (!v.seeking) {
-      const t = dispRef.current * durRef.current;
-      if (Math.abs(v.currentTime - t) > 0.01) {
-        try {
-          v.currentTime = t;
-        } catch {
-          /* seek 무시 */
-        }
-      }
-    }
-    const settled = dispRef.current === targetRef.current && !v.seeking;
-    if (settled) runningRef.current = false;
+    const idx = clamp(Math.round(dispRef.current * (count - 1)), 0, count - 1);
+    if (idx !== lastIdxRef.current) drawIdx(idx);
+    if (dispRef.current === targetRef.current) runningRef.current = false;
     else rafRef.current = requestAnimationFrame(tick);
-  }, []);
+  }, [count, drawIdx]);
 
   const startLoop = useCallback(() => {
     if (runningRef.current) return;
@@ -71,42 +119,53 @@ function SoftVideoScrub({ src }: { src: string }) {
     [startLoop],
   );
 
+  // 프리로드: 모든 프레임을 Image 로 받아둠(reduced-motion 은 첫 1장만)
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    const markReady = () => {
-      if (readyRef.current) return;
-      if (v.readyState >= 1 && isFinite(v.duration) && v.duration > 0) {
-        durRef.current = v.duration;
+    let cancelled = false;
+    const n = reduce ? 1 : count;
+    const imgs: HTMLImageElement[] = new Array(count);
+    let loaded = 0;
+    const onOne = () => {
+      if (cancelled) return;
+      loaded++;
+      if (lastIdxRef.current < 0) {
+        sizeCanvas();
+        drawIdx(0); // 첫 장 들어오면 즉시 표시(빈 화면 방지)
+      }
+      if (loaded >= n) {
         readyRef.current = true;
         setStatus("ready");
-        // 자동재생 차단 + 초기(OPEN) 상태로 고정
-        v.pause();
-        try {
-          v.currentTime = 0;
-        } catch {
-          /* seek 무시 */
-        }
-        targetRef.current = 0;
-        dispRef.current = 0;
-        setP(stageRef.current, 0);
       }
     };
-    const onErr = () => setStatus("missing");
-    v.addEventListener("loadedmetadata", markReady);
-    v.addEventListener("loadeddata", markReady);
-    v.addEventListener("canplay", markReady);
-    v.addEventListener("error", onErr);
-    v.load();
-    markReady();
+    for (let i = 0; i < n; i++) {
+      const im = new Image();
+      im.decoding = "async";
+      im.onload = onOne;
+      im.onerror = () => {
+        if (!cancelled) setStatus("missing");
+      };
+      im.src = url(i + 1);
+      imgs[i] = im;
+    }
+    imgsRef.current = imgs;
     return () => {
-      v.removeEventListener("loadedmetadata", markReady);
-      v.removeEventListener("loadeddata", markReady);
-      v.removeEventListener("canplay", markReady);
-      v.removeEventListener("error", onErr);
+      cancelled = true;
       cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [count, reduce, url, sizeCanvas, drawIdx]);
+
+  // 리사이즈 → canvas 재사이즈 + 현재 프레임 재그림
+  useEffect(() => {
+    const s = stageRef.current;
+    if (!s) return;
+    const ro = new ResizeObserver(() => {
+      const idx = lastIdxRef.current < 0 ? 0 : lastIdxRef.current;
+      sizeCanvas();
+      drawIdx(idx);
+    });
+    ro.observe(s);
+    return () => ro.disconnect();
+  }, [sizeCanvas, drawIdx]);
 
   const relX = (clientX: number) => {
     const s = stageRef.current;
@@ -132,7 +191,7 @@ function SoftVideoScrub({ src }: { src: string }) {
     setTarget(relX(e.clientX));
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
-  // 손/마우스를 떼거나 벗어나면 초기(OPEN) 상태로 사뿐히 복귀
+  // 손/마우스를 떼거나 벗어나면(또는 세로 스크롤에 제스처를 뺏기면) 초기(OPEN)로 사뿐히 복귀
   const release = () => {
     if (!activeRef.current) return;
     activeRef.current = false;
@@ -158,22 +217,14 @@ function SoftVideoScrub({ src }: { src: string }) {
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       onPointerLeave={onPointerLeave}
-      style={reduce ? undefined : { touchAction: "none" }}
     >
-      <video
-        ref={videoRef}
-        className="softvideo__el"
-        src={src}
-        muted
-        playsInline
-        preload="auto"
-        autoPlay={false}
-        onPlay={(e) => e.currentTarget.pause()}
-      />
+      <canvas ref={canvasRef} className="softvideo__el" />
       {status !== "ready" && (
         <div
           className="softseq__ph ph"
-          data-ph={status === "missing" ? `영상 대기 — ${src}` : "영상 로딩…"}
+          data-ph={
+            status === "missing" ? `프레임 대기 — ${frames}` : "프레임 로딩…"
+          }
         />
       )}
       {status === "ready" && !reduce && (
@@ -199,46 +250,12 @@ function SoftVideoScrub({ src }: { src: string }) {
         </div>
       )}
       <div className="stage-meter">
-        <span>OPEN</span>
+        <span>{leftLabel}</span>
         <span className="track">
           <i />
         </span>
-        <span>SOFT&nbsp;CLOSE</span>
+        <span>{rightLabel}</span>
       </div>
     </div>
   );
-}
-
-/* 모바일(터치)용 — 드래그-스크럽 대신 자동재생 루프. 터치 가로채기 없음 → 페이지 정상 스크롤. */
-function SoftVideoLoop({ src }: { src: string }) {
-  const reduce = useReducedMotion();
-  return (
-    <div className="demo__stage demo-softvideo" data-demo="softvideo">
-      <video
-        className="softvideo__el"
-        src={src}
-        muted
-        loop={!reduce}
-        playsInline
-        preload="auto"
-        autoPlay={!reduce}
-      />
-      <div className="stage-meter">
-        <span>OPEN</span>
-        <span className="track">
-          <i />
-        </span>
-        <span>SOFT&nbsp;CLOSE</span>
-      </div>
-    </div>
-  );
-}
-
-/* 입력장치에 따라 분기: 터치/coarse = 자동재생 루프(스크롤 정상), 그 외 = 호버 스크럽. */
-export function VideoScrubStage({ src }: { src: string }) {
-  const [isTouch, setIsTouch] = useState(false);
-  useEffect(() => {
-    setIsTouch(window.matchMedia("(hover: none), (pointer: coarse)").matches);
-  }, []);
-  return isTouch ? <SoftVideoLoop src={src} /> : <SoftVideoScrub src={src} />;
 }

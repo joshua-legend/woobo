@@ -36,7 +36,10 @@ export function SoftByVariant({ variant: _variant }: { variant: string }) {
             </a>
           </div>
           <div className="reveal-up d1">
-            <VideoScrubStage src="/videos/soft-close.mp4" />
+            <VideoScrubStage
+              frames="/videos/soft-close-frames/frame_"
+              count={121}
+            />
           </div>
         </div>
       </div>

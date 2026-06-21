@@ -921,6 +921,9 @@
   background: var(--c-line);
   position: relative;
 }
+.route-manifesto .section--dark .stage-meter {
+  color: var(--c-caption-on-dark);
+}
 .route-manifesto .section--dark .stage-meter .track {
   background: var(--c-line-dark);
 }
@@ -940,6 +943,8 @@
 /* ---- demo-softvideo: 영상 스크럽(마우스 호버 조작) ---- */
 .route-manifesto .demo-softvideo {
   cursor: ew-resize;
+  /* 터치: 세로 스크롤은 페이지에 양보, 가로 드래그만 스크럽으로 받음 */
+  touch-action: pan-y;
 }
 .route-manifesto .softvideo__el {
   position: absolute;
