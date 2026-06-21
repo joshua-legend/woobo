@@ -3061,7 +3061,10 @@
   flex-direction: column;
   --drop: clamp(0, calc((var(--a1, 0) - var(--at, 0)) * 14), 1);
   opacity: var(--drop);
-  transform: translate(var(--cx, 0), calc(-165% * (1 - var(--drop))))
+  transform: translate(
+      calc(var(--cx, 0px) * var(--fan, 1)),
+      calc(-165% * (1 - var(--drop)))
+    )
     rotate(calc(var(--rot, 0deg) * var(--drop)));
   transition: none;
 }
@@ -3120,8 +3123,30 @@
   .route-manifesto .s5-deck2 {
     flex: none;
     width: 100%;
-    height: 40vh;
-    transform: scale(0.7);
+    height: clamp(214px, 32vh, 280px);
+    transform: none;
+  }
+  /* 스케일 대신 카드 실제 축소 + 부채 폭(--fan) 축소 → 박스가 콘텐츠에 맞아 가운데 정렬 */
+  .route-manifesto .s5-card2 {
+    width: 152px;
+    height: 212px;
+    margin: -106px 0 0 -76px;
+    padding: 10px;
+    --fan: 0.62;
+  }
+  .route-manifesto .s5-card2__fl {
+    top: 9px;
+    left: 11px;
+    font-size: 18px;
+  }
+  .route-manifesto .s5-card2__img {
+    margin: 22px 4px 8px;
+  }
+  .route-manifesto .s5-card2__nm {
+    font-size: 15px;
+  }
+  .route-manifesto .s5-card2__co {
+    font-size: 9px;
   }
 }
 /* 단어: --at(인라인 임계값)을 --a1 이 넘으면 점등(흐림→밝음) */
