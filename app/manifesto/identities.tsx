@@ -15,6 +15,9 @@ const FACETS = [
 // story 씬별 배경 틴트(이미지 없을 때·가장자리에 은은히 비침) — 스크롤 진행 시 색 변화
 const SCENE_TINTS = ["#1d1812", "#15191a", "#1b1410", "#13171a", "#1c1813"];
 
+// 챕터 중앙값(0~1) — 모바일에서 스와이프 후 가장 가까운 챕터로 스냅(한 챕터씩).
+const STORY_SNAP = FACETS.map((_f, i) => (i + 0.5) / FACETS.length);
+
 /* =========================== pin · story (가운데 텍스트 + 뒷배경 횡스크롤 팬) =========================== */
 export function IdentityPin() {
   const secRef = useRef<HTMLDivElement>(null);
@@ -44,7 +47,11 @@ export function IdentityPin() {
     setActive(next);
   }, []);
 
-  useScrub(secRef, onUpdate, { start: "top top", end: "bottom bottom" });
+  useScrub(secRef, onUpdate, {
+    start: "top top",
+    end: "bottom bottom",
+    snap: STORY_SNAP,
+  });
 
   return (
       <section

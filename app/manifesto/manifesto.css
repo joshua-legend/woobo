@@ -827,20 +827,14 @@
 }
 
 @media (max-width: 900px) {
-  /* 02 정체성(story) 모바일 스크롤-스냅 — 1→2 경계에서 proximity 스냅이
-     스크롤을 잡아채 버벅임 유발 → 1차 가안 매끄러움 우선으로 비활성.
-     (스냅 앵커 .story-snaps 는 기본 display:none 이라 자동으로 비활성)
-     ── 나중에 스텝 스냅 복구하려면 아래 주석 해제 + mandatory/위치 재조정 ──
-  html { scroll-snap-type: y proximity; }
-  .route-manifesto .identity--story { height: 500svh; }
-  .route-manifesto .story-snaps {
-    display: block; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  /* 02 정체성(story) 모바일 — 챕터당 100svh(=5×100)로 늘려, 스와이프 1회에 여러 챕터가
+     휙 지나가던 문제 제거. 딱딱 멈춤(스텝)은 CSS scroll-snap 이 아니라 GSAP ScrollTrigger
+     snap 으로 처리(모바일은 normalizeScroll 이 스크롤을 잡고 있어 CSS snap 은 충돌·미동작).
+     → useScrub 가 coarse 포인터에서만 챕터 중앙값으로 snap. CSS scroll-snap 은 미사용. */
+  .route-manifesto .identity--story {
+    height: 500svh;
   }
-  .route-manifesto .story-snap {
-    display: block; height: 100svh; scroll-snap-align: start;
-  }
-  */
-  /* split 세로 스택 — 단, 핀(sticky+220vh)·스크럽 인터랙션은 유지(모바일 인터랙션) */
+  /* split 세로 스택 — 단, 핀(sticky)·스크럽 인터랙션은 유지(모바일 인터랙션) */
   .route-manifesto .identity__grid {
     grid-template-columns: 1fr;
     gap: clamp(18px, 5vw, 30px);

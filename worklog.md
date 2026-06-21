@@ -38,6 +38,19 @@
 
 ---
 
+### [2026-06-21] 세션 — 섹션02 정체성 모바일 챕터 스냅(휙 지나감 해결)
+- **한 일:**
+  - 원인 진단: `.identity--story` 높이가 220svh **데스크탑·모바일 공용** → 5챕터 ÷ = 챕터당 44svh(화면 절반 미만)라 모바일 스와이프 1회에 1~2챕터가 휙 지나감.
+  - **1단계** `manifesto.css`: 모바일(≤900px) `.identity--story` 높이 220→**500svh**(챕터당 100svh)로 늘려 빨리 넘어가는 느낌 제거. 옛 CSS scroll-snap 주석 블록 정리.
+  - **2단계** `useScrub.ts`: ScrubOptions에 `snap` 추가, **coarse 포인터에서만** ScrollTrigger `snap` 적용(중앙값 정렬, duration 0.2~0.5·ease power1.inOut). `identities.tsx`: `STORY_SNAP=[0.1,0.3,0.5,0.7,0.9]`(챕터 중앙) 전달.
+- **산출물:** `hooks/useScrub.ts`, `app/manifesto/identities.tsx`, `app/manifesto/manifesto.css`
+- **결정:** 모바일은 Lenis가 아니라 `normalizeScroll(true)`라 **CSS scroll-snap은 충돌·미동작** → GSAP ScrollTrigger snap이 정석(이게 과거 CSS 스냅이 꺼졌던 진짜 이유). 변경은 모바일 한정, 데스크탑 불변.
+- **막힘/배운 점:** normalizeScroll 구간에서 네이티브 스냅 불가 → 스크롤 엔진과 같은 레이어(GSAP)에서 스냅해야 함.
+- **다음:** **실기기에서 스냅 모멘텀/타이밍 튜닝**(duration·delay), 필요시 directional 조정.
+- **확인요청(사장님):** 모바일 섹션02가 한 챕터씩 멈추는 느낌이 적절한지(너무 끈적/너무 헐거운지).
+
+---
+
 ### [2026-06-21] 세션 — 섹션04 도어 영상 → 프레임 시퀀스 + 좌우 드래그 스크럽
 - **한 일:**
   - `videos/door.mp4`(1660×1244·24fps·121f)를 ffmpeg로 **webp 프레임 121장** 추출(`public/videos/door-frames/frame_0001~0121.webp`, 1280폭·q80, 총 2.85MB < 원본 4.43MB).
