@@ -133,7 +133,7 @@
 
 | id | 비율 | intent | 상태 |
 |---|---|---|---|
-| `act1-bg` | 16:9 / 4:5 | 유럽 정통 제조 원산지 무드(시네마틱 작업장 매크로) | 후보 |
+| `act1-bg` | 16:9 / 4:5 | 유럽 정통 제조 원산지 무드(시네마틱 작업장 매크로) | 연결됨(png) |
 
 - **`act1-bg`** · prompt: `Cinematic wide macro of precision European furniture hardware and raw materials resting on a dark workbench — brushed steel drawer runners, machined fittings and a sheet of fine timber veneer, soft volumetric side light raking through a workshop window with faint dust motes in the beam, deep charcoal #16140f palette, matte premium surfaces, a single thin warm orange #ff671f rim-light tracing one metal edge only, shallow depth of field, fine film grain, generous dark negative space in the lower-left for a Korean + English headline, editorial origin-of-craft mood, no text, no logos, no brand markings, no readable labels, no watermark, --ar 16:9`
   - 모바일(4:5): 위와 동일하되 `tighter vertical composition, more headroom and lower-third negative space for stacked headline, --ar 4:5`

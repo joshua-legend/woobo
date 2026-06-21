@@ -37,7 +37,7 @@ function Act1Karaoke() {
   const n = ACT1_WORDS.length;
   return (
     <>
-      <div className="s5-act1bg" data-ph="act1-bg" />
+      <div className="s5-act1bg" />
       <div className="s5-act1scrim" />
       <div className="s5-kara">
         <p>

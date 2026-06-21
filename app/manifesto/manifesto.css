@@ -3023,12 +3023,7 @@
 .route-manifesto .s5-act1bg {
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    #121009 0 14px,
-    #07060300 14px 28px
-  );
-  background-color: #000;
+  background: #000 url("/images/section5/act1-bg.png") center / cover no-repeat;
 }
 .route-manifesto .s5-act1scrim {
   position: absolute;
