@@ -113,7 +113,7 @@
 
 ## SECTION 05 · 약속 (횡스크롤 3막)
 
-> ACT1 원산지 카드(3) · ACT2 sole agent 풀블리드(6) · ACT3 마무리(1). 전부 **생성형 = 가안·무드까지만**.
+> ACT1 원산지 카드(3) **또는** ②안 풀블리드 배경(`act1-bg`) · ACT2 sole agent 풀블리드(6) · ACT3 마무리(1). 전부 **생성형 = 가안·무드까지만**.
 > 코드 연결: `data-ph` 슬롯(빗금 placeholder) → 실 에셋 생성 후 배경/`<img>`로 교체.
 > ⚠️ 합성 제품을 "정품"이라 표기 금지 — 소재·공정·공간·손의 무드로. 공통 스파인(차콜·오렌지 림 한 줄·다크 네거티브) 따름.
 
@@ -127,6 +127,18 @@
 - **`origin-blum`** · prompt: `Cinematic macro of precision Austrian furniture hardware, brushed steel runner with machined edges, deep charcoal background, a single thin warm orange #ff671f rim-light, matte premium finish, shallow DOF, fine grain, no text no logo no watermark, --ar 3:2` · alt: `오스트리아 정밀 하드웨어 공정 무드 (가안 이미지)`
 - **`origin-agoform`** · prompt: `Cinematic macro of German furniture engineering components, drawer system parts in matte steel and dark polymer, deep charcoal background, one restrained orange #ff671f accent glint, premium editorial light, shallow DOF, fine grain, no text no logo, --ar 3:2` · alt: `독일 엔지니어링·소재 무드 (가안 이미지)`
 - **`origin-peka`** · prompt: `Cinematic macro of Swiss precision storage hardware, clean machined fittings, ordered and exact, deep charcoal background, single orange #ff671f rim-light, matte premium, shallow DOF, fine grain, no text no logo, --ar 3:2` · alt: `스위스 정밀·정돈 무드 (가안 이미지)`
+
+### ACT1 ②안 — 풀블리드 원산지 배경 (`public/images/section5/act1-bg.png`, 16:9 · 모바일 4:5)
+> ②안(가라오케 타이포 + 풀블리드 이미지) 채택 시 사용. 가라오케 문구가 **좌하단**에 얹히므로 그쪽에 **다크 네거티브 스페이스 확보**. 특정 제품/브랜드 식별 금지 — 유럽(오스트리아·독일·스위스) 정통 제조의 **무드**만.
+
+| id | 비율 | intent | 상태 |
+|---|---|---|---|
+| `act1-bg` | 16:9 / 4:5 | 유럽 정통 제조 원산지 무드(시네마틱 작업장 매크로) | 후보 |
+
+- **`act1-bg`** · prompt: `Cinematic wide macro of precision European furniture hardware and raw materials resting on a dark workbench — brushed steel drawer runners, machined fittings and a sheet of fine timber veneer, soft volumetric side light raking through a workshop window with faint dust motes in the beam, deep charcoal #16140f palette, matte premium surfaces, a single thin warm orange #ff671f rim-light tracing one metal edge only, shallow depth of field, fine film grain, generous dark negative space in the lower-left for a Korean + English headline, editorial origin-of-craft mood, no text, no logos, no brand markings, no readable labels, no watermark, --ar 16:9`
+  - 모바일(4:5): 위와 동일하되 `tighter vertical composition, more headroom and lower-third negative space for stacked headline, --ar 4:5`
+  - alt(대안 무드): `Moody European craft atelier in low warm light, out-of-focus background of timber stock and steel tooling, a craftsman's hands just leaving frame, single orange #ff671f accent glint on a metal edge, deep charcoal, soft grain, dark negative space lower-left, no text no logo no watermark, --ar 16:9`
+  - alt(캡션): `유럽 정통 제조의 원산지 무드 — 정밀 하드웨어와 소재가 놓인 어두운 작업장 (가안 이미지, 특정 제품 아님)`
 
 ### ACT2 — sole agent 풀블리드 (`public/images/section5/<id>.png`, 풀패널 16:9 · 모바일 4:5)
 | id | 비율 | intent | 상태 |
