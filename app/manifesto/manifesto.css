@@ -3518,3 +3518,42 @@
     animation: none !important;
   }
 }
+
+/* ========================= [05] 섹션5 횡스크롤 ========================= */
+.route-manifesto .s5 {
+  position: relative;
+  height: 480svh;            /* 가로 이동량 — 실측 튜닝 */
+  background: var(--c-charcoal-card);
+}
+.route-manifesto .s5__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+.route-manifesto .s5__track {
+  display: flex;
+  height: 100%;
+  width: 800vw;             /* 8패널 × 100vw */
+  will-change: transform;
+  transform: translateX(calc(var(--scene, 0) * -100vw));
+}
+.route-manifesto .s5-panel {
+  position: relative;
+  flex: 0 0 100vw;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.route-manifesto .s5-label {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  font: 600 11px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-orange);
+}
+.route-manifesto .s5-act1 { background: var(--c-charcoal); }
+.route-manifesto .s5-act3 { background: #0d0c09; }

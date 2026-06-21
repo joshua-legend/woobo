@@ -1,196 +1,106 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useScrub } from "@/hooks/useScrub";
 
-type Facet = {
-  t: string;
-  d: string;
-  feat?: boolean;
-  mark: React.ReactNode; // grid 변주용(기존)
-  icon: React.ReactNode; // fusion 변주용(직관 아이콘, viewBox 0 0 32 32)
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+const setVar = (el: HTMLElement | null, k: string, v: string) => {
+  if (el) el.style.setProperty(k, v);
 };
 
-const FACETS: Facet[] = [
-  {
-    t: "Blum 한국 독점 에이전트",
-    d: "정품의 공식 통로 (sole agent)",
-    feat: true,
-    mark: <path d="M4 15 L12 23 L26 6" />,
-    // 메달/공인 배지
-    icon: (
-      <>
-        <circle cx="16" cy="12" r="7" />
-        <path d="M11 18 L8 28 L16 24 L24 28 L21 18" />
-      </>
-    ),
-  },
-  {
-    t: "정품 보장 (유사품 차단)",
-    d: "A/S·부품 통로 확보",
-    mark: <path d="M15 3 L26 8 V16 C26 23 21 26 15 28 C9 26 4 23 4 16 V8 Z" />,
-    // 방패 + 체크
-    icon: (
-      <>
-        <path d="M16 4 L27 8 V15 C27 22 22 26 16 28 C10 26 5 22 5 15 V8 Z" />
-        <path d="M11 15 L15 19 L22 11" />
-      </>
-    ),
-  },
-  {
-    t: "프리미엄 멀티브랜드 수입",
-    d: "유럽 하드웨어·소재 전문",
-    mark: <circle cx="15" cy="15" r="11" />,
-    // 박스 3개(멀티)
-    icon: (
-      <>
-        <rect x="4.5" y="16" width="9" height="9" />
-        <rect x="18.5" y="16" width="9" height="9" />
-        <rect x="11.5" y="6.5" width="9" height="9" />
-      </>
-    ),
-  },
-  {
-    t: "가구 하드웨어 전문성",
-    d: "제작 현장을 아는 상담",
-    mark: <path d="M5 22 L15 5 L25 22 Z" />,
-    // 기어(기계·하드웨어)
-    icon: (
-      <>
-        <circle cx="16" cy="16" r="5" />
-        <path d="M16 4 V8 M16 24 V28 M4 16 H8 M24 16 H28 M7.5 7.5 L10.3 10.3 M21.7 21.7 L24.5 24.5 M24.5 7.5 L21.7 10.3 M10.3 21.7 L7.5 24.5" />
-      </>
-    ),
-  },
-  {
-    t: "전국 쇼룸 직접 체험",
-    d: "실물 확인 · 방문 예약제",
-    mark: <path d="M6 6 H24 V24 H6 Z M6 13 H24" />,
-    // 지도 핀
-    icon: (
-      <>
-        <path d="M16 28 C16 28 25 19 25 13 A9 9 0 0 0 7 13 C7 19 16 28 16 28 Z" />
-        <circle cx="16" cy="13" r="3.2" />
-      </>
-    ),
-  },
-  {
-    t: "자체 가구 생산 (김포 본점)",
-    d: "하드웨어부터 완제품까지",
-    mark: <path d="M4 26 V12 L15 5 L26 12 V26" />,
-    // 공장
-    icon: (
-      <>
-        <path d="M4 27 V15 L12 19 V15 L20 19 V15 L28 19 V27 Z" />
-        <path d="M23 15 V9 H26 V17" />
-      </>
-    ),
-  },
+/* 진행도 매핑 상수 */
+const A1_DWELL = 0.12; // ACT1 카드 던지기 구간
+const PANELS = 8; // 0=ACT1, 1..6=sole-agent, 7=ACT3
+const LAST = PANELS - 1;
+
+/* 오리진(ACT1) — 던지는 순서 = 쌓이는 순서, Blum 맨 위·강조 */
+const ORIGINS = [
+  { name: "AGOFORM", country: "독일", flag: "🇩🇪", img: "agoform", rot: "-11deg" },
+  { name: "Peka", country: "스위스", flag: "🇨🇭", img: "peka", rot: "6deg" },
+  { name: "Blum", country: "오스트리아", flag: "🇦🇹", img: "blum", rot: "-4deg", flagship: true },
 ];
 
-/* ---------- hybrid (pillars 가로 여정 + fusion 끝노드 + 아이콘 카드 허브) ---------- */
-function TrustHybrid() {
-  // 6개 카드 뿅뿅 stagger 팝 — 뷰포트 '가운데'에 카드 그리드가 닿으면 시작.
-  const cardsRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = cardsRef.current;
-    if (!el) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      el.classList.add("is-pop");
-      return;
+/* sole agent 6가지(ACT2) — 기존 콘텐츠 유지 */
+const FACETS = [
+  { t: "Blum 한국 독점 에이전트", d: "정품의 공식 통로 · sole agent", img: "sole-agent-01" },
+  { t: "정품 보장 (유사품 차단)", d: "A/S · 부품 통로 확보", img: "sole-agent-02" },
+  { t: "프리미엄 멀티브랜드 수입", d: "유럽 하드웨어 · 소재 전문", img: "sole-agent-03" },
+  { t: "가구 하드웨어 전문성", d: "제작 현장을 아는 상담", img: "sole-agent-04" },
+  { t: "전국 쇼룸 직접 체험", d: "실물 확인 · 방문 예약제", img: "sole-agent-05" },
+  { t: "자체 가구 생산 (김포 본점)", d: "하드웨어부터 완제품까지", img: "sole-agent-06" },
+];
+
+function Section5Scroll() {
+  const secRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const activeRef = useRef(0);
+  const [active, setActive] = useState(0);
+
+  const onUpdate = useCallback((p: number) => {
+    const track = trackRef.current;
+    const sec = secRef.current;
+    // p → scenePos (0..7): ACT1 dwell 후 선형 sweep
+    const scene =
+      p <= A1_DWELL ? 0 : ((p - A1_DWELL) / (1 - A1_DWELL)) * LAST;
+    setVar(track, "--scene", scene.toFixed(4));
+
+    // ACT1 카드 로컬 진행 → 카드별 --c1/--c2/--c3
+    const a1 = p <= A1_DWELL ? p / A1_DWELL : 1;
+    for (let i = 0; i < ORIGINS.length; i++) {
+      const ci = clamp(a1 * ORIGINS.length - i, 0, 1);
+      setVar(sec, `--c${i + 1}`, ci.toFixed(4));
     }
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            el.classList.add("is-pop");
-            io.unobserve(e.target);
-          }
-        }
-      },
-      // 그리드 상단이 뷰포트 약 72% 지점에 닿으면 발화(중앙보다 조금 더 일찍).
-      { rootMargin: "0px 0px -28% 0px", threshold: 0 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
+
+    // ACT2 sole-agent 진행(0..6) → 레일 게이지 --sa, 현재 인덱스
+    const sa = clamp(scene - 1, 0, 6);
+    setVar(sec, "--sa", sa.toFixed(4));
+
+    // ACT3 마무리 reveal
+    const a3 = clamp((scene - 6.2) / 0.8, 0, 1);
+    setVar(sec, "--a3", a3.toFixed(4));
+
+    const idx = clamp(Math.round(scene) - 1, 0, 5);
+    if (idx !== activeRef.current) {
+      activeRef.current = idx;
+      setActive(idx);
+    }
   }, []);
 
-  return (
-    <div className="tf-hybrid reveal-up">
-      <div className="tf-end">
-        <b className="tf-end__word">유럽 제조</b>
-        <span className="tf-end__rule" aria-hidden="true" />
-        <span className="tf-end__desc">Blum · AGOFORM · Peka 원산지</span>
-      </div>
+  useScrub(secRef, onUpdate, { start: "top top", end: "bottom bottom" });
 
-      <div className="tf-pipe" aria-hidden="true">
-        <i />
-      </div>
-
-      <div className="tf-hub tf-hub--center">
-        <span className="tf-tag">한국 독점 에이전트 · sole agent</span>
-        <b className="tf-hub__title">우보브랜드샵 — 정품의 공식 통로</b>
-        <div className="tf-cards" ref={cardsRef}>
-          {FACETS.map((f, i) => (
-            <div
-              key={f.t}
-              className="tf-card tf-card--pop"
-              style={
-                { "--reveal-delay": `${i * 0.09}s` } as React.CSSProperties
-              }
-            >
-              <svg className="tf-icon" viewBox="0 0 32 32" aria-hidden="true">
-                {f.icon}
-              </svg>
-              <div className="tf-card__tt">{f.t}</div>
-              <div className="tf-card__ds">{f.d}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="tf-pipe" aria-hidden="true">
-        <i />
-      </div>
-
-      <div className="tf-end">
-        <b className="tf-end__word">고객</b>
-        <span className="tf-end__rule" aria-hidden="true" />
-        <span className="tf-end__desc">정품 그대로, 손에 닿기까지</span>
-      </div>
-    </div>
-  );
-}
-
-/* =========================== [05] 약속 (Trust · 버저닝) =========================== */
-export function TrustByVariant({ variant: _variant }: { variant: string }) {
   return (
     <section
-      className="section trust"
+      className="section s5"
       data-section="trust"
-      data-theme="light"
+      data-theme="dark"
       data-screen-label="05 약속"
+      ref={secRef}
     >
-      <div className="inner">
-        <span className="eyebrow reveal-up">
-          <span className="num">05</span> / 약속
-        </span>
-        <h2 className="reveal-up d1">그래서, 우리가 독점으로 책임집니다.</h2>
-        <p className="lede reveal-up d1">
-          <span className="warn">
-            유사품에 주의하십시오 — 정품 Blum은 한국 독점 에이전트 우보에서.
-          </span>
-        </p>
-        <TrustHybrid />
-        <div className="brands reveal-up">
-          멀티브랜드 수입 전문 — <b>Blum</b> (간판) · AGOFORM (독일) · Peka
-          (스위스) 등
+      <div className="s5__sticky">
+        <div className="s5__track" ref={trackRef}>
+          {/* ACT1 */}
+          <div className="s5-panel s5-act1">
+            <span className="s5-label">유럽 제조 · 원산지</span>
+          </div>
+          {/* ACT2 — sole agent 6 */}
+          {FACETS.map((f, i) => (
+            <div className="s5-panel s5-sa" key={f.t}>
+              <span className="s5-label">{String(i + 1).padStart(2, "0")} / 06</span>
+            </div>
+          ))}
+          {/* ACT3 */}
+          <div className="s5-panel s5-act3">
+            <span className="s5-label">고객에게</span>
+          </div>
         </div>
-        <div className="footnote">
-          ※ 재고·납기 및 정확한 법적 등급 표현은 클라이언트 확인 후 확정 [TODO:
-          확인].
-        </div>
+        {/* 노드 레일(고정 오버레이) — Task 3에서 채움 */}
+        <div className="s5-rail" aria-hidden="true" data-active={active} />
       </div>
     </section>
   );
+}
+
+/* =========================== [05] 약속 (Trust · 횡스크롤) =========================== */
+export function TrustByVariant({ variant: _variant }: { variant: string }) {
+  return <Section5Scroll />;
 }
