@@ -15,9 +15,9 @@ const LAST = PANELS - 1;
 
 /* 오리진(ACT1) — 던지는 순서 = 쌓이는 순서, Blum 맨 위·강조 */
 const ORIGINS = [
-  { name: "AGOFORM", country: "독일", flag: "🇩🇪", img: "agoform", rot: "-11deg" },
-  { name: "Peka", country: "스위스", flag: "🇨🇭", img: "peka", rot: "6deg" },
-  { name: "Blum", country: "오스트리아", flag: "🇦🇹", img: "blum", rot: "-4deg", flagship: true },
+  { name: "AGOFORM", country: "독일", flag: "🇩🇪", img: "origin-agoform", rot: "-11deg" },
+  { name: "Peka", country: "스위스", flag: "🇨🇭", img: "origin-peka", rot: "6deg" },
+  { name: "Blum", country: "오스트리아", flag: "🇦🇹", img: "origin-blum", rot: "-4deg", flagship: true },
 ];
 
 /* sole agent 6가지(ACT2) — 기존 콘텐츠 유지 */
