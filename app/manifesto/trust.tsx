@@ -23,6 +23,13 @@ const ACT1_WORDS: { t: string; flag?: string }[] = [
   { t: "channel." },
 ];
 
+/* ACT1 카드 — 해당 브랜드 단어가 채워지는 시점(at)에 위에서 던져져 문구 옆에 안착 */
+const ACT1_CARDS = [
+  { name: "Blum", country: "오스트리아", flag: "🇦🇹", img: "origin-blum", at: 0.38, rot: "-5deg", x: "0px", z: 3, flagship: true },
+  { name: "AGOFORM", country: "독일", flag: "🇩🇪", img: "origin-agoform", at: 0.47, rot: "-12deg", x: "-82px", z: 1 },
+  { name: "Peka", country: "스위스", flag: "🇨🇭", img: "origin-peka", at: 0.57, rot: "10deg", x: "78px", z: 2 },
+];
+
 /* sole agent 6가지(ACT2) — 기존 콘텐츠 유지 */
 const FACETS = [
   { t: "Blum 한국 독점 에이전트", d: "정품의 공식 통로 · sole agent", img: "sole-agent-01" },
@@ -36,21 +43,49 @@ const FACETS = [
 function Act1Karaoke() {
   const n = ACT1_WORDS.length;
   return (
-    <div className="s5-kara">
-      <p>
-        {ACT1_WORDS.map((w, i) => (
-          <span
-            key={i}
-            className={`s5-w${w.flag ? " s5-w--brand" : ""}`}
+    <div className="s5-act1in">
+      <div className="s5-kara">
+        <p>
+          {ACT1_WORDS.map((w, i) => (
+            <span
+              key={i}
+              className={`s5-w${w.flag ? " s5-w--brand" : ""}`}
+              style={
+                {
+                  "--at": ((i / (n - 1)) * 0.85).toFixed(3),
+                } as React.CSSProperties
+              }
+            >
+              {w.t}
+              {w.flag ? <span className="s5-w__fl"> {w.flag}</span> : null}{" "}
+            </span>
+          ))}
+        </p>
+      </div>
+      <div className="s5-deck2" aria-hidden="true">
+        {ACT1_CARDS.map((c) => (
+          <div
+            key={c.name}
+            className={`s5-card2${c.flagship ? " is-flag" : ""}`}
             style={
-              { "--at": ((i / (n - 1)) * 0.85).toFixed(3) } as React.CSSProperties
+              {
+                "--at": c.at,
+                "--rot": c.rot,
+                "--cx": c.x,
+                zIndex: c.z,
+              } as React.CSSProperties
             }
           >
-            {w.t}
-            {w.flag ? <span className="s5-w__fl"> {w.flag}</span> : null}{" "}
-          </span>
+            <span className="s5-card2__fl">{c.flag}</span>
+            <div className="s5-card2__img" data-ph={c.img} />
+            <b className="s5-card2__nm">{c.name}</b>
+            <span className="s5-card2__co">
+              {c.country}
+              {c.flagship ? " · 간판" : ""}
+            </span>
+          </div>
         ))}
-      </p>
+      </div>
     </div>
   );
 }

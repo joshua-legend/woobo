@@ -3019,16 +3019,77 @@
 .route-manifesto .s5-act1 { background: #000; }
 .route-manifesto .s5-act3 { background: #000; }
 
-/* ACT1 가라오케 — 스크롤 진행(--a1)에 따라 단어가 채워짐 */
+/* ACT1 — 좌: 가라오케 문구 / 우: 던져지는 카드 */
+.route-manifesto .s5-act1in {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 4vw, 64px);
+  padding: 0 clamp(30px, 6vw, 96px);
+}
+/* 가라오케 — 스크롤 진행(--a1)에 따라 단어가 채워짐(좌측 정렬) */
 .route-manifesto .s5-kara {
-  max-width: min(86vw, 880px);
-  padding: 0 24px;
-  text-align: center;
+  flex: 1 1 48%;
+  text-align: left;
+  max-width: 560px;
 }
 .route-manifesto .s5-kara p {
   margin: 0;
-  font: 800 clamp(24px, 3.6vw, 46px) / 1.32 var(--font-sans);
+  font: 800 clamp(22px, 3vw, 40px) / 1.3 var(--font-sans);
   word-break: keep-all;
+}
+/* 우측 카드존 + 던져지는 카드(--a1 이 카드별 --at 을 넘으면 위에서 낙하·안착) */
+.route-manifesto .s5-deck2 {
+  position: relative;
+  flex: 1 1 46%;
+  height: 72%;
+}
+.route-manifesto .s5-card2 {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150px;
+  height: 210px;
+  margin: -105px 0 0 -75px;
+  border-radius: 13px;
+  background: var(--c-paper);
+  border: 1px solid var(--c-line);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.6);
+  padding: 11px;
+  display: flex;
+  flex-direction: column;
+  --drop: clamp(0, calc((var(--a1, 0) - var(--at, 0)) * 14), 1);
+  opacity: var(--drop);
+  transform: translate(var(--cx, 0), calc(-165% * (1 - var(--drop))))
+    rotate(calc(var(--rot, 0deg) * var(--drop)));
+  transition: none;
+}
+.route-manifesto .s5-card2.is-flag {
+  border-color: var(--c-orange);
+  box-shadow: 0 0 0 1px var(--c-orange), 0 20px 44px rgba(0, 0, 0, 0.55);
+}
+.route-manifesto .s5-card2__fl {
+  position: absolute;
+  top: 9px;
+  left: 12px;
+  font-size: 17px;
+}
+.route-manifesto .s5-card2__img {
+  flex: 1;
+  margin: 22px 4px 9px;
+  border-radius: 8px;
+  background: repeating-linear-gradient(45deg, #ece7dd 0 9px, #e3ddd1 9px 18px);
+}
+.route-manifesto .s5-card2__nm {
+  text-align: center;
+  font: 800 14px/1.1 var(--font-sans);
+  color: var(--c-ink);
+}
+.route-manifesto .s5-card2__co {
+  text-align: center;
+  font: 500 9px/1.2 var(--font-mono);
+  color: var(--c-caption);
 }
 /* 단어: --at(인라인 임계값)을 --a1 이 넘으면 점등(흐림→밝음) */
 .route-manifesto .s5-w {
