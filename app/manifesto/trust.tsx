@@ -77,6 +77,19 @@ function NodeRail({ active }: { active: number }) {
   );
 }
 
+function Act3Closing() {
+  return (
+    <div className="s5-closing">
+      <p className="s5-closing__eyebrow">한국 독점 에이전트 · sole agent</p>
+      <h2 className="s5-closing__head">당신의 공간에 정품의 기준을.</h2>
+      <p className="s5-closing__sub">Blum 한국 독점 에이전트, 우보브랜드샵.</p>
+      <a className="s5-closing__cta" href="#showroom">
+        전국 쇼룸 방문 예약 <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  );
+}
+
 function Section5Scroll() {
   const secRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -147,6 +160,7 @@ function Section5Scroll() {
           {/* ACT3 */}
           <div className="s5-panel s5-act3">
             <span className="s5-label">고객에게</span>
+            <Act3Closing />
           </div>
         </div>
         <NodeRail active={active} />

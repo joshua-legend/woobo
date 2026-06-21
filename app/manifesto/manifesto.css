@@ -3699,3 +3699,41 @@
   color: #fff;
 }
 .route-manifesto .s5-rail__node.is-cur { transform: scale(1.25); }
+
+/* ACT3 마무리 */
+.route-manifesto .s5-closing {
+  max-width: 640px;
+  padding: 0 24px;
+  text-align: center;
+  color: var(--c-paper);
+  /* --a3 0→1 동안 아래→제자리 + 페이드 */
+  opacity: var(--a3, 0);
+  transform: translateY(calc(28px * (1 - var(--a3, 0))));
+}
+.route-manifesto .s5-closing__eyebrow {
+  font: 700 12px/1 var(--font-mono);
+  letter-spacing: 0.1em;
+  color: var(--c-orange);
+  margin-bottom: 18px;
+}
+.route-manifesto .s5-closing__head {
+  font: 700 clamp(30px, 6vw, 64px) / 1.12 var(--font-sans);
+  word-break: keep-all;
+  margin: 0 0 16px;
+}
+.route-manifesto .s5-closing__sub {
+  font: 500 clamp(14px, 2vw, 18px) / 1.5 var(--font-sans);
+  color: #cfc8bb;
+  margin: 0 0 32px;
+}
+.route-manifesto .s5-closing__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: var(--c-orange);
+  color: #fff;
+  font: 700 14px/1 var(--font-sans);
+  text-decoration: none;
+}
