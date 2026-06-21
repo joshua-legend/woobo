@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { Fragment, useCallback, useRef, useState } from "react";
 import { useScrub } from "@/hooks/useScrub";
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
@@ -13,21 +13,21 @@ const A1_DWELL = 0.16; // ACT1 가라오케 채움 구간
 const PANELS = 8; // 0=ACT1, 1..6=sole-agent, 7=ACT3
 const LAST = PANELS - 1;
 
-/* ACT1 가라오케 문구 — 스크롤 진행에 따라 단어가 채워짐. flag 있는 단어 = 원산지 강조 */
-const ACT1_WORDS: { t: string; flag?: string }[] = [
-  { t: "Made" }, { t: "in" }, { t: "Europe" }, { t: "—" },
-  { t: "authentic" }, { t: "to" }, { t: "the" }, { t: "origin." },
+/* ACT1 가라오케 문구 — 단어가 채워짐. flag=원산지 강조, br=줄바꿈 */
+const ACT1_WORDS: { t: string; flag?: string; br?: boolean }[] = [
+  { t: "Made" }, { t: "in" }, { t: "Europe" }, { t: "—", br: true },
+  { t: "authentic" }, { t: "to" }, { t: "the" }, { t: "origin.", br: true },
   { t: "Blum", flag: "🇦🇹" }, { t: "·" }, { t: "AGOFORM", flag: "🇩🇪" },
-  { t: "·" }, { t: "Peka", flag: "🇨🇭" }, { t: "—" },
+  { t: "·" }, { t: "Peka", flag: "🇨🇭", br: true },
   { t: "원산지" }, { t: "그대로," }, { t: "one" }, { t: "trusted" },
   { t: "channel." },
 ];
 
 /* ACT1 카드 — 해당 브랜드 단어가 채워지는 시점(at)에 위에서 던져져 문구 옆에 안착 */
 const ACT1_CARDS = [
-  { name: "Blum", country: "오스트리아", flag: "🇦🇹", img: "origin-blum", at: 0.38, rot: "-5deg", x: "0px", z: 3, flagship: true },
-  { name: "AGOFORM", country: "독일", flag: "🇩🇪", img: "origin-agoform", at: 0.47, rot: "-12deg", x: "-116px", z: 1 },
-  { name: "Peka", country: "스위스", flag: "🇨🇭", img: "origin-peka", at: 0.57, rot: "10deg", x: "112px", z: 2 },
+  { name: "Blum", country: "오스트리아", flag: "🇦🇹", img: "origin-blum", at: 0.40, rot: "-5deg", x: "0px", z: 3, flagship: true },
+  { name: "AGOFORM", country: "독일", flag: "🇩🇪", img: "origin-agoform", at: 0.50, rot: "-12deg", x: "-120px", z: 1 },
+  { name: "Peka", country: "스위스", flag: "🇨🇭", img: "origin-peka", at: 0.60, rot: "10deg", x: "118px", z: 2 },
 ];
 
 /* sole agent 6가지(ACT2) — 기존 콘텐츠 유지 */
@@ -47,18 +47,20 @@ function Act1Karaoke() {
       <div className="s5-kara">
         <p>
           {ACT1_WORDS.map((w, i) => (
-            <span
-              key={i}
-              className={`s5-w${w.flag ? " s5-w--brand" : ""}`}
-              style={
-                {
-                  "--at": ((i / (n - 1)) * 0.85).toFixed(3),
-                } as React.CSSProperties
-              }
-            >
-              {w.t}
-              {w.flag ? <span className="s5-w__fl"> {w.flag}</span> : null}{" "}
-            </span>
+            <Fragment key={i}>
+              <span
+                className={`s5-w${w.flag ? " s5-w--brand" : ""}`}
+                style={
+                  {
+                    "--at": ((i / (n - 1)) * 0.85).toFixed(3),
+                  } as React.CSSProperties
+                }
+              >
+                {w.t}
+                {w.flag ? <span className="s5-w__fl"> {w.flag}</span> : null}{" "}
+              </span>
+              {w.br ? <br /> : null}
+            </Fragment>
           ))}
         </p>
       </div>
