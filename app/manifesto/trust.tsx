@@ -52,14 +52,14 @@ function Section5Scroll() {
     }
 
     // ACT2 sole-agent 진행(0..6) → 레일 게이지 --sa, 현재 인덱스
-    const sa = clamp(scene - 1, 0, 6);
+    const sa = clamp(scene - 1, 0, LAST - 1);
     setVar(sec, "--sa", sa.toFixed(4));
 
     // ACT3 마무리 reveal
     const a3 = clamp((scene - 6.2) / 0.8, 0, 1);
     setVar(sec, "--a3", a3.toFixed(4));
 
-    const idx = clamp(Math.round(scene) - 1, 0, 5);
+    const idx = clamp(Math.round(scene) - 1, 0, FACETS.length - 1);
     if (idx !== activeRef.current) {
       activeRef.current = idx;
       setActive(idx);
