@@ -30,6 +30,35 @@ const FACETS = [
   { t: "자체 가구 생산 (김포 본점)", d: "하드웨어부터 완제품까지", img: "sole-agent-06" },
 ];
 
+function Act1Stack() {
+  return (
+    <div className="s5-deck">
+      {ORIGINS.map((o, i) => (
+        <div
+          key={o.name}
+          className={`s5-deckcard${o.flagship ? " is-flag" : ""}`}
+          style={
+            {
+              "--ci": `var(--c${i + 1})`,
+              "--rot": o.rot,
+              zIndex: i + 1,
+            } as React.CSSProperties
+          }
+        >
+          <div className="s5-deckcard__img" data-ph={o.img} />
+          <div className="s5-deckcard__meta">
+            <b>{o.name}</b>
+            <span>
+              {o.flag} {o.country}
+              {o.flagship ? " · 간판" : ""}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Section5Scroll() {
   const secRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -81,6 +110,7 @@ function Section5Scroll() {
           {/* ACT1 */}
           <div className="s5-panel s5-act1">
             <span className="s5-label">유럽 제조 · 원산지</span>
+            <Act1Stack />
           </div>
           {/* ACT2 — sole agent 6 */}
           {FACETS.map((f, i) => (

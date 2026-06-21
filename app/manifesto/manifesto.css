@@ -3557,3 +3557,57 @@
 }
 .route-manifesto .s5-act1 { background: var(--c-charcoal); }
 .route-manifesto .s5-act3 { background: #0d0c09; }
+
+/* ACT1 카드 더미 */
+.route-manifesto .s5-deck {
+  position: relative;
+  width: min(78vw, 360px);
+  height: 300px;
+}
+.route-manifesto .s5-deckcard {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: 240px;
+  height: 150px;
+  margin-left: -120px;
+  border-radius: 14px;
+  background: var(--c-paper);
+  border: 1px solid var(--c-line);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* 던지기: --ci 0→1 동안 위(-130%)→제자리 + 회전 0→--rot, 투명→불투명 */
+  opacity: var(--ci, 0);
+  transform: translateY(calc(-130% * (1 - var(--ci, 0))))
+    rotate(calc(var(--rot) * var(--ci, 0)));
+  transition: none;
+}
+.route-manifesto .s5-deckcard.is-flag {
+  border-color: var(--c-orange);
+}
+.route-manifesto .s5-deckcard__img {
+  flex: 1;
+  border-radius: 8px;
+  background: repeating-linear-gradient(
+    45deg,
+    #ece7dd 0 10px,
+    #e3ddd1 10px 20px
+  );
+}
+.route-manifesto .s5-deckcard__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+}
+.route-manifesto .s5-deckcard__meta b {
+  font: 700 14px/1 var(--font-sans);
+  color: var(--c-ink);
+}
+.route-manifesto .s5-deckcard__meta span {
+  font-size: 10px;
+  color: var(--c-caption);
+}
