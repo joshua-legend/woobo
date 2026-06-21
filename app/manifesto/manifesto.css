@@ -3091,6 +3091,39 @@
   font: 500 11px/1.2 var(--font-mono);
   color: var(--c-caption);
 }
+/* ACT1 반응형 — 중간폭: 카드 축소 유지 / 모바일: 세로 스택(문구 위·카드 아래) */
+@media (max-width: 1180px) {
+  .route-manifesto .s5-act1in {
+    padding: 0 clamp(24px, 5vw, 60px);
+    gap: clamp(16px, 3vw, 40px);
+  }
+  .route-manifesto .s5-deck2 {
+    transform: scale(0.84);
+  }
+}
+@media (max-width: 900px) {
+  .route-manifesto .s5-act1in {
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(8px, 3vh, 26px);
+    padding: 0 22px;
+  }
+  .route-manifesto .s5-kara {
+    flex: none;
+    width: 100%;
+    max-width: none;
+    text-align: center;
+  }
+  .route-manifesto .s5-kara p {
+    font: 800 clamp(20px, 5.4vw, 30px) / 1.34 var(--font-sans);
+  }
+  .route-manifesto .s5-deck2 {
+    flex: none;
+    width: 100%;
+    height: 40vh;
+    transform: scale(0.7);
+  }
+}
 /* 단어: --at(인라인 임계값)을 --a1 이 넘으면 점등(흐림→밝음) */
 .route-manifesto .s5-w {
   --lit: clamp(0, calc((var(--a1, 0) - var(--at, 0)) * 22), 1);
