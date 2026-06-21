@@ -26,8 +26,8 @@ const ACT1_WORDS: { t: string; flag?: string }[] = [
 /* ACT1 카드 — 해당 브랜드 단어가 채워지는 시점(at)에 위에서 던져져 문구 옆에 안착 */
 const ACT1_CARDS = [
   { name: "Blum", country: "오스트리아", flag: "🇦🇹", img: "origin-blum", at: 0.38, rot: "-5deg", x: "0px", z: 3, flagship: true },
-  { name: "AGOFORM", country: "독일", flag: "🇩🇪", img: "origin-agoform", at: 0.47, rot: "-12deg", x: "-82px", z: 1 },
-  { name: "Peka", country: "스위스", flag: "🇨🇭", img: "origin-peka", at: 0.57, rot: "10deg", x: "78px", z: 2 },
+  { name: "AGOFORM", country: "독일", flag: "🇩🇪", img: "origin-agoform", at: 0.47, rot: "-12deg", x: "-116px", z: 1 },
+  { name: "Peka", country: "스위스", flag: "🇨🇭", img: "origin-peka", at: 0.57, rot: "10deg", x: "112px", z: 2 },
 ];
 
 /* sole agent 6가지(ACT2) — 기존 콘텐츠 유지 */

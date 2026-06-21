@@ -3049,14 +3049,14 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 150px;
-  height: 210px;
-  margin: -105px 0 0 -75px;
-  border-radius: 13px;
+  width: 210px;
+  height: 296px;
+  margin: -148px 0 0 -105px;
+  border-radius: 16px;
   background: var(--c-paper);
   border: 1px solid var(--c-line);
-  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.6);
-  padding: 11px;
+  box-shadow: 0 26px 56px rgba(0, 0, 0, 0.62);
+  padding: 14px;
   display: flex;
   flex-direction: column;
   --drop: clamp(0, calc((var(--a1, 0) - var(--at, 0)) * 14), 1);
@@ -3071,24 +3071,24 @@
 }
 .route-manifesto .s5-card2__fl {
   position: absolute;
-  top: 9px;
-  left: 12px;
-  font-size: 17px;
+  top: 12px;
+  left: 15px;
+  font-size: 23px;
 }
 .route-manifesto .s5-card2__img {
   flex: 1;
-  margin: 22px 4px 9px;
-  border-radius: 8px;
-  background: repeating-linear-gradient(45deg, #ece7dd 0 9px, #e3ddd1 9px 18px);
+  margin: 32px 5px 12px;
+  border-radius: 10px;
+  background: repeating-linear-gradient(45deg, #ece7dd 0 10px, #e3ddd1 10px 20px);
 }
 .route-manifesto .s5-card2__nm {
   text-align: center;
-  font: 800 14px/1.1 var(--font-sans);
+  font: 800 18px/1.1 var(--font-sans);
   color: var(--c-ink);
 }
 .route-manifesto .s5-card2__co {
   text-align: center;
-  font: 500 9px/1.2 var(--font-mono);
+  font: 500 11px/1.2 var(--font-mono);
   color: var(--c-caption);
 }
 /* 단어: --at(인라인 임계값)을 --a1 이 넘으면 점등(흐림→밝음) */
