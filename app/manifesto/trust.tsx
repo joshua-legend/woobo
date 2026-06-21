@@ -9,15 +9,18 @@ const setVar = (el: HTMLElement | null, k: string, v: string) => {
 };
 
 /* 진행도 매핑 상수 */
-const A1_DWELL = 0.12; // ACT1 카드 던지기 구간
+const A1_DWELL = 0.16; // ACT1 가라오케 채움 구간
 const PANELS = 8; // 0=ACT1, 1..6=sole-agent, 7=ACT3
 const LAST = PANELS - 1;
 
-/* 오리진(ACT1) — 던지는 순서 = 쌓이는 순서, Blum 맨 위·강조 */
-const ORIGINS = [
-  { name: "AGOFORM", country: "독일", flag: "🇩🇪", img: "origin-agoform", rot: "-11deg" },
-  { name: "Peka", country: "스위스", flag: "🇨🇭", img: "origin-peka", rot: "6deg" },
-  { name: "Blum", country: "오스트리아", flag: "🇦🇹", img: "origin-blum", rot: "-4deg", flagship: true },
+/* ACT1 가라오케 문구 — 스크롤 진행에 따라 단어가 채워짐. flag 있는 단어 = 원산지 강조 */
+const ACT1_WORDS: { t: string; flag?: string }[] = [
+  { t: "Made" }, { t: "in" }, { t: "Europe" }, { t: "—" },
+  { t: "authentic" }, { t: "to" }, { t: "the" }, { t: "origin." },
+  { t: "Blum", flag: "🇦🇹" }, { t: "·" }, { t: "AGOFORM", flag: "🇩🇪" },
+  { t: "·" }, { t: "Peka", flag: "🇨🇭" }, { t: "—" },
+  { t: "원산지" }, { t: "그대로," }, { t: "one" }, { t: "trusted" },
+  { t: "channel." },
 ];
 
 /* sole agent 6가지(ACT2) — 기존 콘텐츠 유지 */
@@ -30,42 +33,24 @@ const FACETS = [
   { t: "자체 가구 생산 (김포 본점)", d: "하드웨어부터 완제품까지", img: "sole-agent-06" },
 ];
 
-function Act1Stack() {
+function Act1Karaoke() {
+  const n = ACT1_WORDS.length;
   return (
-    <div className="s5-deck">
-      {ORIGINS.map((o, i) => (
-        <div
-          key={o.name}
-          className={`s5-deckcard${o.flagship ? " is-flag" : ""}`}
-          style={
-            {
-              "--ci": `var(--c${i + 1})`,
-              "--rot": o.rot,
-              zIndex: i + 1,
-            } as React.CSSProperties
-          }
-        >
-          <span className="s5-deckcard__idx">
-            {i + 1}
-            <em>{o.flag}</em>
-          </span>
-          <div className="s5-deckcard__img" data-ph={o.img} />
-          <div className="s5-deckcard__name">
-            <b>{o.name}</b>
-            <span>
-              {o.country}
-              {o.flagship ? " · 간판" : ""}
-            </span>
-          </div>
+    <div className="s5-kara">
+      <p>
+        {ACT1_WORDS.map((w, i) => (
           <span
-            className="s5-deckcard__idx s5-deckcard__idx--br"
-            aria-hidden="true"
+            key={i}
+            className={`s5-w${w.flag ? " s5-w--brand" : ""}`}
+            style={
+              { "--at": ((i / (n - 1)) * 0.85).toFixed(3) } as React.CSSProperties
+            }
           >
-            {i + 1}
-            <em>{o.flag}</em>
+            {w.t}
+            {w.flag ? <span className="s5-w__fl"> {w.flag}</span> : null}{" "}
           </span>
-        </div>
-      ))}
+        ))}
+      </p>
     </div>
   );
 }
@@ -115,12 +100,9 @@ function Section5Scroll() {
       p <= A1_DWELL ? 0 : ((p - A1_DWELL) / (1 - A1_DWELL)) * LAST;
     setVar(track, "--scene", scene.toFixed(4));
 
-    // ACT1 카드 로컬 진행 → 카드별 --c1/--c2/--c3
+    // ACT1 가라오케 채움 진행도(0→1)
     const a1 = p <= A1_DWELL ? p / A1_DWELL : 1;
-    for (let i = 0; i < ORIGINS.length; i++) {
-      const ci = clamp(a1 * ORIGINS.length - i, 0, 1);
-      setVar(sec, `--c${i + 1}`, ci.toFixed(4));
-    }
+    setVar(sec, "--a1", a1.toFixed(4));
 
     // ACT2 sole-agent 진행(0..6) → 레일 게이지 --sa, 현재 인덱스
     const sa = clamp(scene - 1, 0, FACETS.length - 1);
@@ -155,7 +137,7 @@ function Section5Scroll() {
           {/* ACT1 */}
           <div className="s5-panel s5-act1">
             <span className="s5-label">유럽 제조 · 원산지</span>
-            <Act1Stack />
+            <Act1Karaoke />
           </div>
           {/* ACT2 — sole agent 6 */}
           {FACETS.map((f, i) => (

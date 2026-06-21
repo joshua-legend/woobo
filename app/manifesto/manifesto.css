@@ -3019,87 +3019,31 @@
 .route-manifesto .s5-act1 { background: #000; }
 .route-manifesto .s5-act3 { background: #000; }
 
-/* ACT1 카드 더미 */
-.route-manifesto .s5-deck {
-  position: relative;
-  width: min(78vw, 360px);
-  height: 300px;
+/* ACT1 가라오케 — 스크롤 진행(--a1)에 따라 단어가 채워짐 */
+.route-manifesto .s5-kara {
+  max-width: min(86vw, 880px);
+  padding: 0 24px;
+  text-align: center;
 }
-.route-manifesto .s5-deckcard {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 194px;
-  height: 270px;
-  margin: -135px 0 0 -97px;
-  border-radius: 16px;
-  background: var(--c-paper);
-  border: 1px solid var(--c-line);
-  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.6);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  /* 던지기: --ci 0→1 동안 위→제자리 + 회전 0→--rot, 투명→불투명 */
-  opacity: var(--ci, 0);
-  transform: translateY(calc(-150% * (1 - var(--ci, 0))))
-    rotate(calc(var(--rot) * var(--ci, 0)));
+.route-manifesto .s5-kara p {
+  margin: 0;
+  font: 800 clamp(24px, 3.6vw, 46px) / 1.32 var(--font-sans);
+  word-break: keep-all;
+}
+/* 단어: --at(인라인 임계값)을 --a1 이 넘으면 점등(흐림→밝음) */
+.route-manifesto .s5-w {
+  --lit: clamp(0, calc((var(--a1, 0) - var(--at, 0)) * 22), 1);
+  color: var(--c-paper);
+  opacity: calc(0.18 + var(--lit) * 0.82);
   transition: none;
 }
-.route-manifesto .s5-deckcard.is-flag {
-  border-color: var(--c-orange);
-  box-shadow: 0 0 0 1px var(--c-orange),
-    0 24px 52px rgba(255, 103, 31, 0.22), 0 24px 52px rgba(0, 0, 0, 0.55);
-}
-/* 플레잉카드 코너 인덱스(번호 + 국기) */
-.route-manifesto .s5-deckcard__idx {
-  position: absolute;
-  top: 11px;
-  left: 13px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1;
-  font: 800 17px/1 var(--font-sans);
-  color: var(--c-ink);
-}
-.route-manifesto .s5-deckcard__idx em {
-  font-style: normal;
-  font-size: 14px;
-  margin-top: 3px;
-}
-.route-manifesto .s5-deckcard__idx--br {
-  top: auto;
-  bottom: 11px;
-  left: auto;
-  right: 13px;
-  transform: rotate(180deg);
-}
-.route-manifesto .s5-deckcard.is-flag .s5-deckcard__idx {
+.route-manifesto .s5-w--brand {
   color: var(--c-orange);
+  text-shadow: 0 0 calc(var(--lit) * 20px) rgba(255, 103, 31, 0.4);
 }
-.route-manifesto .s5-deckcard__img {
-  flex: 1;
-  margin: 30px 8px 12px;
-  border-radius: 10px;
-  background: repeating-linear-gradient(
-    45deg,
-    #ece7dd 0 10px,
-    #e3ddd1 10px 20px
-  );
-}
-.route-manifesto .s5-deckcard__name {
-  text-align: center;
-  padding-bottom: 4px;
-}
-.route-manifesto .s5-deckcard__name b {
-  display: block;
-  font: 800 16px/1.15 var(--font-sans);
-  color: var(--c-ink);
-}
-.route-manifesto .s5-deckcard__name span {
-  font: 500 10px/1 var(--font-mono);
-  letter-spacing: 0.04em;
-  color: var(--c-caption);
+.route-manifesto .s5-w__fl {
+  font-size: 0.72em;
+  opacity: var(--lit, 0);
 }
 /* ACT2 sole agent 풀블리드 */
 .route-manifesto .s5-sa__bg {
@@ -3234,10 +3178,6 @@
 }
 
 /* 섹션5 이미지 슬롯 placeholder 캡션 (data-ph → 모노 캡션) */
-.route-manifesto .s5-deckcard__img {
-  position: relative;
-}
-.route-manifesto .s5-deckcard__img[data-ph]::after,
 .route-manifesto .s5-sa__bg[data-ph]::after {
   content: attr(data-ph);
   position: absolute;
@@ -3271,9 +3211,11 @@
     width: 100%;
     min-height: 80svh;
   }
-  .route-manifesto .s5-deckcard,
   .route-manifesto .s5-closing {
     transform: none;
+    opacity: 1;
+  }
+  .route-manifesto .s5-w {
     opacity: 1;
   }
   .route-manifesto .s5-rail { display: none; }
