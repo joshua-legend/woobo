@@ -109,3 +109,47 @@
 
 ## SECTION 03~08 · (추후 슬롯 추가)
 - 03~05 데모 / 06 약속 / 07 사회적 증거(로고월·후기) / 08 쇼룸(지점 지도) — 현재 전부 `.ph` placeholder. 디벨롭 진행하며 슬롯 등재.
+---
+
+## SECTION 05 · 약속 (횡스크롤 3막)
+
+> ACT1 원산지 카드(3) · ACT2 sole agent 풀블리드(6) · ACT3 마무리(1). 전부 **생성형 = 가안·무드까지만**.
+> 코드 연결: `data-ph` 슬롯(빗금 placeholder) → 실 에셋 생성 후 배경/`<img>`로 교체.
+> ⚠️ 합성 제품을 "정품"이라 표기 금지 — 소재·공정·공간·손의 무드로. 공통 스파인(차콜·오렌지 림 한 줄·다크 네거티브) 따름.
+
+### ACT1 — 원산지 카드 (`public/images/section5/<id>.png`, 3:2)
+| id | 비율 | intent | 상태 |
+|---|---|---|---|
+| `origin-blum` | 3:2 | Blum 오스트리아 — 정밀 하드웨어 공정 | 후보 |
+| `origin-agoform` | 3:2 | AGOFORM 독일 — 엔지니어링·소재 | 후보 |
+| `origin-peka` | 3:2 | Peka 스위스 — 정밀·정돈 | 후보 |
+
+- **`origin-blum`** · prompt: `Cinematic macro of precision Austrian furniture hardware, brushed steel runner with machined edges, deep charcoal background, a single thin warm orange #ff671f rim-light, matte premium finish, shallow DOF, fine grain, no text no logo no watermark, --ar 3:2` · alt: `오스트리아 정밀 하드웨어 공정 무드 (가안 이미지)`
+- **`origin-agoform`** · prompt: `Cinematic macro of German furniture engineering components, drawer system parts in matte steel and dark polymer, deep charcoal background, one restrained orange #ff671f accent glint, premium editorial light, shallow DOF, fine grain, no text no logo, --ar 3:2` · alt: `독일 엔지니어링·소재 무드 (가안 이미지)`
+- **`origin-peka`** · prompt: `Cinematic macro of Swiss precision storage hardware, clean machined fittings, ordered and exact, deep charcoal background, single orange #ff671f rim-light, matte premium, shallow DOF, fine grain, no text no logo, --ar 3:2` · alt: `스위스 정밀·정돈 무드 (가안 이미지)`
+
+### ACT2 — sole agent 풀블리드 (`public/images/section5/<id>.png`, 풀패널 16:9 · 모바일 4:5)
+| id | 비율 | intent | 상태 |
+|---|---|---|---|
+| `sole-agent-01` | 16:9 / 4:5 | 한국 독점 에이전트 · 공인 | 후보 |
+| `sole-agent-02` | 16:9 / 4:5 | 정품 보장 · 유사품 차단 | 후보 |
+| `sole-agent-03` | 16:9 / 4:5 | 프리미엄 멀티브랜드 수입 | 후보 |
+| `sole-agent-04` | 16:9 / 4:5 | 가구 하드웨어 전문성 | 후보 |
+| `sole-agent-05` | 16:9 / 4:5 | 전국 쇼룸 직접 체험 | 후보 |
+| `sole-agent-06` | 16:9 / 4:5 | 자체 가구 생산 (김포) | 후보 |
+
+- **`sole-agent-01`** · prompt: `Cinematic dark editorial mood of an official sole-agent channel — a single authenticated pathway, abstract corridor of light over matte metal, deep charcoal, one orange #ff671f rim accent, dark negative space for Korean headline at bottom-left, no text no logo, --ar 16:9` · alt: `한국 독점 에이전트 무드 (가안)`
+- **`sole-agent-02`** · prompt: `Cinematic macro suggesting genuine-part protection, a sealed precision component under cool key light vs blurred imitation behind, deep charcoal, restrained orange #ff671f glint, dark negative space, no text no logo, --ar 16:9` · alt: `정품 보장·유사품 차단 무드 (가안)`
+- **`sole-agent-03`** · prompt: `Cinematic arrangement of premium European furniture hardware and materials from multiple makers, matte metals and fine surfaces, deep charcoal, single orange #ff671f accent, editorial light, dark negative space, no text no logo, --ar 16:9` · alt: `프리미엄 멀티브랜드 수입 무드 (가안)`
+- **`sole-agent-04`** · prompt: `Cinematic close-up of expert hands and machined furniture hardware on a workbench, sense of craft and field knowledge, deep charcoal, one orange #ff671f rim-light, shallow DOF, dark negative space, no text no logo, --ar 16:9` · alt: `가구 하드웨어 전문성 무드 (가안)`
+- **`sole-agent-05`** · prompt: `Cinematic premium showroom interior in low warm light, cabinetry surfaces and shadow, inviting and tactile, deep charcoal palette, single orange #ff671f accent, dark negative space for headline, no text no logo, --ar 16:9` · alt: `전국 쇼룸 직접 체험 무드 (가안)`
+- **`sole-agent-06`** · prompt: `Cinematic mood of an in-house furniture workshop in Gimpo, sawdust light beams, raw and finished pieces, deep charcoal, one orange #ff671f accent, editorial grain, dark negative space, no text no logo, --ar 16:9` · alt: `자체 가구 생산(김포) 무드 (가안)`
+
+### ACT3 — 마무리 (`public/images/section5/closing.png`, 풀패널, 선택)
+| id | 비율 | intent | 상태 |
+|---|---|---|---|
+| `closing` | 16:9 / 4:5 | 고객 공간에 정품의 기준 | 후보(선택) |
+
+- **`closing`** · prompt: `Cinematic premium living space at golden hour, refined cabinetry with soft-close detail implied, calm and aspirational, deep charcoal-to-warm palette, single orange #ff671f accent, generous dark negative space for centered Korean headline, no text no logo, --ar 16:9` · alt: `고객 공간에 정품의 기준 — 마무리 무드 (가안)`
+
+> 전부 생성형 = 무드 가안. 실 에셋 생성 후 코드의 `data-ph` 슬롯을 실제 배경/`<img>`로 교체.

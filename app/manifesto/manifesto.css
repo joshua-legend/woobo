@@ -3737,3 +3737,22 @@
   font: 700 14px/1 var(--font-sans);
   text-decoration: none;
 }
+
+/* 섹션5 이미지 슬롯 placeholder 캡션 (data-ph → 모노 캡션) */
+.route-manifesto .s5-deckcard__img {
+  position: relative;
+}
+.route-manifesto .s5-deckcard__img[data-ph]::after,
+.route-manifesto .s5-sa__bg[data-ph]::after {
+  content: attr(data-ph);
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  font: 600 9px/1.3 var(--font-mono);
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 3px 6px;
+  border-radius: 4px;
+  pointer-events: none;
+}
