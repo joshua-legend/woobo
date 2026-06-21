@@ -45,14 +45,25 @@ function Act1Stack() {
             } as React.CSSProperties
           }
         >
+          <span className="s5-deckcard__idx">
+            {i + 1}
+            <em>{o.flag}</em>
+          </span>
           <div className="s5-deckcard__img" data-ph={o.img} />
-          <div className="s5-deckcard__meta">
+          <div className="s5-deckcard__name">
             <b>{o.name}</b>
             <span>
-              {o.flag} {o.country}
+              {o.country}
               {o.flagship ? " · 간판" : ""}
             </span>
           </div>
+          <span
+            className="s5-deckcard__idx s5-deckcard__idx--br"
+            aria-hidden="true"
+          >
+            {i + 1}
+            <em>{o.flag}</em>
+          </span>
         </div>
       ))}
     </div>
@@ -118,6 +129,9 @@ function Section5Scroll() {
     // ACT3 마무리 reveal
     const a3 = clamp((scene - 6.2) / 0.8, 0, 1);
     setVar(sec, "--a3", a3.toFixed(4));
+
+    // 노드 레일(숫자 1~6)은 ACT2 구간에서만 노출
+    setVar(sec, "--rail", scene >= 0.8 && scene <= 6.5 ? "1" : "0");
 
     const idx = clamp(Math.round(scene) - 1, 0, FACETS.length - 1);
     if (idx !== activeRef.current) {
