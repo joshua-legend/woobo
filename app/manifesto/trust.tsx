@@ -59,6 +59,24 @@ function Act1Stack() {
   );
 }
 
+function NodeRail({ active }: { active: number }) {
+  return (
+    <div className="s5-rail" aria-hidden="true">
+      <span className="s5-rail__track">
+        <i className="s5-rail__fill" />
+      </span>
+      {FACETS.map((_f, i) => (
+        <span
+          key={i}
+          className={`s5-rail__node${i <= active ? " is-lit" : ""}${i === active ? " is-cur" : ""}`}
+        >
+          {i + 1}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function Section5Scroll() {
   const secRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -115,7 +133,15 @@ function Section5Scroll() {
           {/* ACT2 — sole agent 6 */}
           {FACETS.map((f, i) => (
             <div className="s5-panel s5-sa" key={f.t}>
-              <span className="s5-label">{String(i + 1).padStart(2, "0")} / 06</span>
+              <div className="s5-sa__bg" data-ph={f.img} />
+              <div className="s5-sa__scrim" />
+              <div className="s5-sa__txt">
+                <span className="s5-sa__no">
+                  {String(i + 1).padStart(2, "0")} / 06
+                </span>
+                <h3 className="s5-sa__ttl">{f.t}</h3>
+                <p className="s5-sa__ds">{f.d}</p>
+              </div>
             </div>
           ))}
           {/* ACT3 */}
@@ -123,8 +149,7 @@ function Section5Scroll() {
             <span className="s5-label">고객에게</span>
           </div>
         </div>
-        {/* 노드 레일(고정 오버레이) — Task 3에서 채움 */}
-        <div className="s5-rail" aria-hidden="true" data-active={active} />
+        <NodeRail active={active} />
       </div>
     </section>
   );
