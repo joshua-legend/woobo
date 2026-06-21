@@ -173,7 +173,6 @@ function Section5Scroll() {
         <div className="s5__track" ref={trackRef}>
           {/* ACT1 */}
           <div className="s5-panel s5-act1">
-            <span className="s5-label">유럽 제조 · 원산지</span>
             <Act1Karaoke />
           </div>
           {/* ACT2 — sole agent 6 */}
