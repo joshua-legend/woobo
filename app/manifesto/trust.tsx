@@ -13,6 +13,15 @@ const A1_DWELL = 0.16; // ACT1 가라오케 채움 구간
 const PANELS = 8; // 0=ACT1, 1..6=sole-agent, 7=ACT3
 const LAST = PANELS - 1;
 
+// 스텝 슬라이드: 각 패널에서 HOLD 만큼 머물다 다음으로 미끄러짐 → "한 섹션씩 넘어가는" 느낌
+const smooth = (x: number) => x * x * (3 - 2 * x);
+const STEP_HOLD = 0.5;
+const stepped = (s: number) => {
+  const i = Math.floor(s);
+  const f = s - i;
+  return i + (f <= STEP_HOLD ? 0 : smooth((f - STEP_HOLD) / (1 - STEP_HOLD)));
+};
+
 /* ACT1 가라오케 문구 — 단어가 채워짐. flag=원산지 강조, br=줄바꿈 */
 const ACT1_WORDS: { t: string; flag?: string; br?: boolean }[] = [
   { t: "Made" }, { t: "in" }, { t: "Europe" }, { t: "—", br: true },
@@ -103,27 +112,28 @@ function Section5Scroll() {
   const onUpdate = useCallback((p: number) => {
     const track = trackRef.current;
     const sec = secRef.current;
-    // p → scenePos (0..7): ACT1 dwell 후 선형 sweep
+    // p → scenePos(0..7) 선형 → stepped(체류→슬라이드) 로 한 패널씩 머물게
     const scene =
       p <= A1_DWELL ? 0 : ((p - A1_DWELL) / (1 - A1_DWELL)) * LAST;
-    setVar(track, "--scene", scene.toFixed(4));
+    const sv = stepped(scene); // 화면 위치/상태는 stepped 기준
+    setVar(track, "--scene", sv.toFixed(4));
 
-    // ACT1 가라오케 채움 진행도(0→1)
+    // ACT1 가라오케 채움 진행도(0→1) — dwell 구간 그대로(자유 스크럽)
     const a1 = p <= A1_DWELL ? p / A1_DWELL : 1;
     setVar(sec, "--a1", a1.toFixed(4));
 
     // ACT2 sole-agent 진행(0..6) → 레일 게이지 --sa, 현재 인덱스
-    const sa = clamp(scene - 1, 0, FACETS.length - 1);
+    const sa = clamp(sv - 1, 0, FACETS.length - 1);
     setVar(sec, "--sa", sa.toFixed(4));
 
     // ACT3 마무리 reveal
-    const a3 = clamp((scene - 6.2) / 0.8, 0, 1);
+    const a3 = clamp((sv - 6.2) / 0.8, 0, 1);
     setVar(sec, "--a3", a3.toFixed(4));
 
     // 노드 레일(숫자 1~6)은 ACT2 구간에서만 노출
-    setVar(sec, "--rail", scene >= 0.8 && scene <= 6.5 ? "1" : "0");
+    setVar(sec, "--rail", sv >= 0.8 && sv <= 6.5 ? "1" : "0");
 
-    const idx = clamp(Math.round(scene) - 1, 0, FACETS.length - 1);
+    const idx = clamp(Math.round(sv) - 1, 0, FACETS.length - 1);
     if (idx !== activeRef.current) {
       activeRef.current = idx;
       setActive(idx);
