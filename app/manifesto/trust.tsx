@@ -33,12 +33,14 @@ const ACT1_WORDS: { t: string; flag?: string; br?: boolean }[] = [
   { t: "Made" }, { t: "in" }, { t: "Europe" }, { t: "—", br: true },
   { t: "authentic" }, { t: "to" }, { t: "the" }, { t: "origin.", br: true },
   { t: "Blum", flag: "🇦🇹" }, { t: "·" }, { t: "AGOFORM", flag: "🇩🇪" },
-  { t: "·" }, { t: "Peka", flag: "🇨🇭", br: true },
+  { t: "·" }, { t: "Peka", flag: "🇨🇭" }, { t: "·" },
+  { t: "BekaertDeslee", flag: "🇧🇪" }, { t: "·" }, { t: "PWG", flag: "🇩🇪", br: true },
   { t: "원산지" }, { t: "그대로," }, { t: "one" }, { t: "trusted" },
   { t: "channel." },
 ];
 
-/* ACT1 유럽 지도 — 원산지 도장(브랜드 단어 채움 시점 at 에 점등) */
+/* ACT1 유럽 지도 — 원산지 도장(브랜드 단어 채움 시점 at 에 점등).
+   at = 해당 브랜드 단어 인덱스 / (단어수-1=21) * 0.85 와 동기 */
 const GEO = "/geo/countries-110m.json";
 const GEO_STYLE = {
   default: { fill: "#16130d", stroke: "#2c2920", strokeWidth: 0.4, outline: "none" },
@@ -46,9 +48,11 @@ const GEO_STYLE = {
   pressed: { fill: "#16130d", outline: "none" },
 } as const;
 const ACT1_COUNTRIES = [
-  { id: "at", name: "Blum · 오스트리아", code: "AT", coord: [14.3, 47.6], at: 0.4 },
-  { id: "de", name: "AGOFORM · 독일", code: "DE", coord: [10.0, 51.0], at: 0.5 },
-  { id: "ch", name: "Peka · 스위스", code: "CH", coord: [8.2, 46.8], at: 0.6 },
+  { id: "at", name: "Blum · 오스트리아", code: "AT", coord: [14.3, 47.6], at: 0.324 },
+  { id: "de", name: "AGOFORM · 독일", code: "DE", coord: [10.0, 51.0], at: 0.405 },
+  { id: "ch", name: "Peka · 스위스", code: "CH", coord: [8.2, 46.8], at: 0.486 },
+  { id: "be", name: "BekaertDeslee · 벨기에", code: "BE", coord: [4.4, 50.7], at: 0.567 },
+  { id: "de2", name: "PWG · 독일", code: "DE", coord: [13.2, 52.0], at: 0.648 },
 ] as const;
 
 /* sole agent 6가지(ACT2) — 기존 콘텐츠 유지 */
