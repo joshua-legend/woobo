@@ -2983,7 +2983,7 @@
 /* ========================= [05] 섹션5 횡스크롤 ========================= */
 .route-manifesto .s5 {
   position: relative;
-  height: 480svh;            /* 가로 이동량 — 실측 튜닝 */
+  height: 420svh;            /* 7패널(ACT1+SA6) 가로 이동량 — 실측 튜닝 */
   background: #000;
   /* .section 기본 좌우 패딩 제거 → sticky/track 풀블리드(좌우 검은 여백 제거) */
   padding: 0;
@@ -2997,7 +2997,7 @@
 .route-manifesto .s5__track {
   display: flex;
   height: 100%;
-  width: 800vw;             /* 8패널 × 100vw */
+  width: 700vw;             /* 7패널 × 100vw */
   will-change: transform;
   transform: translateX(calc(var(--scene, 0) * -100vw));
 }

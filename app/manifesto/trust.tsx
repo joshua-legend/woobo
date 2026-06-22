@@ -16,7 +16,7 @@ const setVar = (el: HTMLElement | null, k: string, v: string) => {
 
 /* 진행도 매핑 상수 */
 const A1_DWELL = 0.16; // ACT1 가라오케 채움 구간
-const PANELS = 8; // 0=ACT1, 1..6=sole-agent, 7=ACT3
+const PANELS = 7; // 0=ACT1, 1..6=sole-agent (ACT3 제거 → 바로 섹션6)
 const LAST = PANELS - 1;
 
 // 스텝 슬라이드: 각 패널에서 HOLD 만큼 머물다 다음으로 미끄러짐 → "한 섹션씩 넘어가는" 느낌
@@ -145,19 +145,6 @@ function NodeRail({ active }: { active: number }) {
   );
 }
 
-function Act3Closing() {
-  return (
-    <div className="s5-closing">
-      <p className="s5-closing__eyebrow">한국 독점 에이전트 · sole agent</p>
-      <h2 className="s5-closing__head">당신의 공간에 정품의 기준을.</h2>
-      <p className="s5-closing__sub">Blum 한국 독점 에이전트, 우보브랜드샵.</p>
-      <a className="s5-closing__cta" href="#showroom">
-        전국 쇼룸 방문 예약 <span aria-hidden="true">→</span>
-      </a>
-    </div>
-  );
-}
-
 function Section5Scroll() {
   const secRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -182,10 +169,6 @@ function Section5Scroll() {
     // ACT2 sole-agent 진행(0..6) → 레일 게이지 --sa, 현재 인덱스
     const sa = clamp(sv - 1, 0, FACETS.length - 1);
     setVar(sec, "--sa", sa.toFixed(4));
-
-    // ACT3 마무리 reveal
-    const a3 = clamp((sv - 6.2) / 0.8, 0, 1);
-    setVar(sec, "--a3", a3.toFixed(4));
 
     // 노드 레일(숫자 1~6)은 ACT2 구간에서만 노출
     setVar(sec, "--rail", sv >= 0.8 && sv <= 6.5 ? "1" : "0");
@@ -240,11 +223,6 @@ function Section5Scroll() {
               </div>
             </div>
           ))}
-          {/* ACT3 */}
-          <div className="s5-panel s5-act3">
-            <span className="s5-label">고객에게</span>
-            <Act3Closing />
-          </div>
         </div>
         <NodeRail active={active} />
       </div>
