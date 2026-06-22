@@ -1735,59 +1735,6 @@
   gap: 14px;
 }
 /* --- 06 레이아웃 picker (사장님 선택용 — 섹션 우측 버튼) --- */
-.route-manifesto .bf-stage {
-  margin-top: clamp(28px, 4vh, 44px);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 154px;
-  gap: clamp(20px, 3vw, 36px);
-  align-items: start;
-}
-.route-manifesto .bf-stage__main {
-  min-width: 0;
-}
-.route-manifesto .bf-stage__main > * {
-  margin-top: 0;
-}
-.route-manifesto .bf-picker {
-  position: sticky;
-  top: 88px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.route-manifesto .bf-picker__label {
-  margin-bottom: 2px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--c-caption);
-}
-.route-manifesto .bf-picker__btn {
-  text-align: left;
-  padding: 11px 14px;
-  border: 1px solid var(--c-line);
-  border-radius: 8px;
-  background: var(--c-paper);
-  font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--c-ink-2);
-  cursor: pointer;
-  transition:
-    border-color 0.25s var(--ease),
-    background 0.25s var(--ease),
-    color 0.25s var(--ease);
-}
-.route-manifesto .bf-picker__btn:hover {
-  border-color: var(--c-orange);
-  color: var(--c-ink);
-}
-.route-manifesto .bf-picker__btn.is-active {
-  border-color: var(--c-orange);
-  background: color-mix(in srgb, var(--c-orange) 8%, var(--c-paper));
-  color: var(--c-orange);
-}
 /* --- rows (에디토리얼 행 리스트) --- */
 .route-manifesto .bf-rows {
   list-style: none;
@@ -2191,17 +2138,61 @@
 }
 
 /* --- bands (세로 풀폭 밴드, 좌우 교차) --- */
+/* 밴드 고정 + sticky 유럽지도 컴패니언 (B 시그니처 + C 지도) */
+.route-manifesto .bf-bandwrap {
+  margin-top: clamp(32px, 5vh, 56px);
+  display: grid;
+  grid-template-columns: minmax(190px, 0.7fr) minmax(0, 1.7fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+}
+.route-manifesto .bf-geoaside {
+  position: sticky;
+  top: clamp(84px, 16vh, 150px);
+}
 .route-manifesto .bf-bands {
-  margin-top: clamp(32px, 5vh, 52px);
   display: flex;
   flex-direction: column;
-  gap: clamp(16px, 3vh, 28px);
+  gap: clamp(56px, 14vh, 132px);
 }
 .route-manifesto .bf-band {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: clamp(20px, 3vw, 40px);
   align-items: center;
+  opacity: 0.6;
+  transition: opacity 0.55s var(--ease-soft);
+}
+.route-manifesto .bf-band.is-active {
+  opacity: 1;
+}
+/* 밴드 뒤 대형 원산지 워터마크(옅은 잉크 · 스크롤 가로 드리프트) */
+.route-manifesto .bf-band__wm {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+  pointer-events: none;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(60px, 15vw, 184px);
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--c-ink) 5%, transparent);
+  will-change: transform;
+}
+.route-manifesto .bf-band--rev .bf-band__wm {
+  justify-content: flex-start;
+}
+.route-manifesto .bf-band__img,
+.route-manifesto .bf-band__txt {
+  position: relative;
+  z-index: 1;
 }
 .route-manifesto .bf-band--rev .bf-band__img {
   order: 2;
@@ -2218,17 +2209,66 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transform: scale(1.12); /* 패럴랙스 여유분(JS 가 translateY 갱신) */
+  will-change: transform;
+}
+/* 진입 시 좌우 교차 슬라이드 — useReveal 가 .is-in 토글(컨테이너 span 기준) */
+.route-manifesto .bf-band__img.reveal-up {
+  transform: translateX(calc(-36px * var(--motion)));
+}
+.route-manifesto .bf-band--rev .bf-band__img.reveal-up {
+  transform: translateX(calc(36px * var(--motion)));
+}
+.route-manifesto .bf-band__txt.reveal-up {
+  transform: translateX(calc(36px * var(--motion)));
+}
+.route-manifesto .bf-band--rev .bf-band__txt.reveal-up {
+  transform: translateX(calc(-36px * var(--motion)));
+}
+.route-manifesto .bf-band__img.reveal-up.is-in,
+.route-manifesto .bf-band__txt.reveal-up.is-in {
+  transform: none;
 }
 .route-manifesto .bf-band__txt {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  border-left: 2px solid transparent;
+  padding-left: 0;
+  transition:
+    border-color 0.45s var(--ease-soft),
+    padding-left 0.45s var(--ease-soft);
+}
+.route-manifesto .bf-band.is-active .bf-band__txt {
+  border-left-color: var(--c-orange);
+  padding-left: 16px;
+}
+.route-manifesto .bf-band__no {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--c-caption);
+  transition: color 0.4s var(--ease-soft);
+}
+.route-manifesto .bf-band.is-active .bf-band__no {
+  color: var(--c-orange);
 }
 .route-manifesto .bf-band__name {
   font-family: var(--font-head);
   font-weight: 800;
   font-size: clamp(22px, 3vw, 34px);
   letter-spacing: -0.02em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-manifesto .bf-band {
+    opacity: 1;
+  }
+  .route-manifesto .bf-band__img img {
+    transform: none;
+  }
+  .route-manifesto .bf-band__wm {
+    transform: none;
+  }
 }
 
 /* =========================================================
@@ -2773,24 +2813,16 @@
   .route-manifesto .showroom .footnote {
     display: none;
   }
-  /* brandfolio 모바일 폴백 */
-  .route-manifesto .bf-stage {
+  /* brandfolio 모바일 폴백 — 지도 컴패니언 숨김, 밴드 단일 컬럼 */
+  .route-manifesto .bf-bandwrap {
     grid-template-columns: 1fr;
+    gap: clamp(28px, 6vh, 48px);
   }
-  .route-manifesto .bf-picker {
-    position: static;
-    flex-direction: row;
-    flex-wrap: wrap;
-    order: -1;
+  .route-manifesto .bf-geoaside {
+    display: none;
   }
-  .route-manifesto .bf-picker__btn {
-    flex: 1 1 auto;
-    text-align: center;
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-  .route-manifesto .bf-picker__label {
-    flex-basis: 100%;
+  .route-manifesto .bf-bands {
+    gap: clamp(40px, 8vh, 72px);
   }
   .route-manifesto .bf-card--flag {
     grid-template-columns: 1fr;
@@ -3100,9 +3132,9 @@
   .route-manifesto .s5-kara p {
     font: 800 clamp(21px, 5.6vw, 32px) / 1.32 var(--font-sans);
   }
-  /* 모바일: 강제 줄바꿈(<br>) 끄고 폭에 맞춰 자연 줄바꿈 */
-  .route-manifesto .s5-kara br {
-    display: none;
+  /* 모바일: 지도(배경)를 cover 크롭 대신 전체가 중앙에 보이도록 */
+  .route-manifesto .s5-map {
+    height: auto;
   }
 }
 /* 단어: --at(인라인 임계값)을 --a1 이 넘으면 점등(흐림→밝음) */
