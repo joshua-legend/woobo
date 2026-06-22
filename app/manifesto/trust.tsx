@@ -72,6 +72,7 @@ function Act1Karaoke() {
           width={960}
           height={540}
           className="s5-map"
+          preserveAspectRatio="xMidYMid slice"
         >
           <Geographies geography={GEO}>
             {({ geographies }) =>
@@ -215,7 +216,14 @@ function Section5Scroll() {
           {/* ACT2 — sole agent 6 */}
           {FACETS.map((f, i) => (
             <div className="s5-panel s5-sa" key={f.t}>
-              <div className="s5-sa__bg" data-ph={f.img} />
+              <div
+                className="s5-sa__bg"
+                style={{
+                  backgroundImage: `url(/images/section5/${f.img}.png)`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
               <div className="s5-sa__scrim" />
               <div className="s5-sa__txt">
                 <span className="s5-sa__no">

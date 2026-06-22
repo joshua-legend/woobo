@@ -3032,8 +3032,7 @@
 }
 .route-manifesto .s5-map {
   width: 100%;
-  height: auto;
-  max-height: 100%;
+  height: 100%;
   display: block;
 }
 /* 원산지 마커/도장 — --a1(스크롤 채움) 이 --at(인라인) 넘으면 점등 */
