@@ -233,9 +233,6 @@ function Section5Scroll() {
           </div>
         </div>
         <NodeRail active={active} />
-        <div className="s5-plane" aria-hidden="true">
-          ✈️
-        </div>
       </div>
     </section>
   );

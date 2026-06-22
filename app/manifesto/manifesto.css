@@ -3064,22 +3064,6 @@
   font: 800 11px var(--font-sans);
   letter-spacing: 0.04em;
 }
-/* 비행기 — ACT1 종료(--a1exit) 시 우측(한국)으로 비행. 스티키 고정 오버레이 */
-.route-manifesto .s5-plane {
-  position: absolute;
-  left: 42%;
-  top: 42%;
-  z-index: 4;
-  font-size: clamp(22px, 3vw, 30px);
-  pointer-events: none;
-  opacity: clamp(0, calc((var(--a1, 0) - 0.8) * 5), 1);
-  transform: translate(
-      calc(var(--a1exit, 0) * 64vw),
-      calc(var(--a1exit, 0) * -16vh)
-    )
-    rotate(14deg);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-}
 .route-manifesto .s5-act1scrim {
   position: absolute;
   inset: 0;
