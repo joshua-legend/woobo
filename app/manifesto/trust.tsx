@@ -161,8 +161,8 @@ function Act3Closing() {
 function Section5Scroll() {
   const secRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const activeRef = useRef(0);
-  const [active, setActive] = useState(0);
+  const activeRef = useRef(-1);
+  const [active, setActive] = useState(-1);
 
   const onUpdate = useCallback((p: number) => {
     const track = trackRef.current;
@@ -190,7 +190,9 @@ function Section5Scroll() {
     // 노드 레일(숫자 1~6)은 ACT2 구간에서만 노출
     setVar(sec, "--rail", sv >= 0.8 && sv <= 6.5 ? "1" : "0");
 
-    const idx = clamp(Math.round(sv) - 1, 0, FACETS.length - 1);
+    // ACT1 구간(sv<0.5)엔 active 없음(-1) → SA 항목 효과는 ACT2 진입 때만 재생
+    const idx =
+      sv < 0.5 ? -1 : clamp(Math.round(sv) - 1, 0, FACETS.length - 1);
     if (idx !== activeRef.current) {
       activeRef.current = idx;
       setActive(idx);
@@ -215,7 +217,10 @@ function Section5Scroll() {
           </div>
           {/* ACT2 — sole agent 6 */}
           {FACETS.map((f, i) => (
-            <div className="s5-panel s5-sa" key={f.t}>
+            <div
+              className={`s5-panel s5-sa${i === active ? " is-active" : ""}`}
+              key={f.t}
+            >
               <div
                 className="s5-sa__bg"
                 style={{
@@ -230,6 +235,7 @@ function Section5Scroll() {
                   {String(i + 1).padStart(2, "0")} / 06
                 </span>
                 <h3 className="s5-sa__ttl">{f.t}</h3>
+                <span className="s5-sa__underline" aria-hidden="true" />
                 <p className="s5-sa__ds">{f.d}</p>
               </div>
             </div>

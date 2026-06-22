@@ -3162,6 +3162,65 @@
   font: 500 clamp(13px, 1.6vw, 16px) / 1.4 var(--font-sans);
   color: #d9d3c7;
 }
+/* ACT2 전환 효과(E): 항목이 중앙(is-active) 될 때 — 페이드+업 stagger / Ken Burns / 밑줄 드로잉.
+   기본은 숨김 → active 일 때만 재생(스크롤로 자리잡을 때 들어옴) */
+.route-manifesto .s5-sa__no,
+.route-manifesto .s5-sa__ttl,
+.route-manifesto .s5-sa__ds {
+  opacity: 0;
+}
+.route-manifesto .s5-sa__underline {
+  display: block;
+  height: 3px;
+  width: 84px;
+  margin-top: 12px;
+  background: var(--c-orange);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.route-manifesto .s5-sa.is-active .s5-sa__no {
+  animation: s5saFadeUp 0.55s var(--ease) 0.1s both;
+}
+.route-manifesto .s5-sa.is-active .s5-sa__ttl {
+  animation: s5saFadeUp 0.55s var(--ease) 0.24s both;
+}
+.route-manifesto .s5-sa.is-active .s5-sa__ds {
+  animation: s5saFadeUp 0.55s var(--ease) 0.4s both;
+}
+.route-manifesto .s5-sa.is-active .s5-sa__underline {
+  opacity: 1;
+  animation: s5saDraw 0.6s var(--ease) 0.44s both;
+}
+.route-manifesto .s5-sa.is-active .s5-sa__bg {
+  animation: s5saKen 4.5s ease-out both;
+}
+@keyframes s5saFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes s5saDraw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes s5saKen {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
 /* 노드 레일(고정 오버레이) */
 .route-manifesto .s5-rail {
   position: absolute;
@@ -3292,6 +3351,18 @@
   }
   .route-manifesto .s5-w {
     opacity: 1;
+  }
+  /* ACT2 텍스트/효과 정적 표시(세로 스택 폴백) */
+  .route-manifesto .s5-sa__no,
+  .route-manifesto .s5-sa__ttl,
+  .route-manifesto .s5-sa__ds,
+  .route-manifesto .s5-sa__underline {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .route-manifesto .s5-sa__bg {
+    animation: none !important;
   }
   .route-manifesto .s5-rail { display: none; }
 }
