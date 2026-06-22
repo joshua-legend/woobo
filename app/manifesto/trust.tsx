@@ -1,6 +1,12 @@
 "use client";
 
 import { Fragment, useCallback, useRef, useState } from "react";
+import {
+  ComposableMap,
+  Geographies,
+  Geography,
+  Marker,
+} from "react-simple-maps";
 import { useScrub } from "@/hooks/useScrub";
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
@@ -32,6 +38,19 @@ const ACT1_WORDS: { t: string; flag?: string; br?: boolean }[] = [
   { t: "channel." },
 ];
 
+/* ACT1 유럽 지도 — 원산지 도장(브랜드 단어 채움 시점 at 에 점등) */
+const GEO = "/geo/countries-110m.json";
+const GEO_STYLE = {
+  default: { fill: "#16130d", stroke: "#2c2920", strokeWidth: 0.4, outline: "none" },
+  hover: { fill: "#16130d", stroke: "#2c2920", strokeWidth: 0.4, outline: "none" },
+  pressed: { fill: "#16130d", outline: "none" },
+} as const;
+const ACT1_COUNTRIES = [
+  { id: "at", name: "Blum · 오스트리아", code: "AT", coord: [14.3, 47.6], at: 0.4 },
+  { id: "de", name: "AGOFORM · 독일", code: "DE", coord: [10.0, 51.0], at: 0.5 },
+  { id: "ch", name: "Peka · 스위스", code: "CH", coord: [8.2, 46.8], at: 0.6 },
+] as const;
+
 /* sole agent 6가지(ACT2) — 기존 콘텐츠 유지 */
 const FACETS = [
   { t: "Blum 한국 독점 에이전트", d: "정품의 공식 통로 · sole agent", img: "sole-agent-01" },
@@ -46,7 +65,42 @@ function Act1Karaoke() {
   const n = ACT1_WORDS.length;
   return (
     <>
-      <div className="s5-act1bg" />
+      <div className="s5-act1map">
+        <ComposableMap
+          projection="geoMercator"
+          projectionConfig={{ center: [11, 50], scale: 1000 }}
+          width={960}
+          height={540}
+          className="s5-map"
+        >
+          <Geographies geography={GEO}>
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography key={geo.rsmKey} geography={geo} style={GEO_STYLE} />
+              ))
+            }
+          </Geographies>
+          {ACT1_COUNTRIES.map((c) => (
+            <Marker key={c.id} coordinates={c.coord as [number, number]}>
+              <g
+                className="s5-mk"
+                style={{ "--at": c.at } as React.CSSProperties}
+              >
+                <text className="s5-mk__lbl" y={-22} textAnchor="middle">
+                  {c.name}
+                </text>
+                <circle r={4.5} className="s5-mk__dot" />
+                <g className="s5-mk__stamp">
+                  <circle r={16} className="s5-mk__ring" />
+                  <text className="s5-mk__code" dy="4" textAnchor="middle">
+                    {c.code}
+                  </text>
+                </g>
+              </g>
+            </Marker>
+          ))}
+        </ComposableMap>
+      </div>
       <div className="s5-act1scrim" />
       <div className="s5-kara">
         <p>
@@ -117,6 +171,8 @@ function Section5Scroll() {
       p <= A1_DWELL ? 0 : ((p - A1_DWELL) / (1 - A1_DWELL)) * LAST;
     const sv = stepped(scene); // 화면 위치/상태는 stepped 기준
     setVar(track, "--scene", sv.toFixed(4));
+    // ACT1 이탈 진행도(0=ACT1 머묾, 1=SA1 도착) → 비행기 비행에 사용
+    setVar(sec, "--a1exit", clamp(sv, 0, 1).toFixed(4));
 
     // ACT1 가라오케 채움 진행도(0→1) — dwell 구간 그대로(자유 스크럽)
     const a1 = p <= A1_DWELL ? p / A1_DWELL : 1;
@@ -177,6 +233,9 @@ function Section5Scroll() {
           </div>
         </div>
         <NodeRail active={active} />
+        <div className="s5-plane" aria-hidden="true">
+          ✈️
+        </div>
       </div>
     </section>
   );

@@ -3020,10 +3020,65 @@
 .route-manifesto .s5-act3 { background: #000; }
 
 /* ACT1 ②안 — 풀블리드 배경 이미지 + 가라오케 문구(좌하단) */
-.route-manifesto .s5-act1bg {
+/* ACT1 유럽 지도(react-simple-maps) */
+.route-manifesto .s5-act1map {
   position: absolute;
   inset: 0;
-  background: #000 url("/images/section5/act1-bg.png") center / cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.route-manifesto .s5-map {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  display: block;
+}
+/* 원산지 마커/도장 — --a1(스크롤 채움) 이 --at(인라인) 넘으면 점등 */
+.route-manifesto .s5-mk {
+  --lit: clamp(0, calc((var(--a1, 0) - var(--at, 0)) * 26), 1);
+}
+.route-manifesto .s5-mk__lbl {
+  fill: #cfc8ba;
+  font: 600 11px var(--font-sans);
+  opacity: var(--lit);
+}
+.route-manifesto .s5-mk__dot {
+  fill: var(--c-orange);
+  opacity: calc(0.25 + 0.75 * var(--lit));
+}
+.route-manifesto .s5-mk__stamp {
+  opacity: var(--lit);
+  transform: scale(calc(1.7 - 0.7 * var(--lit)))
+    rotate(calc(-13deg + 7deg * var(--lit)));
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.route-manifesto .s5-mk__ring {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 2;
+}
+.route-manifesto .s5-mk__code {
+  fill: var(--c-orange);
+  font: 800 11px var(--font-sans);
+  letter-spacing: 0.04em;
+}
+/* 비행기 — ACT1 종료(--a1exit) 시 우측(한국)으로 비행. 스티키 고정 오버레이 */
+.route-manifesto .s5-plane {
+  position: absolute;
+  left: 42%;
+  top: 42%;
+  z-index: 4;
+  font-size: clamp(22px, 3vw, 30px);
+  pointer-events: none;
+  opacity: clamp(0, calc((var(--a1, 0) - 0.8) * 5), 1);
+  transform: translate(
+      calc(var(--a1exit, 0) * 64vw),
+      calc(var(--a1exit, 0) * -16vh)
+    )
+    rotate(14deg);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 }
 .route-manifesto .s5-act1scrim {
   position: absolute;
@@ -3213,8 +3268,7 @@
 }
 
 /* 섹션5 이미지 슬롯 placeholder 캡션 (data-ph → 모노 캡션) */
-.route-manifesto .s5-sa__bg[data-ph]::after,
-.route-manifesto .s5-act1bg[data-ph]::after {
+.route-manifesto .s5-sa__bg[data-ph]::after {
   content: attr(data-ph);
   position: absolute;
   left: 8px;
