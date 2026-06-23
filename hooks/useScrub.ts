@@ -6,8 +6,8 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 type ScrubOptions = {
   start?: string;
   end?: string;
-  /** 진행도 스냅 지점(0~1). coarse 포인터(모바일)에서만 적용 — 한 비트씩 정렬. */
-  snap?: number | number[];
+  /** 진행도 스냅 지점(0~1) 또는 스냅 함수. coarse 포인터(모바일)에서만 적용 — 한 비트씩 정렬. */
+  snap?: number | number[] | ((value: number) => number);
 };
 
 /**

@@ -60,6 +60,8 @@ html {
   /* scroll-behavior: smooth 제거 — Lenis 가상 스크롤과 이중 제어되어 모바일에서
      스크롤이 끊겨 보임. 부드러움은 Lenis 가 담당. */
   -webkit-text-size-adjust: 100%;
+  /* 모바일 우측 흰 여백(가로 서브픽셀 넘침) 방지 */
+  overflow-x: clip;
 }
 body {
   margin: 0;

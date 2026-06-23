@@ -28,6 +28,17 @@ const stepped = (s: number) => {
   return i + (f <= STEP_HOLD ? 0 : smooth((f - STEP_HOLD) / (1 - STEP_HOLD)));
 };
 
+// 모바일(coarse)에서 ACT2 각 패널(SA1..6) 중앙으로 스냅 → 한 항목씩 멈춰감.
+// ACT1(가라오케 채움)은 자유 스크럽(스냅 안 함). useScrub 가 coarse 에서만 적용.
+const sceneToP = (k: number) => A1_DWELL + (k / LAST) * (1 - A1_DWELL);
+const snapToPanel = (value: number): number => {
+  const scene =
+    value <= A1_DWELL ? 0 : ((value - A1_DWELL) / (1 - A1_DWELL)) * LAST;
+  if (scene < 0.6) return value;
+  const k = Math.min(LAST, Math.max(1, Math.round(scene)));
+  return sceneToP(k);
+};
+
 /* ACT1 가라오케 문구 — 단어가 채워짐. flag=원산지 강조, br=줄바꿈 */
 const ACT1_WORDS: { t: string; flag?: string; br?: boolean }[] = [
   { t: "Made" }, { t: "in" }, { t: "Europe" }, { t: "—", br: true },
@@ -198,7 +209,11 @@ function Section5Scroll() {
     }
   }, []);
 
-  useScrub(secRef, onUpdate, { start: "top top", end: "bottom bottom" });
+  useScrub(secRef, onUpdate, {
+    start: "top top",
+    end: "bottom bottom",
+    snap: snapToPanel,
+  });
 
   return (
     <section
