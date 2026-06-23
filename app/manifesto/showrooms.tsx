@@ -1,14 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Keyboard } from "swiper/modules";
+import { useCallback, useRef, useState } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
 import { CTA_HREF } from "@/lib/branches";
-import { KakaoMiniMap } from "./KakaoMiniMap";
-import "swiper/css";
-import "swiper/css/navigation";
 
 type Shop = {
   key: string;
@@ -39,41 +34,10 @@ const SHOPS: Shop[] = [
 
 const kakaoHref = (s: Shop) =>
   `https://map.kakao.com/?q=${encodeURIComponent(s.address)}`;
+const naverHref = (s: Shop) =>
+  `https://map.naver.com/p/search/${encodeURIComponent(s.address)}`;
 const telHref = (s: Shop) => `tel:${s.tel.replace(/[^0-9]/g, "")}`;
 const isKey = (s: Shop) => s.type === "본점" || s.type === "직영 지사";
-
-/* 지도 핀들(map/split 공용) */
-function ShopPins({
-  active,
-  onPick,
-}: {
-  active: string;
-  onPick: (k: string) => void;
-}) {
-  return (
-    <div className="sr-map__geo">
-      <img
-        className="sr-map__korea"
-        src="/korea-map.svg"
-        alt="전국 우보브랜드샵 지도"
-      />
-      {SHOPS.map((s) => (
-        <button
-          key={s.key}
-          type="button"
-          className={`sr-dot${s.key === active ? " is-active" : ""}${isKey(s) ? " is-key" : ""}`}
-          style={{ left: `${s.x}%`, top: `${s.y}%` }}
-          onMouseEnter={() => onPick(s.key)}
-          onFocus={() => onPick(s.key)}
-          onClick={() => onPick(s.key)}
-          aria-label={`${s.name} · ${s.region}`}
-        >
-          <span className="sr-dot__pin" />
-        </button>
-      ))}
-    </div>
-  );
-}
 
 function ShopActions({ s }: { s: Shop }) {
   return (
@@ -89,6 +53,14 @@ function ShopActions({ s }: { s: Shop }) {
       >
         카카오맵 ↗
       </a>
+      <a
+        className="sr-naver"
+        href={naverHref(s)}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        네이버지도 ↗
+      </a>
     </div>
   );
 }
@@ -102,36 +74,10 @@ function ShopBadges({ s }: { s: Shop }) {
   );
 }
 
-/* 상세 패널(map) — 선택 지점 */
-function ShopDetail({ s }: { s: Shop }) {
-  // 모바일(터치)에선 라이브 카카오 미니맵을 마운트하지 않는다.
-  // 늦게 로드된 SDK가 스크롤 도중 맵을 생성하며 페이지 하단으로 튕기는 이슈 →
-  // 모바일은 "카카오맵 ↗" 링크로 유도, 데스크톱만 임베드.
-  const [showMiniMap, setShowMiniMap] = useState(false);
-  useEffect(() => {
-    setShowMiniMap(!window.matchMedia("(pointer: coarse)").matches);
-  }, []);
+/* 카드 — 지역 필터 그리드용(i = 등장 스태거 인덱스) */
+function ShopCard({ s, i = 0 }: { s: Shop; i?: number }) {
   return (
-    <div className="sr-detail">
-      <ShopBadges s={s} />
-      <b className="sr-name">
-        {s.name}
-        {s.sub && <em> · {s.sub}</em>}
-      </b>
-      <p className="sr-addr">{s.address}</p>
-      <a className="sr-tel" href={telHref(s)}>
-        T. {s.tel}
-      </a>
-      <ShopActions s={s} />
-      {showMiniMap && <KakaoMiniMap address={s.address} />}
-    </div>
-  );
-}
-
-/* 카드(grid/finder) */
-function ShopCard({ s }: { s: Shop }) {
-  return (
-    <article className="sr-card">
+    <article className="sr-card" style={{ "--i": i } as React.CSSProperties}>
       <ShopBadges s={s} />
       <b className="sr-name">
         {s.name}
@@ -146,67 +92,53 @@ function ShopCard({ s }: { s: Shop }) {
   );
 }
 
-/* ---------- map: 한국 지도 + 핀 → 우측 상세 ---------- */
-function ShopMap() {
-  const [active, setActive] = useState(SHOPS[0].key);
-  const cur = SHOPS.find((s) => s.key === active) ?? SHOPS[0];
-  return (
-    <div className="sr-map">
-      <ShopPins active={active} onPick={setActive} />
-      <ShopDetail s={cur} />
-    </div>
-  );
-}
+/* ---------- finder: 지역 칩 필터 + 카드 그리드 ---------- */
+const REGIONS = ["전체", "수도권", "충청", "영남", "호남", "제주"] as const;
+type Region = (typeof REGIONS)[number];
 
-/* ---------- swiper: 카드 가로 무한 스와이프(드래그/스와이프) ---------- */
-function ShopSwiper() {
+function ShopFinder() {
+  const [region, setRegion] = useState<Region>("전체");
+  const shown =
+    region === "전체" ? SHOPS : SHOPS.filter((s) => s.region === region);
+  const count = (r: Region) =>
+    r === "전체" ? SHOPS.length : SHOPS.filter((s) => s.region === r).length;
+
   return (
-    <div className="sr-swiper">
-      <Swiper
-        className="sr-swiper__track"
-        modules={[Navigation, Keyboard]}
-        slidesPerView="auto"
-        spaceBetween={14}
-        loop
-        grabCursor
-        keyboard={{ enabled: true }}
-        navigation
-      >
-        {SHOPS.map((s) => (
-          <SwiperSlide key={s.key} className="sr-slide">
-            <ShopCard s={s} />
-          </SwiperSlide>
+    <div className="sr-finder">
+      <div className="sr-chips" role="tablist" aria-label="지역 선택">
+        {REGIONS.map((r) => (
+          <button
+            key={r}
+            type="button"
+            role="tab"
+            aria-selected={region === r}
+            className={`sr-chip${region === r ? " is-active" : ""}`}
+            onClick={() => setRegion(r)}
+          >
+            {r}
+            <span className="sr-chip__n">{count(r)}</span>
+          </button>
         ))}
-      </Swiper>
+      </div>
+      {/* key=region → 필터 변경 시 카드 재마운트로 등장 애니메이션 리플레이 */}
+      <div className="sr-grid" key={region}>
+        {shown.map((s, i) => (
+          <ShopCard key={s.key} s={s} i={i} />
+        ))}
+      </div>
     </div>
   );
 }
-
-/* 레이아웃 후보(섹션 우측 picker) */
-const SR_LAYOUTS: { key: string; label: string }[] = [
-  { key: "map", label: "지도" },
-  { key: "card", label: "카드" },
-];
 
 /* =========================== [07] 전국 우보브랜드샵 (CTA) =========================== */
 export function ShowroomSection() {
   const reduce = useReducedMotion();
   const lineRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLAnchorElement>(null);
-  const [layout, setLayout] = useState("map");
 
   const showLine = useCallback(() => {
     lineRef.current?.classList.add("in");
   }, []);
   useInViewOnce(lineRef, showLine, { amount: 0.5 });
-
-  const pop = useCallback(() => {
-    const el = ctaRef.current;
-    if (!el || reduce) return;
-    el.classList.remove("pop");
-    void el.offsetWidth;
-    el.classList.add("pop");
-  }, [reduce]);
 
   return (
     <section
@@ -229,42 +161,7 @@ export function ShowroomSection() {
           <strong>방문 예약제.</strong>
         </p>
 
-        <div className="sr-stage">
-          <div className="sr-stage__main">
-            {layout === "card" ? <ShopSwiper /> : <ShopMap />}
-          </div>
-          <aside className="sr-picker" aria-label="레이아웃 선택">
-            <span className="sr-picker__label">레이아웃 선택</span>
-            {SR_LAYOUTS.map((l) => (
-              <button
-                type="button"
-                key={l.key}
-                className={`sr-picker__btn${layout === l.key ? " is-active" : ""}`}
-                onClick={() => setLayout(l.key)}
-              >
-                {l.label}
-              </button>
-            ))}
-          </aside>
-        </div>
-
-        <div className="actions reveal-up">
-          <a
-            className="btn btn--primary"
-            data-cta="book"
-            href={CTA_HREF.booking}
-            ref={ctaRef}
-            onClick={pop}
-          >
-            쇼룸 방문 예약 <span className="arrow">→</span>
-          </a>
-          <a className="btn btn--secondary" href={CTA_HREF.quote}>
-            견적·상담 요청
-          </a>
-          <a className="btn btn--ghost" href={CTA_HREF.catalog}>
-            카탈로그 받기 ↓
-          </a>
-        </div>
+        <ShopFinder />
 
         <div className={`closeline${reduce ? " in" : ""}`} ref={lineRef}>
           <i />
@@ -274,7 +171,7 @@ export function ShowroomSection() {
         </p>
         <div className="footnote">
           ※ 일부 지점은 파트너샵(청주 가구철물닷컴 · 제주 루미채). 지도·연락처는
-          변동될 수 있어 방문 전 확인 권장 [TODO: 카카오맵 임베드].
+          변동될 수 있어 방문 전 확인 권장.
         </div>
       </div>
     </section>

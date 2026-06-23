@@ -19,6 +19,9 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       // 모바일/터치: Lenis 대신 ScrollTrigger.normalizeScroll.
       // 스크롤을 JS 스레드에서 처리해 주소창/툴바가 스크롤 도중 show/hide 되며
       // 스크롤 위치가 한 칸 튀던 문제(뷰포트 리사이즈 점프)를 제거한다.
+      // ignoreMobileResize: 주소창 show/hide 로 인한 리사이즈에 반응하지 않아
+      // 고정 헤더(position:fixed)가 스크롤 중 위로 밀려 사라지던 현상을 줄인다.
+      ScrollTrigger.config({ ignoreMobileResize: true });
       ScrollTrigger.normalizeScroll(true);
       return () => {
         ScrollTrigger.normalizeScroll(false);

@@ -38,6 +38,34 @@
 
 ---
 
+### [2026-06-22] 세션 — 섹션06 멀티브랜드: 밴드형 고정 + 인터랙션
+- **한 일:**
+  - 섹션06(`brands.tsx`) **레이아웃 선택(picker) 삭제 + 밴드형 고정**. `BrandShowcase`/`BrandMap`/`LAYOUTS`/`MAP_MODES`/`bf-stage`/picker 제거, `BrandsByVariant`는 `variant` 무시하고 `<BrandBands/>`만 렌더.
+  - **인터랙션 B+C** 추가: (B) 밴드 진입 좌우 교차 슬라이드인(`reveal-up`) + 이미지 미세 세로 패럴랙스 + 뷰포트 중앙 밴드 활성(오렌지 액센트 라인·번호·딤). (C) 좌측 **sticky 유럽지도 컴패니언** — 스크롤에 따라 활성 브랜드의 원산지 점 점등(`MAP_DOTS`·`.bf-dot`·`.bf-map__geo` 재활용).
+  - 활성/패럴랙스는 window scroll rAF(passive) 1루프. reduced-motion: 밴드 정적·딤 해제·패럴랙스 off. 모바일: 지도 정적 상단, 밴드 단일 컬럼.
+  - CSS: 밴드 블록 재작성 + picker/stage CSS 제거 + 모바일 폴백 교체. (쇼케이스/지도형 잔여 dead CSS는 후속 일괄 정리 대상)
+- **산출물:** `app/manifesto/brands.tsx`(재작성), `app/manifesto/manifesto.css`(bf-band* 갱신·picker 제거). `tsc --noEmit` 통과.
+- **결정:** 섹션06 = 밴드형 단일안. 지도형 가치는 sticky 컴패니언으로 흡수(picker 없이 원산지 내러티브 유지).
+- **막힘/배운 점:** `reveal-up`에 좌우 슬라이드를 얹을 때 `.is-in` 리셋 specificity(0,4,0)로 맞춰야 `--rev` 초기 transform을 덮음.
+- **다음:** 실기기에서 활성 딤(0.6)·패럴랙스 강도·sticky top 실측 튜닝. 잔여 dead CSS(쇼케이스/지도형) 정리. Lenis 환경에서 활성 추적 체감 확인.
+- **확인요청(사장님):** 밴드 활성 딤/지도 점등 체감, 밴드 순서·문구.
+
+---
+
+### [2026-06-22] 세션 — 섹션3·4 비디오 정지 + 섹션5 ACT2 실이미지 연결
+- **한 일:**
+  - **섹션3·4 비디오 스크럽**(`VideoScrubStage`): 손/마우스를 떼면 처음(OPEN)으로 복귀하던 `release()`의 `setTarget(0)` 제거 → **마지막으로 만진 프레임에서 정지**. 가이드 재노출도 제거(중간 프레임 위 가이드 어색함 방지).
+  - **섹션5 ACT2 이미지 프롬프트**: 기존 다크 시네마틱 → **밝은 커머셜 광고 무드**(브랜드 무관·보편·프로페셔널)로 6종 재작성(각 500자+ 디테일 버전 + 복붙용 공통 스파인).
+  - 생성된 6장(ChatGPT 타임스탬프 파일) 내용 확인 후 `sole-agent-01~06.png`로 매핑·리네임. `trust.tsx` `.s5-sa__bg`에 인라인 `background-image`(cover) 연결 → 빗금 placeholder 대신 실이미지 노출.
+  - `image-manifest.md` ACT2 블록 갱신(상태 후보→생성됨(연결), 커머셜 프롬프트·공통 스파인 기록).
+- **산출물:** `app/manifesto/VideoScrubStage.tsx`, `app/manifesto/trust.tsx`, `public/images/section5/sole-agent-01~06.png`, `image-manifest.md`.
+- **결정:** ACT2 이미지 톤 = 밝은 커머셜(다크 폐기). 비디오는 untouch 시 정지(리셋 X).
+- **막힘/배운 점:** `sole-agent-06`이 "자체 생산(김포) 작업장"이 아니라 밝은 쇼룸 인테리어 → 헤드라인과 약매칭. 추후 작업장 실물컷 교체 필요.
+- **다음:** ACT2 모바일(4:5) 크롭본 생성, `sole-agent-06` 작업장 컷 교체, 좌하단 헤드라인 가독성 실측.
+- **확인요청(사장님):** ACT2 밝은 커머셜 무드 방향 OK 여부, `sole-agent-06` 무드 교체 여부.
+
+---
+
 ### [2026-06-21] 세션 — 섹션05 약속 대격변: 횡스크롤 3막
 - **한 일:**
   - 브레인스토밍(비주얼 컴패니언 목업) → 스펙 → 7태스크 계획 → 서브에이전트 주도 구현(태스크별 스펙+코드품질 2단계 리뷰).

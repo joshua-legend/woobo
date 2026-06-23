@@ -70,7 +70,9 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  /* clip = 가로 넘침은 막되 스크롤 컨테이너/새 containing block 을 만들지 않음
+     → 모바일에서 position:fixed 헤더가 body 기준으로 어긋나 위로 사라지던 문제 방지. */
+  overflow-x: clip;
   word-break: keep-all;
 }
 h1,

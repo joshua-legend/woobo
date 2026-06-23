@@ -191,12 +191,11 @@ export function VideoScrubStage({
     setTarget(relX(e.clientX));
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
-  // 손/마우스를 떼거나 벗어나면(또는 세로 스크롤에 제스처를 뺏기면) 초기(OPEN)로 사뿐히 복귀
+  // 손/마우스를 떼거나 벗어나면(또는 세로 스크롤에 제스처를 뺏기면) 초기로 복귀하지 않고
+  // 마지막으로 만진 프레임 그대로 멈춘다. (target 을 건드리지 않으면 disp 가 그 자리에 수렴해 정지)
   const release = () => {
     if (!activeRef.current) return;
     activeRef.current = false;
-    setShowGuide(true);
-    setTarget(0);
   };
   const onPointerUp = (e: React.PointerEvent) => {
     if (e.pointerType === "mouse") return;

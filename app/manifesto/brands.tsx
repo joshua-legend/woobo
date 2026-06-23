@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
 type Brand = {
   key: string;
@@ -64,185 +66,130 @@ const MAP_DOTS: { key: string; x: number; y: number }[] = [
   { key: "bekaert", x: 32.7, y: 56.7 }, // 벨기에
 ];
 
-/* 지도형 표시 방식 3종 */
-const MAP_MODES: { key: string; label: string }[] = [
-  { key: "swipe", label: "스와이프" },
-  { key: "list", label: "리스트" },
-];
+/* 밴드 뒤 대형 워터마크용 원산지 영문 표기 */
+const ORIGIN_EN: Record<string, string> = {
+  오스트리아: "AUSTRIA",
+  독일: "GERMANY",
+  스위스: "SWITZERLAND",
+  벨기에: "BELGIUM",
+};
 
-/* ---------- map: 유럽 지도 + 3가지 브라우징 방식(스와이프/리스트/칩) ---------- */
-function BrandMap() {
-  const [mode, setMode] = useState("swipe");
-  const [active, setActive] = useState(BRANDS[0].key);
-  const cardsRef = useRef<HTMLUListElement>(null);
-
-  // 핀(또는 칩) 선택 → active 갱신 + 스와이프 모드면 해당 카드로 스크롤
-  const pick = (key: string) => {
-    setActive(key);
-    if (mode === "swipe") {
-      const idx = BRANDS.findIndex((b) => b.key === key);
-      const el = cardsRef.current?.children[idx] as HTMLElement | undefined;
-      el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-    }
-  };
-
-  const geo = (
+/* 유럽 지도 + 원산지 점(활성 점등). 데스크탑 좌측 sticky 컴패니언용. */
+function GeoMap({ active }: { active: string }) {
+  return (
     <div className="bf-map__geo">
-      <img
-        className="bf-map__europe"
-        src="/europe-map.svg"
-        alt="유럽 원산지 지도"
-      />
+      <img className="bf-map__europe" src="/europe-map.svg" alt="" />
       {MAP_DOTS.map((d) => {
         const b = BRANDS.find((x) => x.key === d.key) ?? BRANDS[0];
         return (
-          <button
+          <span
             key={d.key}
-            type="button"
             className={`bf-dot${d.key === active ? " is-active" : ""}`}
             style={{ left: `${d.x}%`, top: `${d.y}%` }}
-            onMouseEnter={() => setActive(d.key)}
-            onFocus={() => setActive(d.key)}
-            onClick={() => pick(d.key)}
-            aria-label={`${b.name} · ${b.country}`}
           >
             <span className="bf-dot__pin" />
             <span className="bf-dot__label">{b.name}</span>
-          </button>
+          </span>
         );
       })}
       <span className="bf-map__legend">유럽 원산지 → 한국 · 우보 정식 수입</span>
     </div>
   );
-
-  return (
-    <div className="bf-map" data-mode={mode}>
-      <div className="bf-map__modes" role="tablist" aria-label="지도형 표시 방식">
-        {MAP_MODES.map((m) => (
-          <button
-            type="button"
-            key={m.key}
-            className={`bf-map__mode${mode === m.key ? " is-active" : ""}`}
-            onClick={() => setMode(m.key)}
-          >
-            {m.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="bf-map__split">
-          {geo}
-          {mode === "list" ? (
-            <ul className="bf-maplist" aria-label="브랜드 목록">
-              {BRANDS.map((b) => (
-                <li
-                  key={b.key}
-                  className={`bf-maplistitem${b.key === active ? " is-active" : ""}`}
-                >
-                  <span className="bf-maplistitem__img">
-                    {b.img && <img src={b.img} alt="" aria-hidden="true" />}
-                  </span>
-                  <div className="bf-maplistitem__txt">
-                    <span className="bf-country">{b.country}</span>
-                    <b className="bf-mapcard__name">{b.name}</b>
-                    <p className="bf-role">{b.role}</p>
-                    <p className="bf-korea bf-korea--em">{b.korea}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <ul className="bf-mapcards" ref={cardsRef} aria-label="브랜드 목록">
-              {BRANDS.map((b) => (
-                <li
-                  key={b.key}
-                  className={`bf-mapcard${b.key === active ? " is-active" : ""}`}
-                >
-                  <span className="bf-mapcard__img">
-                    {b.img && <img src={b.img} alt="" aria-hidden="true" />}
-                  </span>
-                  <span className="bf-country">{b.country}</span>
-                  <b className="bf-mapcard__name">{b.name}</b>
-                  <p className="bf-role">{b.role}</p>
-                  <p className="bf-korea bf-korea--em">{b.korea}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-    </div>
-  );
 }
 
-/* ---------- showcase: 큰 무드 이미지 히어로 + 썸네일 스트립 ---------- */
-function BrandShowcase() {
-  const [active, setActive] = useState(BRANDS[0].key);
-  const cur = BRANDS.find((b) => b.key === active) ?? BRANDS[0];
-  return (
-    <div className="bf-showcase">
-      <div className="bf-showcase__hero">
-        {cur.img && <img src={cur.img} alt="" aria-hidden="true" />}
-        <div className="bf-showcase__cap">
-          <span className="bf-country">{cur.country}</span>
-          <b className="bf-showcase__name">{cur.name}</b>
-          <p className="bf-role">{cur.role}</p>
-          <p className="bf-korea">{cur.korea}</p>
-        </div>
-      </div>
-      <div className="bf-showcase__thumbs">
-        {BRANDS.map((b) => (
-          <button
-            type="button"
-            key={b.key}
-            className={`bf-thumb${b.key === active ? " is-active" : ""}`}
-            onMouseEnter={() => setActive(b.key)}
-            onFocus={() => setActive(b.key)}
-            onClick={() => setActive(b.key)}
-          >
-            {b.img && <img src={b.img} alt="" aria-hidden="true" />}
-            <span>{b.name}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ---------- bands: 세로 풀폭 밴드(이미지/텍스트 좌우 교차) ---------- */
+/* ---------- 밴드형 + sticky 유럽지도 컴패니언 ----------
+   - 좌우 교차 밴드(reveal-up 슬라이드인 + 헤드라인 노출).
+   - 스크롤하면 뷰포트 중앙에 가장 가까운 밴드가 활성 → 지도의 원산지 점이 점등.
+   - 활성 밴드 이미지에 미세 세로 패럴랙스. reduced-motion 시 전부 정적. */
 function BrandBands() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(BRANDS[0].key);
+
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+    const bands = Array.from(wrap.querySelectorAll<HTMLElement>(".bf-band"));
+    if (!bands.length) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const mid = window.innerHeight / 2;
+      let best = 0;
+      let bestD = Infinity;
+      bands.forEach((b, i) => {
+        const r = b.getBoundingClientRect();
+        const c = r.top + r.height / 2;
+        const d = Math.abs(c - mid);
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+        if (!reduce) {
+          const p = clamp((c - mid) / window.innerHeight, -0.5, 0.5);
+          const img = b.querySelector<HTMLElement>(".bf-band__img img");
+          if (img)
+            img.style.transform = `scale(1.12) translateY(${(p * 4).toFixed(2)}%)`;
+          const wm = b.querySelector<HTMLElement>(".bf-band__wm");
+          if (wm) wm.style.transform = `translateX(${(p * 56).toFixed(1)}px)`;
+        }
+      });
+      const key = BRANDS[best].key;
+      setActive((prev) => (prev === key ? prev : key));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <div className="bf-bands">
-      {BRANDS.map((b, i) => (
-        <div
-          key={b.key}
-          className={`bf-band${i % 2 ? " bf-band--rev" : ""}`}
-        >
-          <span className="bf-band__img">
-            {b.img && <img src={b.img} alt="" aria-hidden="true" />}
-          </span>
-          <div className="bf-band__txt">
-            <span className="bf-country">{b.country}</span>
-            <b className="bf-band__name">{b.name}</b>
-            <p className="bf-role">{b.role}</p>
-            <p className="bf-korea">{b.korea}</p>
-          </div>
-        </div>
-      ))}
+    <div className="bf-bandwrap" ref={wrapRef}>
+      <aside className="bf-geoaside" aria-hidden="true">
+        <GeoMap active={active} />
+      </aside>
+
+      <div className="bf-bands">
+        {BRANDS.map((b, i) => (
+          <article
+            key={b.key}
+            className={`bf-band${i % 2 ? " bf-band--rev" : ""}${
+              b.key === active ? " is-active" : ""
+            }`}
+          >
+            <span className="bf-band__wm" aria-hidden="true">
+              {ORIGIN_EN[b.country] ?? b.country}
+            </span>
+            <span className="bf-band__img reveal-up">
+              {b.img && <img src={b.img} alt="" aria-hidden="true" />}
+            </span>
+            <div className="bf-band__txt reveal-up d1">
+              <span className="bf-band__no">
+                {String(i + 1).padStart(2, "0")} /{" "}
+                {String(BRANDS.length).padStart(2, "0")}
+              </span>
+              <span className="bf-country">{b.country}</span>
+              <b className="bf-band__name">{b.name}</b>
+              <p className="bf-role">{b.role}</p>
+              <p className="bf-korea bf-korea--em">{b.korea}</p>
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }
 
-/* 사장님 선택용 레이아웃 후보 (오른쪽 picker 버튼) */
-const LAYOUTS: { key: string; label: string }[] = [
-  { key: "showcase", label: "쇼케이스" },
-  { key: "map", label: "지도형" },
-  { key: "bands", label: "밴드형" },
-];
-
-/* =========================== [06] 멀티브랜드 수입 (Brands · 레이아웃 선택) =========================== */
-export function BrandsByVariant({ variant }: { variant: string }) {
-  const initial = LAYOUTS.some((l) => l.key === variant) ? variant : "showcase";
-  const [layout, setLayout] = useState(initial);
+/* =========================== [06] 멀티브랜드 수입 (Brands · 밴드형 고정) =========================== */
+export function BrandsByVariant({ variant: _variant }: { variant: string }) {
   return (
     <section
       className="section brandfolio"
@@ -259,33 +206,7 @@ export function BrandsByVariant({ variant }: { variant: string }) {
           우보인터내셔날은 유럽·세계의 프리미엄 부품·소재 브랜드를{" "}
           <strong>한국에 정식으로 수입·공급하는 공식 통로</strong>입니다.
         </p>
-        <div className="bf-stage">
-          <div className="bf-stage__main">
-            {layout === "showcase" ? (
-              <BrandShowcase />
-            ) : layout === "bands" ? (
-              <BrandBands />
-            ) : (
-              <BrandMap />
-            )}
-          </div>
-          <aside className="bf-picker" aria-label="레이아웃 선택">
-            <span className="bf-picker__label">레이아웃 선택</span>
-            {LAYOUTS.map((l) => (
-              <button
-                type="button"
-                key={l.key}
-                className={`bf-picker__btn${layout === l.key ? " is-active" : ""}`}
-                onClick={() => setLayout(l.key)}
-              >
-                {l.label}
-              </button>
-            ))}
-          </aside>
-        </div>
-        <div className="footnote">
-          ※ 로고·브랜드 표기·세부 문구는 클라이언트 확인 후 확정 [TODO].
-        </div>
+        <BrandBands />
       </div>
     </section>
   );

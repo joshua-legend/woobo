@@ -141,21 +141,27 @@
   - alt(캡션): `유럽 정통 제조의 원산지 무드 — 정밀 하드웨어와 소재가 놓인 어두운 작업장 (가안 이미지, 특정 제품 아님)`
 
 ### ACT2 — sole agent 풀블리드 (`public/images/section5/<id>.png`, 풀패널 16:9 · 모바일 4:5)
+> 톤 변경: **밝은 커머셜 광고 무드**로 재생성(기존 다크 시네마틱 폐기). 브랜드 무관·보편·프로페셔널.
+> 연결됨: `trust.tsx` `.s5-sa__bg` 인라인 `background-image`(cover) → `/images/section5/sole-agent-0N.png`. 하단 스크림(`s5-sa__scrim`)이 좌하단 헤드라인 가독성 담당.
+> ⚠️ `sole-agent-06`은 "자체 생산(김포) 작업장" 컷이 아니라 밝은 캐비닛 쇼룸 인테리어 — 무드 약매칭, 추후 작업장 실물컷 교체 권장.
+
 | id | 비율 | intent | 상태 |
 |---|---|---|---|
-| `sole-agent-01` | 16:9 / 4:5 | 한국 독점 에이전트 · 공인 | 후보 |
-| `sole-agent-02` | 16:9 / 4:5 | 정품 보장 · 유사품 차단 | 후보 |
-| `sole-agent-03` | 16:9 / 4:5 | 프리미엄 멀티브랜드 수입 | 후보 |
-| `sole-agent-04` | 16:9 / 4:5 | 가구 하드웨어 전문성 | 후보 |
-| `sole-agent-05` | 16:9 / 4:5 | 전국 쇼룸 직접 체험 | 후보 |
-| `sole-agent-06` | 16:9 / 4:5 | 자체 가구 생산 (김포) | 후보 |
+| `sole-agent-01` | 16:9 / 4:5 | 한국 독점 에이전트 · 공식 통로 | 생성됨(연결) |
+| `sole-agent-02` | 16:9 / 4:5 | 정품 보장 · 유사품 차단 | 생성됨(연결) |
+| `sole-agent-03` | 16:9 / 4:5 | 프리미엄 멀티브랜드 수입 | 생성됨(연결) |
+| `sole-agent-04` | 16:9 / 4:5 | 가구 하드웨어 전문성 | 생성됨(연결) |
+| `sole-agent-05` | 16:9 / 4:5 | 전국 쇼룸 직접 체험 | 생성됨(연결) |
+| `sole-agent-06` | 16:9 / 4:5 | 자체 가구 생산 (김포) ⚠️약매칭 | 생성됨(연결) |
 
-- **`sole-agent-01`** · prompt: `Cinematic dark editorial mood of an official sole-agent channel — a single authenticated pathway, abstract corridor of light over matte metal, deep charcoal, one orange #ff671f rim accent, dark negative space for Korean headline at bottom-left, no text no logo, --ar 16:9` · alt: `한국 독점 에이전트 무드 (가안)`
-- **`sole-agent-02`** · prompt: `Cinematic macro suggesting genuine-part protection, a sealed precision component under cool key light vs blurred imitation behind, deep charcoal, restrained orange #ff671f glint, dark negative space, no text no logo, --ar 16:9` · alt: `정품 보장·유사품 차단 무드 (가안)`
-- **`sole-agent-03`** · prompt: `Cinematic arrangement of premium European furniture hardware and materials from multiple makers, matte metals and fine surfaces, deep charcoal, single orange #ff671f accent, editorial light, dark negative space, no text no logo, --ar 16:9` · alt: `프리미엄 멀티브랜드 수입 무드 (가안)`
-- **`sole-agent-04`** · prompt: `Cinematic close-up of expert hands and machined furniture hardware on a workbench, sense of craft and field knowledge, deep charcoal, one orange #ff671f rim-light, shallow DOF, dark negative space, no text no logo, --ar 16:9` · alt: `가구 하드웨어 전문성 무드 (가안)`
-- **`sole-agent-05`** · prompt: `Cinematic premium showroom interior in low warm light, cabinetry surfaces and shadow, inviting and tactile, deep charcoal palette, single orange #ff671f accent, dark negative space for headline, no text no logo, --ar 16:9` · alt: `전국 쇼룸 직접 체험 무드 (가안)`
-- **`sole-agent-06`** · prompt: `Cinematic mood of an in-house furniture workshop in Gimpo, sawdust light beams, raw and finished pieces, deep charcoal, one orange #ff671f accent, editorial grain, dark negative space, no text no logo, --ar 16:9` · alt: `자체 가구 생산(김포) 무드 (가안)`
+> 공통 스파인(커머셜): `bright premium commercial advertising photography, clean and airy, soft diffused natural daylight, paper-warm #f4f1ec light tones with refined neutral palette, a single subtle warm orange #ff671f accent only (never a fill/area), high production value, crisp and modern, shallow depth of field, uncluttered lower-left area for a Korean headline, no text, no logos, no brand markings, no readable labels, no watermark, --ar 16:9 (모바일 4:5)`
+
+- **`sole-agent-01`** · prompt: `bright modern minimal architectural interior with one clear open pathway of light leading forward — a single official, authorized route, calm and trustworthy` + 공통 스파인 · alt: `공식 통로 — 밝은 커머셜 무드 (가안)`
+- **`sole-agent-02`** · prompt: `a single pristine premium object on a clean minimal pedestal under soft bright studio light, certified quality and authenticity, immaculate` + 공통 스파인 · alt: `정품 보장 — 밝은 커머셜 무드 (가안)`
+- **`sole-agent-03`** · prompt: `a bright editorial lineup of premium furniture materials and finishes — brushed metal, fine wood, matte surfaces on a clean light surface, curated and high-end` + 공통 스파인 · alt: `멀티브랜드 수입 — 밝은 커머셜 무드 (가안)`
+- **`sole-agent-04`** · prompt: `professional hands consulting over a clean bright workbench with refined furniture components and material samples, expert and approachable` + 공통 스파인 · alt: `하드웨어 전문성 — 밝은 커머셜 무드 (가안)`
+- **`sole-agent-05`** · prompt: `a bright, airy modern premium showroom interior in natural daylight, refined cabinetry and clean surfaces, inviting and spacious` + 공통 스파인 · alt: `쇼룸 체험 — 밝은 커머셜 무드 (가안)`
+- **`sole-agent-06`** · prompt: `a bright, clean modern furniture workshop in natural light, organized workbenches with raw and finished pieces, professional craftsmanship` + 공통 스파인 · alt: `자체 생산(김포) — 밝은 커머셜 무드 (가안, ⚠️쇼룸톤·약매칭)`
 
 ### ACT3 — 마무리 (`public/images/section5/closing.png`, 풀패널, 선택)
 | id | 비율 | intent | 상태 |
