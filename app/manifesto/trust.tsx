@@ -275,12 +275,19 @@ function Section5Scroll() {
           __wooboLenis?: { scrollTo: (t: number, o?: object) => void };
         }
       ).__wooboLenis;
-      if (lenis) lenis.scrollTo(y, { duration: 0.55 });
+      // 부드러운 easeInOutCubic + 긴 듀레이션 → 한 단계가 천천히 매끄럽게
+      const ease = (t: number) =>
+        t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const DUR = 1.15;
+      if (lenis) lenis.scrollTo(y, { duration: DUR, easing: ease });
       else window.scrollTo({ top: y, behavior: "smooth" });
       window.clearTimeout(unlockTimer);
-      unlockTimer = window.setTimeout(() => {
-        locked = false;
-      }, 600);
+      unlockTimer = window.setTimeout(
+        () => {
+          locked = false;
+        },
+        DUR * 1000 + 80,
+      );
     };
     window.addEventListener("wheel", onWheel, { passive: false, capture: true });
     return () => {

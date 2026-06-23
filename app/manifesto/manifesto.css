@@ -3112,6 +3112,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Ken Burns 확대/슬라이드 전환 시 가장자리 비침(흰 여백) 방지 */
+  overflow: hidden;
+  background: #000;
 }
 .route-manifesto .s5-label {
   position: absolute;
@@ -3238,6 +3241,8 @@
     #07060300 14px 28px
   );
   background-color: #000;
+  /* 항상 1.04배로 살짝 over-cover → 어떤 전환에서도 가장자리 비침 없음 */
+  transform: scale(1.04);
 }
 .route-manifesto .s5-sa__scrim {
   position: absolute;
@@ -3323,10 +3328,10 @@
 }
 @keyframes s5saKen {
   from {
-    transform: scale(1);
+    transform: scale(1.04);
   }
   to {
-    transform: scale(1.12);
+    transform: scale(1.14);
   }
 }
 /* 노드 레일(고정 오버레이) */
