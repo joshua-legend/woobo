@@ -3195,6 +3195,10 @@
   word-break: keep-all;
 }
 @media (max-width: 900px) {
+  /* 단계마다 충분한 스크롤 거리 → 한 스와이프가 한 단계만 넘도록(스냅과 함께) */
+  .route-manifesto .s5 {
+    height: 900svh;
+  }
   .route-manifesto .s5-kara {
     left: 24px;
     right: 24px;

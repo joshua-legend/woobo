@@ -15,7 +15,8 @@ const setVar = (el: HTMLElement | null, k: string, v: string) => {
 };
 
 /* 진행도 매핑 상수 */
-const A1_DWELL = 0.16; // ACT1 가라오케 채움 구간
+const A1_DWELL = 0.3; // ACT1 가라오케 채움 구간(스크롤 비중 — 모바일서 단계감 위해 확대)
+const ACT1_STEPS = 4; // ACT1 가라오케 스냅 단계 수(여러 번 스와이프해야 다 채워짐)
 const PANELS = 7; // 0=ACT1, 1..6=sole-agent (ACT3 제거 → 바로 섹션6)
 const LAST = PANELS - 1;
 
@@ -28,15 +29,25 @@ const stepped = (s: number) => {
   return i + (f <= STEP_HOLD ? 0 : smooth((f - STEP_HOLD) / (1 - STEP_HOLD)));
 };
 
-// 모바일(coarse)에서 ACT2 각 패널(SA1..6) 중앙으로 스냅 → 한 항목씩 멈춰감.
-// ACT1(가라오케 채움)은 자유 스크럽(스냅 안 함). useScrub 가 coarse 에서만 적용.
-const sceneToP = (k: number) => A1_DWELL + (k / LAST) * (1 - A1_DWELL);
-const snapToPanel = (value: number): number => {
-  const scene =
-    value <= A1_DWELL ? 0 : ((value - A1_DWELL) / (1 - A1_DWELL)) * LAST;
-  if (scene < 0.6) return value;
-  const k = Math.min(LAST, Math.max(1, Math.round(scene)));
-  return sceneToP(k);
+// 모바일(coarse) 스냅 지점 = ACT1 가라오케 단계(ACT1_STEPS) + ACT2 패널(SA1..6) 중앙.
+// 각 지점에서 멈추므로 한 스와이프 = 한 단계로 끊어 진행(useScrub 가 coarse 에서만 적용).
+const SNAP_STOPS: number[] = (() => {
+  const arr: number[] = [];
+  for (let i = 0; i <= ACT1_STEPS; i++) arr.push((i / ACT1_STEPS) * A1_DWELL);
+  for (let k = 1; k <= LAST; k++) arr.push(A1_DWELL + (k / LAST) * (1 - A1_DWELL));
+  return arr;
+})();
+const snapToStop = (value: number): number => {
+  let best = SNAP_STOPS[0];
+  let bd = Infinity;
+  for (const s of SNAP_STOPS) {
+    const d = Math.abs(s - value);
+    if (d < bd) {
+      bd = d;
+      best = s;
+    }
+  }
+  return best;
 };
 
 /* ACT1 가라오케 문구 — 단어가 채워짐. flag=원산지 강조, br=줄바꿈 */
@@ -212,7 +223,7 @@ function Section5Scroll() {
   useScrub(secRef, onUpdate, {
     start: "top top",
     end: "bottom bottom",
-    snap: snapToPanel,
+    snap: snapToStop,
   });
 
   return (
