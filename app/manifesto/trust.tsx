@@ -69,7 +69,7 @@ const syncStopOnEnter = (active: boolean, progress: number) => {
 
 /* ACT1 가라오케 문구 — 단어가 채워짐. flag=원산지 강조, br=줄바꿈 */
 const ACT1_WORDS: { t: string; flag?: string; br?: boolean }[] = [
-  { t: "Made" }, { t: "in" }, { t: "Europe" }, { t: "—", br: true },
+  { t: "Made" }, { t: "in" }, { t: "Europe" }, { t: "—" },
   { t: "authentic" }, { t: "to" }, { t: "the" }, { t: "origin.", br: true },
   { t: "Blum", flag: "🇦🇹" }, { t: "·" }, { t: "AGOFORM", flag: "🇩🇪" },
   { t: "·" }, { t: "Peka", flag: "🇨🇭" }, { t: "·" },
