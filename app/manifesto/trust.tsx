@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   ComposableMap,
   Geographies,
@@ -67,12 +67,24 @@ const FACETS = [
 
 function Act1Karaoke() {
   const n = ACT1_WORDS.length;
+  // 모바일은 세로형 cover라 더 줌아웃해야 유럽이 다 보임
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 900px)");
+    const u = () => setMobile(mq.matches);
+    u();
+    mq.addEventListener("change", u);
+    return () => mq.removeEventListener("change", u);
+  }, []);
   return (
     <>
       <div className="s5-act1map">
         <ComposableMap
           projection="geoMercator"
-          projectionConfig={{ center: [11, 50], scale: 1000 }}
+          projectionConfig={{
+            center: mobile ? [10, 49] : [11, 50],
+            scale: mobile ? 620 : 1000,
+          }}
           width={960}
           height={540}
           className="s5-map"

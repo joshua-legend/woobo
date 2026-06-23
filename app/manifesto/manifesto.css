@@ -2480,7 +2480,8 @@
   margin-top: 14px;
 }
 .route-manifesto .sr-book,
-.route-manifesto .sr-kakao {
+.route-manifesto .sr-kakao,
+.route-manifesto .sr-naver {
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.02em;
@@ -2492,11 +2493,13 @@
   background: var(--c-orange);
   color: #fff;
 }
-.route-manifesto .sr-kakao {
+.route-manifesto .sr-kakao,
+.route-manifesto .sr-naver {
   border: 1px solid var(--c-line-dark);
   color: var(--c-paper-on-dark);
 }
-.route-manifesto .sr-kakao:hover {
+.route-manifesto .sr-kakao:hover,
+.route-manifesto .sr-naver:hover {
   border-color: var(--c-orange);
   color: var(--c-orange);
 }
@@ -2629,6 +2632,75 @@
   border: 1px solid var(--c-line-dark);
   border-radius: 10px;
   background: var(--c-charcoal-card);
+  transition:
+    border-color 0.25s var(--ease),
+    transform 0.25s var(--ease);
+  animation: srCardIn 0.5s var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+.route-manifesto .sr-card:hover {
+  border-color: color-mix(in srgb, var(--c-orange) 50%, var(--c-line-dark));
+  transform: translateY(-3px);
+}
+@keyframes srCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* 지역 필터 칩 */
+.route-manifesto .sr-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: clamp(20px, 3vh, 32px) 0 clamp(16px, 2.5vh, 22px);
+}
+.route-manifesto .sr-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border: 1px solid var(--c-line-dark);
+  border-radius: var(--r-pill);
+  background: var(--c-charcoal-card);
+  color: var(--c-muted-on-dark);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    border-color 0.25s var(--ease),
+    color 0.25s var(--ease),
+    background 0.25s var(--ease);
+}
+.route-manifesto .sr-chip:hover {
+  border-color: var(--c-orange);
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .sr-chip.is-active {
+  border-color: var(--c-orange);
+  background: color-mix(in srgb, var(--c-orange) 14%, var(--c-charcoal-card));
+  color: var(--c-paper-on-dark);
+}
+.route-manifesto .sr-chip__n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--c-muted-on-dark);
+}
+.route-manifesto .sr-chip.is-active .sr-chip__n {
+  color: var(--c-orange);
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-manifesto .sr-card {
+    animation: none;
+  }
+  .route-manifesto .sr-card:hover {
+    transform: none;
+  }
 }
 /* swiper(카드 가로 무한 스와이프 — 드래그/스와이프 + 좌우 화살표) */
 .route-manifesto .sr-swiper {
@@ -3132,9 +3204,9 @@
   .route-manifesto .s5-kara p {
     font: 800 clamp(21px, 5.6vw, 32px) / 1.32 var(--font-sans);
   }
-  /* 모바일: 지도(배경)를 cover 크롭 대신 전체가 중앙에 보이도록 */
+  /* 모바일 지도: 세로 cover로 꽉 채움(상하 검정 띠 제거). 줌아웃은 projection에서 분기 */
   .route-manifesto .s5-map {
-    height: auto;
+    height: 100%;
   }
 }
 /* 단어: --at(인라인 임계값)을 --a1 이 넘으면 점등(흐림→밝음) */
