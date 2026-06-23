@@ -8,6 +8,8 @@ type ScrubOptions = {
   end?: string;
   /** 진행도 스냅 지점(0~1) 또는 스냅 함수. coarse 포인터(모바일)에서만 적용 — 한 비트씩 정렬. */
   snap?: number | number[] | ((value: number) => number);
+  /** 섹션 진입/이탈 토글(스냅 단계 인덱스 동기화 등에 사용). */
+  onToggle?: (active: boolean, progress: number) => void;
 };
 
 /**
@@ -43,6 +45,7 @@ export function useScrub(
         end: opts.end ?? "bottom bottom",
         onUpdate: (self) => onUpdate(self.progress),
         onRefresh: (self) => onUpdate(self.progress),
+        onToggle: (self) => opts.onToggle?.(self.isActive, self.progress),
         snap:
           coarse && opts.snap != null
             ? {
@@ -61,5 +64,5 @@ export function useScrub(
     return () => ctx.revert();
     // onUpdate 는 호출부에서 useCallback 으로 안정화
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref, opts.start, opts.end, opts.snap]);
+  }, [ref, opts.start, opts.end, opts.snap, opts.onToggle]);
 }

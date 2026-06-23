@@ -37,17 +37,34 @@ const SNAP_STOPS: number[] = (() => {
   for (let k = 1; k <= LAST; k++) arr.push(A1_DWELL + (k / LAST) * (1 - A1_DWELL));
   return arr;
 })();
-const snapToStop = (value: number): number => {
-  let best = SNAP_STOPS[0];
+const nearestStopIdx = (value: number): number => {
+  let ni = 0;
   let bd = Infinity;
-  for (const s of SNAP_STOPS) {
-    const d = Math.abs(s - value);
+  for (let i = 0; i < SNAP_STOPS.length; i++) {
+    const d = Math.abs(SNAP_STOPS[i] - value);
     if (d < bd) {
       bd = d;
-      best = s;
+      ni = i;
     }
   }
-  return best;
+  return ni;
+};
+// 마지막 정착 단계 — 한 스와이프에 ±1 단계만 이동(관성으로 멀리 가도 한 단계만)
+let lastStopIdx = 0;
+const snapToStop = (value: number): number => {
+  const ni = nearestStopIdx(value);
+  const next =
+    ni > lastStopIdx
+      ? lastStopIdx + 1
+      : ni < lastStopIdx
+        ? lastStopIdx - 1
+        : lastStopIdx;
+  lastStopIdx = Math.max(0, Math.min(SNAP_STOPS.length - 1, next));
+  return SNAP_STOPS[lastStopIdx];
+};
+// 섹션 진입 시 실제 위치로 동기화(위/아래서 들어와도 점프 방지)
+const syncStopOnEnter = (active: boolean, progress: number) => {
+  if (active) lastStopIdx = nearestStopIdx(progress);
 };
 
 /* ACT1 가라오케 문구 — 단어가 채워짐. flag=원산지 강조, br=줄바꿈 */
@@ -224,6 +241,7 @@ function Section5Scroll() {
     start: "top top",
     end: "bottom bottom",
     snap: snapToStop,
+    onToggle: syncStopOnEnter,
   });
 
   return (
