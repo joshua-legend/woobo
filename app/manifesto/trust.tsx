@@ -49,19 +49,8 @@ const nearestStopIdx = (value: number): number => {
   }
   return ni;
 };
-// 마지막 정착 단계 — 한 스와이프에 ±1 단계만 이동(관성으로 멀리 가도 한 단계만)
+// 데스크탑 휠 페이저용 마지막 정착 단계(모바일 스냅은 GSAP 배열+directional 사용).
 let lastStopIdx = 0;
-const snapToStop = (value: number): number => {
-  const ni = nearestStopIdx(value);
-  const next =
-    ni > lastStopIdx
-      ? lastStopIdx + 1
-      : ni < lastStopIdx
-        ? lastStopIdx - 1
-        : lastStopIdx;
-  lastStopIdx = Math.max(0, Math.min(SNAP_STOPS.length - 1, next));
-  return SNAP_STOPS[lastStopIdx];
-};
 // 섹션 진입 시 실제 위치로 동기화(위/아래서 들어와도 점프 방지)
 const syncStopOnEnter = (active: boolean, progress: number) => {
   if (active) lastStopIdx = nearestStopIdx(progress);
@@ -240,7 +229,7 @@ function Section5Scroll() {
   useScrub(secRef, onUpdate, {
     start: "top top",
     end: "bottom bottom",
-    snap: snapToStop,
+    snap: SNAP_STOPS,
     onToggle: syncStopOnEnter,
   });
 

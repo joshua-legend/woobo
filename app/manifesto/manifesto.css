@@ -389,6 +389,10 @@
   background-position: center;
   opacity: 0;
   transition: opacity 1.3s var(--ease);
+  /* GPU 레이어 승격 → 1.3s 크로스페이드가 메인스레드 페인트 없이 합성됨(모바일 스크롤 멈칫 방지) */
+  transform: translateZ(0);
+  will-change: opacity;
+  backface-visibility: hidden;
 }
 .route-manifesto .hero--slot__bg.is-active {
   opacity: 1;
