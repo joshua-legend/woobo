@@ -2482,6 +2482,7 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 14px;
+  justify-content: center;
 }
 .route-manifesto .sr-book,
 .route-manifesto .sr-kakao,

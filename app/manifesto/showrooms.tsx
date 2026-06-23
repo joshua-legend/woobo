@@ -3,7 +3,6 @@
 import { useCallback, useRef, useState } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
-import { CTA_HREF } from "@/lib/branches";
 
 type Shop = {
   key: string;
@@ -42,9 +41,6 @@ const isKey = (s: Shop) => s.type === "본점" || s.type === "직영 지사";
 function ShopActions({ s }: { s: Shop }) {
   return (
     <div className="sr-acts">
-      <a className="sr-book" href={CTA_HREF.booking}>
-        방문 예약 <span className="arrow">→</span>
-      </a>
       <a
         className="sr-kakao"
         href={kakaoHref(s)}
