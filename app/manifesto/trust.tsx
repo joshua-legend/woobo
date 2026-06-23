@@ -244,6 +244,53 @@ function Section5Scroll() {
     onToggle: syncStopOnEnter,
   });
 
+  // 데스크탑(파인 포인터): 휠 한 번 = 한 단계. Lenis scrollTo 로 다음 STOP 으로 이동(중간 멈춤 없음).
+  // 경계(첫/마지막 단계)에선 가로채지 않아 인접 섹션으로 자연 스크롤.
+  useEffect(() => {
+    const sec = secRef.current;
+    if (!sec) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const LASTSTOP = SNAP_STOPS.length - 1;
+    let locked = false;
+    let unlockTimer = 0;
+    const onWheel = (e: WheelEvent) => {
+      const range = sec.offsetHeight - window.innerHeight;
+      if (range <= 0) return;
+      const topAbs = sec.getBoundingClientRect().top + window.scrollY;
+      const p = (window.scrollY - topAbs) / range;
+      if (p < -0.002 || p > 1.002) return; // 섹션 밖 → 일반 스크롤
+      const dir = e.deltaY > 0 ? 1 : e.deltaY < 0 ? -1 : 0;
+      if (!dir) return;
+      const target = lastStopIdx + dir;
+      if (target < 0 || target > LASTSTOP) return; // 경계 → 인접 섹션으로
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (locked) return;
+      locked = true;
+      lastStopIdx = target;
+      const y = topAbs + SNAP_STOPS[target] * range;
+      const lenis = (
+        window as unknown as {
+          __wooboLenis?: { scrollTo: (t: number, o?: object) => void };
+        }
+      ).__wooboLenis;
+      if (lenis) lenis.scrollTo(y, { duration: 0.55 });
+      else window.scrollTo({ top: y, behavior: "smooth" });
+      window.clearTimeout(unlockTimer);
+      unlockTimer = window.setTimeout(() => {
+        locked = false;
+      }, 600);
+    };
+    window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    return () => {
+      window.removeEventListener("wheel", onWheel, {
+        capture: true,
+      } as EventListenerOptions);
+      window.clearTimeout(unlockTimer);
+    };
+  }, []);
+
   return (
     <section
       className="section s5"

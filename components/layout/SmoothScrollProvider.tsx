@@ -30,6 +30,8 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
 
     // 데스크톱: Lenis 부드러운 휠 스크롤
     const lenis = new Lenis({ lerp: 0.12, smoothWheel: true });
+    // 섹션 단계 페이저(섹션5)에서 lenis.scrollTo 로 한 단계씩 이동하기 위해 노출
+    (window as unknown as { __wooboLenis?: Lenis }).__wooboLenis = lenis;
 
     lenis.on("scroll", ScrollTrigger.update);
 
@@ -39,6 +41,7 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
 
     return () => {
       gsap.ticker.remove(onTick);
+      delete (window as unknown as { __wooboLenis?: Lenis }).__wooboLenis;
       lenis.destroy();
     };
   }, []);
