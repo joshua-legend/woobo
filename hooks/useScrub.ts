@@ -47,9 +47,12 @@ export function useScrub(
           coarse && opts.snap != null
             ? {
                 snapTo: opts.snap,
-                duration: { min: 0.2, max: 0.5 },
-                delay: 0.06,
-                ease: "power1.inOut",
+                duration: { min: 0.18, max: 0.42 },
+                delay: 0.02,
+                ease: "power2.inOut",
+                // 관성 투영 끄기 → 슬라이드 사이 중간에 안 멈추고 가까운 패널로 바로 정렬
+                inertia: false,
+                directional: true,
               }
             : undefined,
       });

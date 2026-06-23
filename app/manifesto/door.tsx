@@ -35,9 +35,6 @@ export function DoorByVariant({ variant: _variant }: { variant: string }) {
                 leftLabel="닫힘"
                 rightLabel="열림"
               />
-              <p className="door__phnote">
-                ※ AI 가안 영상 — 출시 전 Blum 공식 영상으로 교체 [TODO]
-              </p>
             </div>
           </div>
         </div>

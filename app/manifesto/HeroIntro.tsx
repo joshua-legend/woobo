@@ -77,9 +77,21 @@ export function HeroIntro() {
     const prevBody = body.style.overflow;
     html.style.overflow = "hidden";
     body.style.overflow = "hidden";
+    // Lenis/normalizeScroll 는 overflow:hidden 을 우회하므로(JS 가상 스크롤),
+    // 인트로 동안 터치/휠을 window 캡처 단계에서 막아 스크롤 자체를 차단한다.
+    // (안 막으면 스플래시 중 터치 스크롤로 첫 섹션이 넘어간 채로 시작됨)
+    const block = (e: Event) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    const opts: AddEventListenerOptions = { capture: true, passive: false };
+    window.addEventListener("touchmove", block, opts);
+    window.addEventListener("wheel", block, opts);
     return () => {
       html.style.overflow = prevHtml;
       body.style.overflow = prevBody;
+      window.removeEventListener("touchmove", block, opts);
+      window.removeEventListener("wheel", block, opts);
     };
   }, [phase]);
 
